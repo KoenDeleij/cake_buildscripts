@@ -14,11 +14,10 @@
 
     <files>   
 
-         <file src="../build.ps1" target="build.ps1"/>
-         <file src="../build.sh" target="build.sh"/>
-         <file src="../build.cake" target="build.cake"/>
-         <file src="../nuget.config" target="nuget.config"/>
-         <file src="../Models/BuildConfiguration.cake" target="Models/BuildConfiguration.cake"/>
+         <file src="../build.ps1" target="../../build.ps1"/>
+         <file src="../build.sh" target="../../build.sh"/>
+         <file src="../build.cake" target="../../build.cake"/>
+         <file src="../Models/BuildConfiguration.cake" target="../../Models/BuildConfiguration.cake"/>
 
     </files>
 </package>
