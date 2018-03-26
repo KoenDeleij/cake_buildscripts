@@ -47,6 +47,17 @@ Task("NuGetRestore")
    NuGetRestore(buildConfiguration.SolutionFile);
 });
 
+Task("Build")
+    .IsDependentOn("NuGetRestore")
+    .Does(() =>
+{
+    MSBuild (buildConfiguration.SolutionFile, c => {
+		c.Configuration = configuration;
+		c.MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
+        c.MaxCpuCount = 10;
+	});
+});
+
 Task("Default")
     .IsDependentOn("Debug");
 
