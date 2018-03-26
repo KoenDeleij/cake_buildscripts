@@ -27,7 +27,7 @@ else
 fi
 
 # Define default arguments.
-SCRIPT="build.cake"
+SCRIPT="build/Redhotminute.Appollo.Cake.BuildScripts/build.cake"
 CAKE_ARGUMENTS=()
 
 # Parse arguments.
