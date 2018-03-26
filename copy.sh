@@ -1,1 +1,2 @@
-cp -R * ../../
+# cp -R * ../../
+cp build.sh ../../build.sh
