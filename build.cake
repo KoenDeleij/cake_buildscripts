@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 
-BuildConfiguration configuration;
+BuildConfiguration buildConfiguration;
 
 Task("Debug").Does(() => 
 {
@@ -22,8 +22,8 @@ Task("Debug").Does(() =>
         
         var configData = System.IO.File.ReadAllText(filePaths.FullPath, Encoding.UTF8);
 
-        configuration = JsonConvert.DeserializeObject<BuildConfiguration>(configData);
-        Information(Figlet(configuration.MainProjectName));
+        buildConfiguration = JsonConvert.DeserializeObject<BuildConfiguration>(configData);
+        Information(Figlet(buildConfiguration.MainProjectName));
     }
     else
     {
@@ -43,7 +43,7 @@ Task("NuGetRestore")
     .IsDependentOn("Clean")
     .Does(() =>
 {
-   NuGetRestore(configuration.SolutionFile);
+   NuGetRestore(buildConfiguration.SolutionFile);
 });
 
 Task("Default")
