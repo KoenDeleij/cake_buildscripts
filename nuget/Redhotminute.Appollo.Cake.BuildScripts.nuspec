@@ -16,6 +16,7 @@
          <file src="../build.ps1" target=""/>
          <file src="../build.sh" target=""/>
          <file src="../build.cake" target=""/>
+         <file src="../copy.sh" target=""/>
          <file src="../Models/BuildConfiguration.cake" target="Models/BuildConfiguration.cake"/>
 
     </files>
