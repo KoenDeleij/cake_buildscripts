@@ -12,7 +12,7 @@
 
         <contentFiles>
             <!-- Include Assets as Content -->
-            <files include="../build.ps1" buildAction="None" flatten="true" />
+            <files include="../build.ps1" buildAction="None" copyToOutput="false" flatten="true" />
         </contentFiles>
 
     </metadata>
