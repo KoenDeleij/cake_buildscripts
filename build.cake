@@ -33,6 +33,7 @@ Task("Debug").Does(() =>
 });
 
 Task("Clean")
+    .IsDependentOn("Debug")
     .Does(() =>
 {
     CleanDirectories("./**/bin");
