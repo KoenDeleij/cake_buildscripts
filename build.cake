@@ -12,7 +12,7 @@ var configuration = Argument("configuration", "Release");
 
 Task("Debug").Does(() => 
 {
-    FilePath filePaths = File("./build.config");
+    FilePath filePaths = File("../../build.config");
 
     if (FileExists(filePaths.FullPath))
     {
