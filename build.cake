@@ -1,4 +1,5 @@
-#tool nuget:?package=NUnit.ConsoleRunner
+#tool "nuget:?package=JetBrains.dotCover.CommandLineTools"
+#tool "nuget:?package=NUnit.ConsoleRunner"
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
 
 #addin nuget:?package=Cake.CoreCLR
