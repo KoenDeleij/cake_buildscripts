@@ -1,3 +1,6 @@
+#tool nuget:?package=MSBuild.SonarQube.Runner.Tool
+#addin nuget:?package=Cake.Sonar
+
 #tool "nuget:?package=JetBrains.dotCover.CommandLineTools"
 #tool "nuget:?package=NUnit.ConsoleRunner"
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
@@ -35,6 +38,10 @@ Task("Debug").Does(() =>
     }
 });
 
+//////////////////////////////////////////////////////////////////////
+// PREPARING
+//////////////////////////////////////////////////////////////////////
+
 Task("Clean")
     .IsDependentOn("Debug")
     .Does(() =>
@@ -49,6 +56,10 @@ Task("NuGetRestore")
 {
    NuGetRestore(buildConfiguration.SolutionFile);
 });
+
+//////////////////////////////////////////////////////////////////////
+// BUILDING
+//////////////////////////////////////////////////////////////////////
 
 Task("Build")
     .IsDependentOn("NuGetRestore")
@@ -75,6 +86,9 @@ Task("Build-iOS")
 			.WithProperty("TreatWarningsAsErrors", "false"));
 	});
 
+//////////////////////////////////////////////////////////////////////
+// TESTING
+//////////////////////////////////////////////////////////////////////
 
 Task("UnitTest")
     .IsDependentOn("Build")
@@ -117,6 +131,31 @@ Task("UnitTestWithCoverage")
             .WithFilter(string.Format("+:{0}", buildConfiguration.MainProjectName))
             .WithFilter(string.Format("-:{0}.Tests", buildConfiguration.MainProjectName)));
 });
+
+Task("SonarBegin")
+  .Does(() => {
+     SonarBegin(new SonarBeginSettings{
+        Url = "http://rhm-d-dock01.boolhosting.tld:9000/",
+        Login = "5779d7544d436849f9f8afc51c42331def4e700d",
+        Name = string.Format("Appollo-{0}", buildConfiguration.MainProjectName),
+        Version = TFBuild.Environment.Build.Number,
+        Verbose = true
+     });
+  });
+
+Task("SonarEnd")
+  .Does(() => {
+     SonarEnd(new SonarEndSettings{
+        Login = "admin",
+        Password = "admin"
+     });
+  });
+
+Task("Sonar")
+  .IsDependentOn("SonarBegin")
+  .IsDependentOn("UnitTestWithCoverage")
+  .IsDependentOn("SonarEnd");
+
 
 Task("Default")
     .IsDependentOn("Debug");
