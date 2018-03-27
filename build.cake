@@ -77,6 +77,31 @@ Task("UnitTest")
         });
 });
 
+Task("UnitTestWithCoverage")
+    .IsDependentOn("Build")
+    .Does(() =>
+{
+    var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
+    Information(path);
+
+    DotCoverCover((ICakeContext c) => {
+            c.NUnit3(path,
+                new NUnit3Settings {
+                    NoResults = false,
+                    NoHeader = true,
+                    TeamCity = true,
+                    Workers = 5,
+                    Timeout = 10000,
+                    Results = new[] { new NUnit3Result { FileName = "TestResult.xml" } },   
+                }
+            );
+        },
+        parameters.Paths.CoverageResult,
+        new DotCoverCoverSettings()
+            .WithFilter(string.Format("+:{0}", buildConfiguration.MainProjectName))
+            .WithFilter(string.Format("-:{0}.Tests", buildConfiguration.MainProjectName)));
+});
+
 Task("Default")
     .IsDependentOn("Debug");
 
