@@ -62,7 +62,8 @@ Task("Unit-Tests")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    var path = string.Format("{0}/{1}.Tests/**/bin/{2}", parameters.WorkingDirectory, parameters.ProjectName, parameters.Configuration) + "/*.Tests.dll";
+    // var path = string.Format("./**/*.Tests/**/bin/{0}", configuration) + "/*.Tests.dll";
+    var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
     Information(path);
     NUnit3(path, new NUnit3Settings {
             NoResults = true,
