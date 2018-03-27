@@ -72,7 +72,7 @@ Task("Build-iOS")
 			.WithTarget("Build")
 			.WithProperty("Platform", "iPhoneSimulator")
 			.WithProperty("OutputPath", "bin/iPhoneSimulator")
-			.WithProperty("TreatWarningsAsErrors", "false");
+			.WithProperty("TreatWarningsAsErrors", "false"));
 			// .SetVerbosity(Verbosity.Minimal));
 	});
 
