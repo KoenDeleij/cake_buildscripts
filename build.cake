@@ -61,6 +61,22 @@ Task("Build")
 	});
 });
 
+Task("Build-iOS")
+	.IsDependentOn("NuGetRestore")
+	.Does (() =>
+	{
+            var path = "./**/*.iOS/*.csproj";
+
+    		DotNetBuild(path, settings => 
+			settings.SetConfiguration(configuration)   
+			.WithTarget("Build")
+			.WithProperty("Platform", "iPhoneSimulator")
+			.WithProperty("OutputPath", "bin/iPhoneSimulator")
+			.WithProperty("TreatWarningsAsErrors", "false");
+			// .SetVerbosity(Verbosity.Minimal));
+	});
+
+
 Task("UnitTest")
     .IsDependentOn("Build")
     .Does(() =>
