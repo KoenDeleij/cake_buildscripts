@@ -65,15 +65,14 @@ Task("Build-iOS")
 	.IsDependentOn("NuGetRestore")
 	.Does (() =>
 	{
-            var path = "./**/*.iOS/*.csproj";
+            // var path = "./*.iOS/*.csproj";
 
-    		DotNetBuild(path, settings => 
+    		DotNetBuild(buildConfiguration.IOSProjectFile, settings => 
 			settings.SetConfiguration(configuration)   
 			.WithTarget("Build")
 			.WithProperty("Platform", "iPhoneSimulator")
 			.WithProperty("OutputPath", "bin/iPhoneSimulator")
 			.WithProperty("TreatWarningsAsErrors", "false"));
-			// .SetVerbosity(Verbosity.Minimal));
 	});
 
 
