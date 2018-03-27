@@ -1,4 +1,6 @@
 #tool nuget:?package=NUnit.ConsoleRunner
+#tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
+
 #addin nuget:?package=Cake.CoreCLR
 #addin nuget:?package=Cake.Figlet
 #addin nuget:?package=Newtonsoft.Json
