@@ -5,5 +5,7 @@ public class BuildConfiguration
     public string SolutionFile { get; set; }
 
     public string IOSProjectFile { get; set; }
+
+    public string AndroidProjectFile { get; set; }
 }
 

@@ -72,6 +72,17 @@ Task("Build")
 	});
 });
 
+Task("Build-Android")
+	.IsDependentOn("NuGetRestore")
+	.Does(() =>
+	{ 		
+		DotNetBuild(buildConfiguration.AndroidProjectFile, settings =>
+			settings.SetConfiguration(configuration)           
+			.WithProperty("DebugSymbols", "false")
+			.WithProperty("TreatWarningsAsErrors", "false")
+			.SetVerbosity(Verbosity.Minimal));
+    });
+
 Task("Build-iOS")
 	.IsDependentOn("NuGetRestore")
 	.Does (() =>
