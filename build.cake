@@ -58,7 +58,7 @@ Task("Build")
 	});
 });
 
-Task("Unit-Tests")
+Task("UnitTest")
     .IsDependentOn("Build")
     .Does(() =>
 {
