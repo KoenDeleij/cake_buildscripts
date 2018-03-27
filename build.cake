@@ -1,4 +1,4 @@
-// #addin nuget:?package=Cake.Core&version=0.26.1
+#tool nuget:?package=NUnit.ConsoleRunner
 #addin nuget:?package=Cake.CoreCLR
 #addin nuget:?package=Cake.Figlet
 #addin nuget:?package=Newtonsoft.Json
@@ -56,6 +56,21 @@ Task("Build")
 		c.MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
         c.MaxCpuCount = 10;
 	});
+});
+
+Task("Unit-Tests")
+    .IsDependentOn("Build")
+    .Does(() =>
+{
+    var path = string.Format("{0}/{1}.Tests/**/bin/{2}", parameters.WorkingDirectory, parameters.ProjectName, parameters.Configuration) + "/*.Tests.dll";
+    Information(path);
+    NUnit3(path, new NUnit3Settings {
+            NoResults = true,
+            NoHeader = true,
+            TeamCity = true,
+            Workers = 5,
+            Timeout = 10000
+        });
 });
 
 Task("Default")
