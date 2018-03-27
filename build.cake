@@ -68,7 +68,7 @@ Task("UnitTest")
     Information(path);
 
     NUnit3(path, new NUnit3Settings {
-            NoResults = true,
+            NoResults = false,
             NoHeader = true,
             TeamCity = true,
             Workers = 5,
