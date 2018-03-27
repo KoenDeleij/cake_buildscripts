@@ -137,6 +137,7 @@ Task("SonarBegin")
      SonarBegin(new SonarBeginSettings{
         Url = "http://rhm-d-dock01.boolhosting.tld:9000/",
         Login = "5779d7544d436849f9f8afc51c42331def4e700d",
+        Password = "admin",
         Name = string.Format("Appollo-{0}", buildConfiguration.MainProjectName),
         Version = "123",
         Verbose = true
