@@ -96,7 +96,7 @@ Task("UnitTestWithCoverage")
                 }
             );
         },
-        parameters.Paths.CoverageResult,
+        "CoverageResult",
         new DotCoverCoverSettings()
             .WithFilter(string.Format("+:{0}", buildConfiguration.MainProjectName))
             .WithFilter(string.Format("-:{0}.Tests", buildConfiguration.MainProjectName)));
