@@ -64,15 +64,16 @@ Task("UnitTest")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    // var path = string.Format("./**/*.Tests/**/bin/{0}", configuration) + "/*.Tests.dll";
     var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
     Information(path);
+
     NUnit3(path, new NUnit3Settings {
             NoResults = true,
             NoHeader = true,
             TeamCity = true,
             Workers = 5,
-            Timeout = 10000
+            Timeout = 10000,
+            Results = new[] { new NUnit3Result { FileName = "TestResult.xml" } },   
         });
 });
 
