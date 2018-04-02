@@ -123,10 +123,20 @@ Task("PushNugetPackage")
 
         var path = "./*.nupkg";
 
-        NuGetPush(path, new NuGetPushSettings {
-            Source = nugetUrl,
-            ApiKey = nugetApiKey
-        });
+        var files = GetFiles(path);
+        if(files != null)
+        {
+            Information("Uploading " + files[0]);
+            NuGetPush(files[0], new NuGetPushSettings {
+                Source = nugetUrl,
+                ApiKey = nugetApiKey
+            });
+        }
+        else
+        {
+            Information("No .nupkg file found.");
+        }
+
     });
     
 
