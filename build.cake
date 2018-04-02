@@ -105,7 +105,7 @@ Task("Build-iOS")
 
 Task("CreateNugetPackage").Does(() =>
 {
-    NuGetPack("./nuget/Redhotminute.Xamarin.iOS.AnimatedTransitions.nuspec", new NuGetPackSettings());
+    NuGetPack(buildConfiguration.NuSpecFile, new NuGetPackSettings());
 });
     
 
