@@ -103,6 +103,12 @@ Task("Build-iOS")
 			.WithProperty("TreatWarningsAsErrors", "false"));
 	});
 
+Task("CreateNugetPackage").Does(() =>
+{
+    NuGetPack(buildConfiguration.NuSpecFile);
+});
+    
+
 //////////////////////////////////////////////////////////////////////
 // TESTING
 //////////////////////////////////////////////////////////////////////

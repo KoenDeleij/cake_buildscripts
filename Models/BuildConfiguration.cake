@@ -7,5 +7,7 @@ public class BuildConfiguration
     public string IOSProjectFile { get; set; }
 
     public string AndroidProjectFile { get; set; }
+
+    public string NuSpecFile { get; set; }
 }
 
