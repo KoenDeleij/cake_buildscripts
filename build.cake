@@ -110,6 +110,17 @@ Task("CreateNugetPackage")
         Information(buildConfiguration.NuspecFile);
         NuGetPack(buildConfiguration.NuspecFile, new NuGetPackSettings());
     });
+
+Task("PushNugetPackage")
+    .IsDependentOn("CreateNugetPackage")
+    .Does(() =>
+    {
+        var nugetUrl = context.Environment.GetEnvironmentVariable("NugetUrl");
+        var nugetApiKey = context.Environment.GetEnvironmentVariable("NugetApiKey");
+
+        Information(nugetUrl);
+        Information(nugetApiKey);
+    });
     
 
 //////////////////////////////////////////////////////////////////////
