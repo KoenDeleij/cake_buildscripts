@@ -95,11 +95,11 @@ Task("Build-iOS")
 	{
             // var path = "./*.iOS/*.csproj";
 
-    		DotNetBuild(buildConfiguration.IOSProjectFile, settings => 
+    		MSBuild(buildConfiguration.IOSProjectFile, settings => 
 			settings.SetConfiguration(configuration)   
 			.WithTarget("Build")
-			.WithProperty("Platform", "iPhoneSimulator")
-			.WithProperty("OutputPath", "bin/iPhoneSimulator")
+			.WithProperty("Platform", "iPhone")
+			.WithProperty("OutputPath", "bin/iPhone")
 			.WithProperty("TreatWarningsAsErrors", "false"));
 	});
 
