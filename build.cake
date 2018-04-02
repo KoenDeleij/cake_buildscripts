@@ -105,6 +105,7 @@ Task("Build-iOS")
 
 Task("CreateNugetPackage").Does(() =>
 {
+    Information(buildConfiguration.NuSpecFile);
     NuGetPack(buildConfiguration.NuSpecFile, new NuGetPackSettings());
 });
     
