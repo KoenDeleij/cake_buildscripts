@@ -115,8 +115,8 @@ Task("PushNugetPackage")
     .IsDependentOn("CreateNugetPackage")
     .Does(() =>
     {
-        var nugetUrl = context.Environment.GetEnvironmentVariable("NugetUrl");
-        var nugetApiKey = context.Environment.GetEnvironmentVariable("NugetApiKey");
+        var nugetUrl = Environment.GetEnvironmentVariable("NugetUrl");
+        var nugetApiKey = Environment.GetEnvironmentVariable("NugetApiKey");
 
         Information(nugetUrl);
         Information(nugetApiKey);
