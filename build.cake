@@ -120,6 +120,13 @@ Task("PushNugetPackage")
 
         Information(nugetUrl);
         Information(nugetApiKey);
+
+        var path = "./*.nupkg";
+
+        NuGetPush(path, new NuGetPushSettings {
+            Source = nugetUrl,
+            ApiKey = nugetApiKey
+        });
     });
     
 
