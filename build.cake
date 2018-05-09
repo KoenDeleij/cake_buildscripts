@@ -209,6 +209,7 @@ Task("UnitTest")
                 new DotNetCoreTestSettings()
                 {
                     Configuration = configuration,
+                    ArgumentCustomization = args => args.Append("--logger \"trx;LogFileName=TestResults.xml\""),
                     NoBuild = true
                 });
 });
