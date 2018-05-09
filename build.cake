@@ -15,11 +15,17 @@ using Newtonsoft.Json;
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
+// var workingDirectory = Argument("workingdirectory", "./");
 
 BuildConfiguration buildConfiguration;
 
 Task("Debug").Does(() => 
 {
+    var currentDirectory = Environment.CurrentDirectory;
+    Information("Current directory: " + currentDirectory);
+
+    // Information("Working directory: " + workingDirectory);
+
     FilePath filePaths = File("build.config");
 
     if (FileExists(filePaths.FullPath))
@@ -34,8 +40,50 @@ Task("Debug").Does(() =>
     else
     {
         Information("Configuration file does not exists!");
-        Information("Trying to fetch environment vars");
+        Information("Trying to find solution & projects");
+
+        buildConfiguration = new BuildConfiguration();
+
+        var solutionPath = "./**/*.sln";
+        var solutionFiles = GetFiles(solutionPath);
+
+        if(solutionFiles.Any())
+        {
+            buildConfiguration.SolutionFile = solutionFiles.FirstOrDefault().ToString();
+            buildConfiguration.MainProjectName = solutionFiles.FirstOrDefault().GetFilenameWithoutExtension().ToString();
+            Information("Going to use solution: " + solutionFiles.FirstOrDefault());
+        }
+
+        var iosPath = "./**/*iOS*.csproj";
+        var iosFiles = GetFiles(iosPath);
+
+        if(iosFiles.Any())
+        {
+            buildConfiguration.IOSProjectFile = iosFiles.FirstOrDefault().ToString();
+            Information("Going to use iOS project file: " + iosFiles.FirstOrDefault());
+        }
+
+        var droidPath = "./**/*Droid*.csproj";
+        var droidFiles = GetFiles(droidPath);
+
+        if(droidFiles.Any())
+        {
+            buildConfiguration.AndroidProjectFile = droidFiles.FirstOrDefault().ToString();
+            Information("Going to use Droid project file: " + droidFiles.FirstOrDefault());
+        }
+
+        var testPath = "./**/*.Tests.csproj";
+        var testFiles = GetFiles(testPath);
+
+        if(testFiles.Any())
+        {
+            buildConfiguration.TestProjectFile = testFiles.FirstOrDefault().ToString();
+            Information("Going to use Test project file: " + testFiles.FirstOrDefault());
+        }
     }
+
+    // TODO: validate config, should have solution
+    Information(Figlet(buildConfiguration.MainProjectName));
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -54,7 +102,7 @@ Task("NuGetRestore")
     .IsDependentOn("Clean")
     .Does(() =>
 {
-   NuGetRestore(buildConfiguration.SolutionFile);
+    NuGetRestore(buildConfiguration.SolutionFile);
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -93,6 +141,7 @@ Task("Build-iOS")
 	.IsDependentOn("NuGetRestore")
 	.Does (() =>
 	{
+        // TODO: test is iOS project exists
             // var path = "./*.iOS/*.csproj";
 
     		MSBuild(buildConfiguration.IOSProjectFile, settings => 
@@ -143,17 +192,25 @@ Task("UnitTest")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
-    Information(path);
+    // var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
+    // Information(path);
 
-    NUnit3(path, new NUnit3Settings {
-            NoResults = false,
-            NoHeader = true,
-            TeamCity = true,
-            Workers = 5,
-            Timeout = 10000,
-            Results = new[] { new NUnit3Result { FileName = "TestResult.xml" } },   
-        });
+    // NUnit3(path, new NUnit3Settings {
+    //         NoResults = false,
+    //         NoHeader = true,
+    //         TeamCity = true,
+    //         Workers = 5,
+    //         Timeout = 10000,
+    //         Results = new[] { new NUnit3Result { FileName = "TestResult.xml" } },   
+    //     });
+
+    DotNetCoreTest(
+                buildConfiguration.TestProjectFile,
+                new DotNetCoreTestSettings()
+                {
+                    Configuration = configuration,
+                    NoBuild = true
+                });
 });
 
 Task("UnitTestWithCoverage")
