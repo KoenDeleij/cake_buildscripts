@@ -233,11 +233,11 @@ Task("xUnitTestWithCoverage")
     .IsDependentOn("Build")
     .Does(() =>
 {
-        var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
+        // var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
 
 DotCoverCover(tool => {
         tool.DotNetCoreTool(
-            path,
+            buildConfiguration.TestProjectFile,
             "xunit",
             new ProcessArgumentBuilder()
                 .AppendSwitchQuoted("-xml", "result")
