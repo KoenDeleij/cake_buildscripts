@@ -240,14 +240,14 @@ DotCoverCover(tool => {
             path,
             "xunit",
             new ProcessArgumentBuilder()
-                .AppendSwitchQuoted("-xml", string.Format("{0}/tests/{1}.xml", artifacts, testProject.GetFilenameWithoutExtension()))
+                .AppendSwitchQuoted("-xml", "result")
                 .AppendSwitch("-configuration", configuration)
                 .Append("-noshadow"),
             new DotNetCoreToolSettings() {
                 // EnvironmentVariables = GitVersionEnvironmentVariables,
             });
         },
-        artifacts + "/coverage/coverage-"+ testProject.GetFilenameWithoutExtension() + ".dcvr",
+        "result.dcvr",
         new DotCoverCoverSettings() {
                 // TargetWorkingDir = testProject.GetDirectory(),
                 // WorkingDirectory = testProject.GetDirectory(),
