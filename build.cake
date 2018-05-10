@@ -4,7 +4,7 @@
 #tool "nuget:?package=JetBrains.dotCover.CommandLineTools"
 #tool "nuget:?package=NUnit.ConsoleRunner"
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
-#tool "nuget:?package=xunit.runner.console"
+#tool "nuget:?package=xunit.runner.console?version=2.4.0-beta.1.build3958"
 
 #addin nuget:?package=Cake.CoreCLR
 #addin nuget:?package=Cake.Figlet
