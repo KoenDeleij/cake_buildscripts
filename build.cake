@@ -1,7 +1,7 @@
 #tool nuget:?package=MSBuild.SonarQube.Runner.Tool
 #addin nuget:?package=Cake.Sonar
 
-#tool "nuget:?package=JetBrains.dotCover.CommandLineTools&version=2018.1.0"
+#tool "nuget:?package=JetBrains.dotCover.CommandLineTools"
 #tool "nuget:?package=NUnit.ConsoleRunner"
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
 #tool "nuget:?package=xunit.runner.console&version=2.4.0-beta.1.build3958"
@@ -81,7 +81,7 @@ Task("Debug").Does(() =>
             buildConfiguration.TestProjectFile = testFiles.FirstOrDefault().ToString();
             Information("Going to use Test project file: " + buildConfiguration.TestProjectFile);
             buildConfiguration.TestProjectDirectory = testFiles.FirstOrDefault().GetDirectory().ToString();
-            Information("Going to use Test project file: " + buildConfiguration.TestProjectDirectory);
+            Information("Going to use Test project directory: " + buildConfiguration.TestProjectDirectory);
             
         }
     }
@@ -246,6 +246,7 @@ DotCoverCover(tool => {
                 .AppendSwitchQuoted("-xml", "result")
                 .AppendSwitch("-configuration", configuration)
                 .Append("-noshadow"),
+                .Append("-no-build"),
             new DotNetCoreToolSettings() {
                 // EnvironmentVariables = GitVersionEnvironmentVariables,
             });
