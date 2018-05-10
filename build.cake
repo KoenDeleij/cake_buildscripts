@@ -192,18 +192,6 @@ Task("UnitTest")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    // var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
-    // Information(path);
-
-    // NUnit3(path, new NUnit3Settings {
-    //         NoResults = false,
-    //         NoHeader = true,
-    //         TeamCity = true,
-    //         Workers = 5,
-    //         Timeout = 10000,
-    //         Results = new[] { new NUnit3Result { FileName = "TestResult.xml" } },   
-    //     });
-
     DotNetCoreTest(
                 buildConfiguration.TestProjectFile,
                 new DotNetCoreTestSettings()
@@ -214,7 +202,7 @@ Task("UnitTest")
                 });
 });
 
-Task("UnitTestWithCoverage")
+Task("NUnitTestWithCoverage")
     .IsDependentOn("Build")
     .Does(() =>
 {
@@ -239,6 +227,23 @@ Task("UnitTestWithCoverage")
             .WithFilter(string.Format("-:{0}.Tests", buildConfiguration.MainProjectName)));
 });
 
+Task("xUnitTestWithCoverage")
+    .IsDependentOn("Build")
+    .Does(() =>
+{
+        var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
+        DotCoverCover(tool => {
+            tool.XUnit2(path,
+                new XUnit2Settings {
+                    ShadowCopy = false
+                });
+        },
+        new FilePath("./result.dcvr"),
+        new DotCoverCoverSettings()
+            .WithFilter("+:App")
+            .WithFilter("-:App.Tests"));
+});
+
 Task("SonarBegin")
   .Does(() => {
      SonarBegin(new SonarBeginSettings{
@@ -261,7 +266,7 @@ Task("SonarEnd")
 
 Task("Sonar")
   .IsDependentOn("SonarBegin")
-  .IsDependentOn("UnitTestWithCoverage")
+  .IsDependentOn("NUnitTestWithCoverage")
   .IsDependentOn("SonarEnd");
 
 
