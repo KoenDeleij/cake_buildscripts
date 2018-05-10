@@ -12,6 +12,13 @@ bp-jacobd:MonkeyTown jacob.duijzer$ sh ~/Documents/Projecten/Appcell/Redhotminut
 
 https://github.com/OmniSharp/csharp-language-server-protocol/blob/master/build.cake
 
+https://github.com/jzeferino/cake-xamarin-sample/blob/master/build.cake
+
+
+https://ghuntley.com/blog/example-of-xamarin-ios-with-cake
+
+https://github.com/cake-build/cake/issues/1629
+
 ## Nice
 
 

@@ -1,10 +1,12 @@
 #tool nuget:?package=MSBuild.SonarQube.Runner.Tool
 #addin nuget:?package=Cake.Sonar
+#addin nuget:?package=Cake.Xamarin
 
 #tool "nuget:?package=JetBrains.dotCover.CommandLineTools"
 #tool "nuget:?package=NUnit.ConsoleRunner"
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
 #tool "nuget:?package=xunit.runner.console&version=2.4.0-beta.1.build3958"
+
 
 #addin nuget:?package=Cake.CoreCLR
 #addin nuget:?package=Cake.Figlet
@@ -215,22 +217,32 @@ Task("NUnitTestWithCoverage")
     var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
     Information(path);
 
-    DotCoverCover((ICakeContext c) => {
-            c.NUnit3(path,
-                new NUnit3Settings {
-                    NoResults = false,
-                    NoHeader = true,
-                    TeamCity = true,
-                    Workers = 5,
-                    Timeout = 10000,
-                    Results = new[] { new NUnit3Result { FileName = "TestResult.xml" } },   
-                }
-            );
-        },
-        "CoverageResult",
-        new DotCoverCoverSettings()
-            .WithFilter(string.Format("+:{0}.*", buildConfiguration.MainProjectName))
-            .WithFilter(string.Format("-:{0}.Tests", buildConfiguration.MainProjectName)));
+    DotCoverAnalyse((ctx) => {
+        ctx.NUnit3(path);
+    },
+    "coverage.html",
+    new DotCoverAnalyseSettings {
+        ReportType = DotCoverReportType.HTML
+    }
+    .WithFilter(string.Format("+:{0}.*", buildConfiguration.MainProjectName))
+    .WithFilter(string.Format("-:{0}.Tests", buildConfiguration.MainProjectName)));
+
+    // DotCoverCover((ICakeContext c) => {
+    //         c.NUnit3(path,
+    //             new NUnit3Settings {
+    //                 NoResults = false,
+    //                 NoHeader = true,
+    //                 TeamCity = true,
+    //                 Workers = 5,
+    //                 Timeout = 10000,
+    //                 Results = new[] { new NUnit3Result { FileName = "TestResult.xml" } },   
+    //             }
+    //         );
+    //     },
+    //     "CoverageResult",
+    //     new DotCoverCoverSettings()
+    //         .WithFilter(string.Format("+:{0}.*", buildConfiguration.MainProjectName))
+    //         .WithFilter(string.Format("-:{0}.Tests", buildConfiguration.MainProjectName)));
 });
 
 Task("xUnitTestWithCoverage")
