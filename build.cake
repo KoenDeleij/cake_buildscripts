@@ -217,6 +217,8 @@ Task("NUnitTestWithCoverage")
     var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
     Information(path);
 
+    DotNetCorePublish(buildConfiguration.TestProjectFile);
+
     DotCoverAnalyse((ctx) => {
         ctx.NUnit3(path);
     },
