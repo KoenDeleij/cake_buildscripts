@@ -245,7 +245,7 @@ DotCoverCover(tool => {
             new ProcessArgumentBuilder()
                 .AppendSwitchQuoted("-xml", "result")
                 .AppendSwitch("-configuration", configuration)
-                .Append("-noshadow"),
+                .Append("-noshadow")
                 .Append("-no-build"),
             new DotNetCoreToolSettings() {
                 // EnvironmentVariables = GitVersionEnvironmentVariables,
