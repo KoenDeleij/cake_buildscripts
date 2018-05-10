@@ -1,7 +1,7 @@
 #tool nuget:?package=MSBuild.SonarQube.Runner.Tool
 #addin nuget:?package=Cake.Sonar
 
-#tool "nuget:?package=JetBrains.dotCover.CommandLineTools"
+#tool "nuget:?package=JetBrains.dotCover.CommandLineTools&version=2018.1.0"
 #tool "nuget:?package=NUnit.ConsoleRunner"
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
 #tool "nuget:?package=xunit.runner.console&version=2.4.0-beta.1.build3958"
@@ -203,6 +203,7 @@ Task("UnitTest")
                 });
 });
 
+// TODO environ var NUnit / xUnit
 Task("NUnitTestWithCoverage")
     .IsDependentOn("Build")
     .Does(() =>
