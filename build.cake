@@ -106,6 +106,7 @@ Task("NuGetRestore")
     .IsDependentOn("Clean")
     .Does(() =>
 {
+    DotNetCoreRestore(buildConfiguration.SolutionFile);
     NuGetRestore(buildConfiguration.SolutionFile);
 });
 
