@@ -9,6 +9,9 @@ mbp-jacobd:THTForms jacob.duijzer$ sh ~/Documents/Projecten/Appcell/Redhotminute
 
 bp-jacobd:MonkeyTown jacob.duijzer$ sh ~/Documents/Projecten/Appcell/Redhotminute.Appollo.Cake.BuildScripts/build.sh -s ~/Documents/Projecten/Appcell/Redhotminute.Appollo.Cake.BuildScripts/build.cake --target=NugetRestore --workingdirectory=/Users/jacob.duijzer/Documents/Projecten/JacobsBitBuckets/MonkeyTown/
 
+
+https://github.com/OmniSharp/csharp-language-server-protocol/blob/master/build.cake
+
 ## Nice
 
 

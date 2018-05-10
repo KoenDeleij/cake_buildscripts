@@ -234,16 +234,38 @@ Task("xUnitTestWithCoverage")
     .Does(() =>
 {
         var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
-        DotCoverCover(tool => {
-            tool.XUnit2(path,
-                new XUnit2Settings {
-                    ShadowCopy = false
-                });
+
+DotCoverCover(tool => {
+        tool.DotNetCoreTool(
+            path,
+            "xunit",
+            new ProcessArgumentBuilder()
+                .AppendSwitchQuoted("-xml", string.Format("{0}/tests/{1}.xml", artifacts, testProject.GetFilenameWithoutExtension()))
+                .AppendSwitch("-configuration", configuration)
+                .Append("-noshadow"),
+            new DotNetCoreToolSettings() {
+                // EnvironmentVariables = GitVersionEnvironmentVariables,
+            });
         },
-        new FilePath("./result.dcvr"),
-        new DotCoverCoverSettings()
-            .WithFilter("+:App")
-            .WithFilter("-:App.Tests"));
+        artifacts + "/coverage/coverage-"+ testProject.GetFilenameWithoutExtension() + ".dcvr",
+        new DotCoverCoverSettings() {
+                // TargetWorkingDir = testProject.GetDirectory(),
+                // WorkingDirectory = testProject.GetDirectory(),
+                // EnvironmentVariables = GitVersionEnvironmentVariables,
+            }
+            .WithFilter("+:OmniSharp.*")
+    );
+
+        // DotCoverCover(tool => {
+        //     tool.XUnit2(path,
+        //         new XUnit2Settings {
+        //             ShadowCopy = false
+        //         });
+        // },
+        // new FilePath("./result.dcvr"),
+        // new DotCoverCoverSettings()
+        //     .WithFilter("+:App")
+        //     .WithFilter("-:App.Tests"));
 });
 
 Task("SonarBegin")
