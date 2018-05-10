@@ -250,7 +250,7 @@ DotCoverCover(tool => {
         "result.dcvr",
         new DotCoverCoverSettings() {
                 // TargetWorkingDir = testProject.GetDirectory(),
-                // WorkingDirectory = testProject.GetDirectory(),
+                WorkingDirectory = "ValkCadeauCard/ValkCadeauCard/ValkCadeauCard.Tests",
                 // EnvironmentVariables = GitVersionEnvironmentVariables,
             }
             .WithFilter("+:OmniSharp.*")
