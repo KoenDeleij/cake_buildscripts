@@ -79,7 +79,10 @@ Task("Debug").Does(() =>
         if(testFiles.Any())
         {
             buildConfiguration.TestProjectFile = testFiles.FirstOrDefault().ToString();
-            Information("Going to use Test project file: " + testFiles.FirstOrDefault());
+            Information("Going to use Test project file: " + buildConfiguration.TestProjectFile);
+            buildConfiguration.TestProjectDirectory = testFiles.FirstOrDefault().GetDirectory().ToString();
+            Information("Going to use Test project file: " + buildConfiguration.TestProjectDirectory);
+            
         }
     }
 
@@ -237,7 +240,7 @@ Task("xUnitTestWithCoverage")
 
 DotCoverCover(tool => {
         tool.DotNetCoreTool(
-            buildConfiguration.TestProjectFile,
+            buildConfiguration.TestProjectDirectory,
             "xunit",
             new ProcessArgumentBuilder()
                 .AppendSwitchQuoted("-xml", "result")
@@ -249,8 +252,8 @@ DotCoverCover(tool => {
         },
         "result.dcvr",
         new DotCoverCoverSettings() {
-                // TargetWorkingDir = testProject.GetDirectory(),
-                WorkingDirectory = "ValkCadeauCard/ValkCadeauCard/ValkCadeauCard.Tests",
+                TargetWorkingDir = buildConfiguration.TestProjectDirectory,
+                WorkingDirectory = buildConfiguration.TestProjectDirectory,
                 // EnvironmentVariables = GitVersionEnvironmentVariables,
             }
             .WithFilter("+:OmniSharp.*")

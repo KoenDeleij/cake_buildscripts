@@ -8,6 +8,8 @@ public class BuildConfiguration
 
     public string AndroidProjectFile { get; set; }
 
+    public string TestProjectDirectory { get; set; }
+
     public string TestProjectFile { get; set; }
 
     public string NuspecFile { get; set; }
