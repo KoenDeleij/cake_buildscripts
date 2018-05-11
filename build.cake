@@ -340,9 +340,9 @@ Task("SonarBegin")
 
 Task("SonarEnd")
   .Does(() => {
-     SonarEnd(new SonarEndSettings{
-        Login = "admin",
-        Password = "admin"
+     SonarEnd(new SonarEndSettings
+     {
+        
      });
   });
 
