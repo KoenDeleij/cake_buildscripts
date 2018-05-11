@@ -97,7 +97,17 @@ Task("Debug").Does(() =>
 // PREPARING
 //////////////////////////////////////////////////////////////////////
 
+Task("TestSetup")
+    .Does(() => 
+    {
+        CleanDirectory(artifacts + "/tests");
+        CleanDirectory(artifacts + "/coverage");
+        EnsureDirectoryExists(artifacts + "/tests");
+        EnsureDirectoryExists(artifacts + "/coverage");
+    });
+
 Task("Clean")
+    .IsDependentOn("TestSetup")
     .IsDependentOn("Debug")
     .Does(() =>
 {
