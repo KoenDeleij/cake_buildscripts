@@ -24,6 +24,14 @@ var artifacts = new DirectoryPath("./artifacts").MakeAbsolute(Context.Environmen
 BuildConfiguration buildConfiguration;
 
 //////////////////////////////////////////////////////////////////////
+// Criteria
+//////////////////////////////////////////////////////////////////////
+
+Func<bool> HasIOSPropjectFile => () => !string.IsNullOrEmpty(buildConfiguration.IOSProjectFile);
+
+Func<bool> HasDroidPropjectFile => () => !string.IsNullOrEmpty(buildConfiguration.AndroidProjectFile);
+
+//////////////////////////////////////////////////////////////////////
 // PREPARING
 //////////////////////////////////////////////////////////////////////
 
@@ -155,6 +163,7 @@ Task("Build")
 });
 
 Task("Build-Android")
+    .WithCriteria(HasDroidPropjectFile)
 	.IsDependentOn("NuGetRestore")
 	.Does(() =>
 { 		
@@ -172,6 +181,7 @@ Task("Build-Android")
 });
 
 Task("Build-iOS")
+    .WithCriteria(HasIOSPropjectFile)
 	.IsDependentOn("NuGetRestore")
 	.Does (() =>
 	{
@@ -290,7 +300,7 @@ Task("xUnitTestWithCoverage")
                 // EnvironmentVariables = GitVersionEnvironmentVariables,
             });
         },
-        "coverage.dcvr",
+        artifacts + "/coverage/coverage.dcvr",
         new DotCoverCoverSettings() {
                 TargetWorkingDir = buildConfiguration.TestProjectDirectory,
                 WorkingDirectory = buildConfiguration.TestProjectDirectory,
