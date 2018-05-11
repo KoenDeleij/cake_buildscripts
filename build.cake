@@ -160,6 +160,10 @@ Task("Build")
 	});
 });
 
+//////////////////////////////////////////////////////////////////////
+// BUILDING ANDROID
+//////////////////////////////////////////////////////////////////////
+
 Task("Build-Android")
     .WithCriteria(HasDroidPropjectFile)
 	.IsDependentOn("NuGetRestore")
@@ -178,7 +182,12 @@ Task("Build-Android")
 		// 	.SetVerbosity(Verbosity.Minimal));
 });
 
+//////////////////////////////////////////////////////////////////////
+// BUILDING iOS
+//////////////////////////////////////////////////////////////////////
+
 Task("Build-iOS")
+    .WithCriteria(IsRunningOnUnix())
     .WithCriteria(HasIOSPropjectFile)
 	.IsDependentOn("NuGetRestore")
 	.Does (() =>
@@ -191,8 +200,13 @@ Task("Build-iOS")
 			.WithTarget("Build")
 			.WithProperty("Platform", "iPhone")
 			.WithProperty("OutputPath", "bin/iPhone")
+            .WithProperty("BuildIpa", "true")
 			.WithProperty("TreatWarningsAsErrors", "false"));
 	});
+
+//////////////////////////////////////////////////////////////////////
+// ETC
+//////////////////////////////////////////////////////////////////////
 
 Task("CreateNugetPackage")
     .Does(() =>
@@ -262,23 +276,6 @@ Task("NUnitTestWithCoverage")
     }
     .WithFilter(string.Format("+:{0}.*", buildConfiguration.MainProjectName))
     .WithFilter(string.Format("-:{0}.Tests", buildConfiguration.MainProjectName)));
-
-    // DotCoverCover((ICakeContext c) => {
-    //         c.NUnit3(path,
-    //             new NUnit3Settings {
-    //                 NoResults = false,
-    //                 NoHeader = true,
-    //                 TeamCity = true,
-    //                 Workers = 5,
-    //                 Timeout = 10000,
-    //                 Results = new[] { new NUnit3Result { FileName = "TestResult.xml" } },   
-    //             }
-    //         );
-    //     },
-    //     "CoverageResult",
-    //     new DotCoverCoverSettings()
-    //         .WithFilter(string.Format("+:{0}.*", buildConfiguration.MainProjectName))
-    //         .WithFilter(string.Format("-:{0}.Tests", buildConfiguration.MainProjectName)));
 });
 
 Task("xUnitTestWithCoverage")
