@@ -10,6 +10,7 @@
 #addin "nuget:?package=Cake.Sonar"
 #addin "nuget:?package=Cake.Xamarin"
 #addin "nuget:?package=Cake.AppCenter"
+#addin "nuget:?package=Cake.Tfs.Build.Variables"
 
 #load "./models/BuildConfiguration.cake"
 #load "./models/AppCenterSettings.cake"
@@ -186,23 +187,48 @@ Task("Build")
 // BUILDING ANDROID
 //////////////////////////////////////////////////////////////////////
 
-Task("Build-Android")
+Task("Build-Droid")
     .WithCriteria(HasDroidPropjectFile)
 	.IsDependentOn("NuGetRestore")
 	.Does(() =>
 { 		
-        MSBuild (buildConfiguration.AndroidProjectFile, c => 
-        {
-		    c.Configuration = configuration;
-		    c.MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
-            c.MaxCpuCount = 10;
-	    });
-		// DotNetBuild(buildConfiguration.AndroidProjectFile, settings =>
-		// 	settings.SetConfiguration(configuration)           
-		// 	.WithProperty("DebugSymbols", "false")
-		// 	.WithProperty("TreatWarningsAsErrors", "false")
-		// 	.SetVerbosity(Verbosity.Minimal));
+        var file = BuildAndroidApk(buildConfiguration.AndroidProjectFile);
+        Information(file.ToString());
 });
+
+Task("AppCenterRelease-Droid")
+    .IsDependentOn("Build-Droid")
+    .IsDependentOn("AppCenterSettings")
+    .IsDependentOn("AppCenterLogin")
+    .WithCriteria(() => appCenterSettings.IsValidForDistribution)
+    .Does(() =>
+    {
+        //https://cakebuild.net/api/Cake.AppCenter/
+        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ appcenter apps set-current CakeTestApp/CakeTestApp-Dev
+        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ appcenter distribute release -f CakeTestApp.iOS/bin/iPhone/CakeTestApp.iOS.ipa -g Collaborators
+        // Error: binary file 'CakeTestApp.iOS/bin/iPhone/CakeTestApp.iOS.ipa' doesn't exist
+        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ ls CakeTestApp
+        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ appcenter distribute release -f CakeTestApp/CakeTestApp.iOS/bin/iPhone/CakeTestApp.iOS.ipa -g Collaborators
+
+        var apkFilePattern = "./**/*.apk";
+        var foundApkFiles = GetFiles(apkFilePattern);
+
+        if(foundApkFiles.Any())
+        {
+            AppCenterDistributeRelease(
+                new AppCenterDistributeReleaseSettings() 
+                { 
+                    App = appCenterSettings.Owner + "/" + appCenterSettings.AppName, 
+                    File = foundApkFiles.FirstOrDefault().ToString(),
+                    Group = appCenterSettings.DistributionGroup
+                });
+        }
+    })
+    .Finally(() =>
+    {  
+        // TODO: move to settings
+        AppCenterLogout(new AppCenterLogoutSettings { Token = "8600137f6b1b07c5e1a4d7792da999249631e148" });
+    });
 
 //////////////////////////////////////////////////////////////////////
 // BUILDING iOS
@@ -214,14 +240,14 @@ Task("Build-iOS")
 	.IsDependentOn("NuGetRestore")
 	.Does (() =>
 	{
-        // dotnetbuild?
+        // TODO: BuildiOSIpa (Cake.Xamarin, https://github.com/Redth/Cake.Xamarin/blob/master/src/Cake.Xamarin/Aliases.cs)
         MSBuild(buildConfiguration.IOSProjectFile, settings => 
-        settings.SetConfiguration(configuration)   
-        .WithTarget("Build")
-        .WithProperty("Platform", "iPhone")
-        .WithProperty("OutputPath", "bin/iPhone")
-        .WithProperty("BuildIpa", "true")
-        .WithProperty("TreatWarningsAsErrors", "false"));
+            settings.SetConfiguration(configuration)   
+            .WithTarget("Build")
+            .WithProperty("Platform", "iPhone")
+            .WithProperty("OutputPath", "bin/iPhone")
+            .WithProperty("BuildIpa", "true")
+            .WithProperty("TreatWarningsAsErrors", "false"));
 	});
 
 Task("AppCenterRelease-iOS")
@@ -258,8 +284,6 @@ Task("AppCenterRelease-iOS")
         AppCenterLogout(new AppCenterLogoutSettings { Token = "8600137f6b1b07c5e1a4d7792da999249631e148" });
     });
 
-// npm install -g appcenter-cli
-
 //////////////////////////////////////////////////////////////////////
 // AppCenter Tasks]
 //
@@ -271,7 +295,7 @@ Task("AppCenterSettings")
     .Does(() => 
     {
         appCenterSettings = new AppCenterSettings();
-        appCenterSettings.Owner = EnvironmentVariable("appcenter_owner") ?? Argument("appcenter_owner", string.Empty);
+        appCenterSettings.Owner = EvaluateTfsBuildVariable("appcenter_owner", EnvironmentVariable("appcenter_owner") ?? Argument("appcenter_owner", string.Empty));
         appCenterSettings.AppName = EnvironmentVariable("appcenter_appname") ?? Argument("appcenter_appname", string.Empty);
         appCenterSettings.DistributionGroup = EnvironmentVariable("appcenter_distributiongroup") ?? Argument("appcenter_distributiongroup", string.Empty);
 

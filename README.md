@@ -19,9 +19,14 @@ https://ghuntley.com/blog/example-of-xamarin-ios-with-cake
 
 https://github.com/cake-build/cake/issues/1629
 
+# Good Xamarin examples
+
+https://github.com/ghuntley/appstore-automation-with-fastlane/blob/master/build.cake
+
 ## Nice
 
+## iOS TEST BUILD & UPLOAD
+./build.sh --target=AppCenterRelease-iOS --configuration=Debug --appcenter_owner=CakeTestApp --appcenter_appname=CakeTestApp-Dev --appcenter_distributiongroup=Collaborator
 
-Good readme!
-
-curl https://repository.redhotminute.com/repository/raw-rhm-mobile/cake/cakebuild-latest.tar.gz | tar -xzv
+## ANDROID TEST BUILD & UPLOAD
+./build.sh --target=AppCenterRelease-Droid --configuration=Debug --appcenter_owner=CakeTestApp --appcenter_appname=CakeTestApp-Dev-1 --appcenter_distributiongroup=Collaborator
