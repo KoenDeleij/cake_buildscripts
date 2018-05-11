@@ -12,6 +12,7 @@
 #addin "nuget:?package=Cake.AppCenter"
 
 #load "./models/BuildConfiguration.cake"
+#load "./models/AppCenterSettings.cake"
 
 using Newtonsoft.Json;
 
@@ -21,6 +22,7 @@ var configuration = Argument("configuration", "Release");
 var artifacts = new DirectoryPath("./artifacts").MakeAbsolute(Context.Environment);
 
 BuildConfiguration buildConfiguration;
+AppCenterSettings appCenterSettings;
 
 //////////////////////////////////////////////////////////////////////
 // Criteria
@@ -82,6 +84,16 @@ Setup(context =>
         {
             buildConfiguration.AndroidProjectFile = droidFiles.FirstOrDefault().ToString();
         }
+        else
+        {
+            droidPath = "./**/*Android*.csproj";
+            droidFiles = GetFiles(droidPath);
+
+            if(droidFiles.Any())
+            {
+                buildConfiguration.AndroidProjectFile = droidFiles.FirstOrDefault().ToString();
+            }
+        }
 
         var testPath = "./**/*.Tests.csproj";
         var testFiles = GetFiles(testPath);
@@ -121,6 +133,8 @@ Setup(context =>
         Information("Test project: NOT FOUND!");
         Information("Test project directory: NOT FOUND!");
     }
+
+    Information("Build configuration: " + configuration);
     
     EnsureDirectoryExists(artifacts);
     EnsureDirectoryExists(artifacts + "/tests");
@@ -141,10 +155,17 @@ Task("Clean")
 Task("NuGetRestore")
     .IsDependentOn("Clean")
     .Does(() =>
-{
-    NuGetRestore(buildConfiguration.SolutionFile);
-    DotNetCoreRestore(buildConfiguration.SolutionFile);
-});
+    {
+        NuGetRestore(buildConfiguration.SolutionFile);
+
+        DotNetCoreRestore(buildConfiguration.SolutionFile);
+    })
+    .OnError(exception =>
+    {
+        Information("Possible errors with restoring packages");
+        Information(exception);
+    });
+
 
 //////////////////////////////////////////////////////////////////////
 // BUILDING
@@ -193,9 +214,7 @@ Task("Build-iOS")
 	.IsDependentOn("NuGetRestore")
 	.Does (() =>
 	{
-        // TODO: test is iOS project exists
-        // var path = "./*.iOS/*.csproj";
-
+        // dotnetbuild?
         MSBuild(buildConfiguration.IOSProjectFile, settings => 
         settings.SetConfiguration(configuration)   
         .WithTarget("Build")
@@ -207,14 +226,75 @@ Task("Build-iOS")
 
 Task("AppCenterRelease-iOS")
     .IsDependentOn("Build-iOS")
+    .IsDependentOn("AppCenterSettings")
+    .IsDependentOn("AppCenterLogin")
+    .WithCriteria(() => appCenterSettings.IsValidForDistribution)
     .Does(() =>
     {
-        MobileCenterLogin(new MobileCenterLoginSettings { Token = "8600137f6b1b07c5e1a4d7792da999249631e148" });
+        //https://cakebuild.net/api/Cake.AppCenter/
+        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ appcenter apps set-current CakeTestApp/CakeTestApp-Dev
+        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ appcenter distribute release -f CakeTestApp.iOS/bin/iPhone/CakeTestApp.iOS.ipa -g Collaborators
+        // Error: binary file 'CakeTestApp.iOS/bin/iPhone/CakeTestApp.iOS.ipa' doesn't exist
+        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ ls CakeTestApp
+        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ appcenter distribute release -f CakeTestApp/CakeTestApp.iOS/bin/iPhone/CakeTestApp.iOS.ipa -g Collaborators
+
+        var ipaFilePattern = "./**/*iOS*.ipa";
+        var foundIpaFiles = GetFiles(ipaFilePattern);
+
+        if(foundIpaFiles.Any())
+        {
+            AppCenterDistributeRelease(
+                new AppCenterDistributeReleaseSettings() 
+                { 
+                    App = appCenterSettings.Owner + "/" + appCenterSettings.AppName, 
+                    File = foundIpaFiles.FirstOrDefault().ToString(),
+                    Group = appCenterSettings.DistributionGroup
+                });
+        }
     })
     .Finally(() =>
     {  
-        MobileCenterLogout(new MobileCenterLoginSettings { Token = "8600137f6b1b07c5e1a4d7792da999249631e148" });
+        // TODO: move to settings
+        AppCenterLogout(new AppCenterLogoutSettings { Token = "8600137f6b1b07c5e1a4d7792da999249631e148" });
     });
+
+// npm install -g appcenter-cli
+
+//////////////////////////////////////////////////////////////////////
+// AppCenter Tasks]
+//
+// Make sure the appcenter cli tools are installed
+//
+//////////////////////////////////////////////////////////////////////
+
+Task("AppCenterSettings")
+    .Does(() => 
+    {
+        appCenterSettings = new AppCenterSettings();
+        appCenterSettings.Owner = EnvironmentVariable("appcenter_owner") ?? Argument("appcenter_owner", string.Empty);
+        appCenterSettings.AppName = EnvironmentVariable("appcenter_appname") ?? Argument("appcenter_appname", string.Empty);
+        appCenterSettings.DistributionGroup = EnvironmentVariable("appcenter_distributiongroup") ?? Argument("appcenter_distributiongroup", string.Empty);
+
+        Information("Owner: " + appCenterSettings.Owner);
+        Information("AppName: " + appCenterSettings.AppName);
+        Information("DistributionGroup: " + appCenterSettings.DistributionGroup);
+        Information("ValidForDistribution: " + appCenterSettings.IsValidForDistribution);
+    });
+
+Task("AppCenterLogin")
+    .Does(() => 
+    {
+        // TODO: move to settings
+        AppCenterLogin(new AppCenterLoginSettings { Token = "8600137f6b1b07c5e1a4d7792da999249631e148" });
+    })
+    .OnError(exception =>
+    {
+        Information(exception);
+
+        Information("Make sure the appcenter cli tools are installed!");
+        Information("npm install -g appcenter-cli");
+    });
+
 
 //////////////////////////////////////////////////////////////////////
 // ETC
