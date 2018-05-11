@@ -144,7 +144,6 @@ Task("NuGetRestore")
     .Does(() =>
 {
     DotNetCoreRestore(buildConfiguration.SolutionFile);
-    NuGetRestore(buildConfiguration.SolutionFile);
 });
 
 //////////////////////////////////////////////////////////////////////
