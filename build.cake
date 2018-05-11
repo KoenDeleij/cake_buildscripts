@@ -19,6 +19,8 @@ using Newtonsoft.Json;
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 
+var artifacts = new DirectoryPath("./artifacts").MakeAbsolute(Context.Environment);
+
 BuildConfiguration buildConfiguration;
 
 Task("Debug").Does(() => 
@@ -250,14 +252,12 @@ Task("xUnitTestWithCoverage")
     .IsDependentOn("Build")
     .Does(() =>
 {
-        // var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
-
-DotCoverCover(tool => {
+    DotCoverCover(tool => {
         tool.DotNetCoreTool(
             buildConfiguration.TestProjectDirectory,
             "xunit",
             new ProcessArgumentBuilder()
-                .AppendSwitchQuoted("-xml", "result.xml")
+                .AppendSwitchQuoted("-xml", artifacts + "/tests/results.xml")
                 .AppendSwitch("-configuration", configuration)
                 .Append("-noshadow")
                 .Append("-nobuild"),
@@ -274,25 +274,22 @@ DotCoverCover(tool => {
             .WithFilter("+:" + buildConfiguration.MainProjectName + ".*")
             .WithFilter("-:" + buildConfiguration.MainProjectName + ".Tests*")
     );
-
-        // DotCoverCover(tool => {
-        //     tool.XUnit2(path,
-        //         new XUnit2Settings {
-        //             ShadowCopy = false
-        //         });
-        // },
-        // new FilePath("./result.dcvr"),
-        // new DotCoverCoverSettings()
-        //     .WithFilter("+:App")
-        //     .WithFilter("-:App.Tests"));
 })
 .Finally(() => 
 {
     DotCoverReport(
-        "coverage.dcvr",
+        artifacts + "/coverage/coverage.dcvr",
         new FilePath("coverage.xml"),
         new DotCoverReportSettings {
             ReportType = DotCoverReportType.DetailedXML
+        }
+    );
+
+    DotCoverReport(
+        artifacts + "/coverage/coverage.dcvr",
+        new FilePath(coverage.html"),
+        new DotCoverReportSettings {
+            ReportType = DotCoverReportType.HTML
         }
     );
 });
