@@ -297,7 +297,7 @@ Task("xUnitTestWithCoverage")
 
     DotCoverReport(
         artifacts + "/coverage/coverage.dcvr",
-        new FilePath(coverage.html"),
+        new FilePath(artifacts + "/coverage/coverage.html"),
         new DotCoverReportSettings {
             ReportType = DotCoverReportType.HTML
         }
