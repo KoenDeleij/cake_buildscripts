@@ -265,7 +265,7 @@ DotCoverCover(tool => {
                 // EnvironmentVariables = GitVersionEnvironmentVariables,
             });
         },
-        "result.dcvr",
+        "coverage.dcvr",
         new DotCoverCoverSettings() {
                 TargetWorkingDir = buildConfiguration.TestProjectDirectory,
                 WorkingDirectory = buildConfiguration.TestProjectDirectory,
@@ -285,6 +285,16 @@ DotCoverCover(tool => {
         // new DotCoverCoverSettings()
         //     .WithFilter("+:App")
         //     .WithFilter("-:App.Tests"));
+})
+.Finally(() => 
+{
+    DotCoverReport(
+        "coverage.dcvr",
+        new FilePath("coverage.xml"),
+        new DotCoverReportSettings {
+            ReportType = DotCoverReportType.DetailedXML
+        }
+    );
 });
 
 Task("SonarBegin")
