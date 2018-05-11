@@ -23,28 +23,31 @@ var artifacts = new DirectoryPath("./artifacts").MakeAbsolute(Context.Environmen
 
 BuildConfiguration buildConfiguration;
 
-Task("Debug").Does(() => 
+//////////////////////////////////////////////////////////////////////
+// PREPARING
+//////////////////////////////////////////////////////////////////////
+
+Setup(context =>
 {
+    // Read config or find projects
     var currentDirectory = Environment.CurrentDirectory;
     Information("Current directory: " + currentDirectory);
-
-    // Information("Working directory: " + workingDirectory);
 
     FilePath filePaths = File("build.config");
 
     if (FileExists(filePaths.FullPath))
     {
-        Information("File exists!");
+        // TODO: find out if using cake.config is better
+        Information("Using configuration file (build.config)");
         
         var configData = System.IO.File.ReadAllText(filePaths.FullPath, Encoding.UTF8);
 
         buildConfiguration = JsonConvert.DeserializeObject<BuildConfiguration>(configData);
-        Information(Figlet(buildConfiguration.MainProjectName));
     }
     else
     {
-        Information("Configuration file does not exists!");
-        Information("Trying to find solution & projects");
+        Information("Configuration file does not exists (build.config).");
+        Information("Trying to find solution & projects.");
 
         buildConfiguration = new BuildConfiguration();
 
@@ -55,7 +58,6 @@ Task("Debug").Does(() =>
         {
             buildConfiguration.SolutionFile = solutionFiles.FirstOrDefault().ToString();
             buildConfiguration.MainProjectName = solutionFiles.FirstOrDefault().GetFilenameWithoutExtension().ToString();
-            Information("Going to use solution: " + solutionFiles.FirstOrDefault());
         }
 
         var iosPath = "./**/*iOS*.csproj";
@@ -64,7 +66,6 @@ Task("Debug").Does(() =>
         if(iosFiles.Any())
         {
             buildConfiguration.IOSProjectFile = iosFiles.FirstOrDefault().ToString();
-            Information("Going to use iOS project file: " + iosFiles.FirstOrDefault());
         }
 
         var droidPath = "./**/*Droid*.csproj";
@@ -73,7 +74,6 @@ Task("Debug").Does(() =>
         if(droidFiles.Any())
         {
             buildConfiguration.AndroidProjectFile = droidFiles.FirstOrDefault().ToString();
-            Information("Going to use Droid project file: " + droidFiles.FirstOrDefault());
         }
 
         var testPath = "./**/*.Tests.csproj";
@@ -82,35 +82,51 @@ Task("Debug").Does(() =>
         if(testFiles.Any())
         {
             buildConfiguration.TestProjectFile = testFiles.FirstOrDefault().ToString();
-            Information("Going to use Test project file: " + buildConfiguration.TestProjectFile);
             buildConfiguration.TestProjectDirectory = testFiles.FirstOrDefault().GetDirectory().ToString();
-            Information("Going to use Test project directory: " + buildConfiguration.TestProjectDirectory);
-            
         }
     }
 
     // TODO: validate config, should have solution
     Information(Figlet(buildConfiguration.MainProjectName));
+
+    if(string.IsNullOrEmpty(buildConfiguration.SolutionFile))
+        throw new Exception("Cannot start without solution file.");
+
+    Information("Solution: " + buildConfiguration.SolutionFile);
+
+    if(!string.IsNullOrEmpty(buildConfiguration.IOSProjectFile))
+        Information("iOS project: " + buildConfiguration.IOSProjectFile);
+    else
+        Information("iOS project: NOT FOUND!");
+
+    if(!string.IsNullOrEmpty(buildConfiguration.AndroidProjectFile))
+        Information("Droid project: " + buildConfiguration.AndroidProjectFile);
+    else
+        Information("Droid project: NOT FOUND!");
+
+    if(!string.IsNullOrEmpty(buildConfiguration.TestProjectFile))
+    {
+        Information("Test project: " + buildConfiguration.TestProjectFile);
+        Information("Test project directory: " + buildConfiguration.TestProjectDirectory);
+    }
+    else
+    {
+        Information("Test project: NOT FOUND!");
+        Information("Test project directory: NOT FOUND!");
+    }
+    
+    EnsureDirectoryExists(artifacts);
+    EnsureDirectoryExists(artifacts + "/tests");
+    EnsureDirectoryExists(artifacts + "/coverage");
 });
 
-//////////////////////////////////////////////////////////////////////
-// PREPARING
-//////////////////////////////////////////////////////////////////////
-
-Task("TestSetup")
-    .Does(() => 
-    {
-        CleanDirectory(artifacts + "/tests");
-        CleanDirectory(artifacts + "/coverage");
-        EnsureDirectoryExists(artifacts + "/tests");
-        EnsureDirectoryExists(artifacts + "/coverage");
-    });
 
 Task("Clean")
-    .IsDependentOn("TestSetup")
-    .IsDependentOn("Debug")
     .Does(() =>
 {
+    CleanDirectory(artifacts);
+    CleanDirectory(artifacts + "/tests");
+    CleanDirectory(artifacts + "/coverage");
     CleanDirectories("./**/bin");
     CleanDirectories("./**/obj");
 });
@@ -171,7 +187,6 @@ Task("Build-iOS")
 	});
 
 Task("CreateNugetPackage")
-    .IsDependentOn("Debug")
     .Does(() =>
     {
         Information(buildConfiguration.NuspecFile);
@@ -328,10 +343,6 @@ Task("Sonar")
   .IsDependentOn("SonarBegin")
   .IsDependentOn("NUnitTestWithCoverage")
   .IsDependentOn("SonarEnd");
-
-
-Task("Default")
-    .IsDependentOn("Debug");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
