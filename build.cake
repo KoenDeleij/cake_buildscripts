@@ -1,16 +1,14 @@
-#tool nuget:?package=MSBuild.SonarQube.Runner.Tool
-#addin nuget:?package=Cake.Sonar
-#addin nuget:?package=Cake.Xamarin
-
+#tool "nuget:?package=MSBuild.SonarQube.Runner.Tool"
 #tool "nuget:?package=JetBrains.dotCover.CommandLineTools"
 #tool "nuget:?package=NUnit.ConsoleRunner"
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
-#tool "nuget:?package=xunit.runner.console&version=2.4.0-beta.1.build3958"
-
+#tool "nuget:?package=xunit.runner.console"
 
 #addin nuget:?package=Cake.CoreCLR
 #addin nuget:?package=Cake.Figlet
 #addin nuget:?package=Newtonsoft.Json
+#addin nuget:?package=Cake.Sonar
+#addin nuget:?package=Cake.Xamarin
 
 #load "./models/BuildConfiguration.cake"
 
@@ -143,6 +141,7 @@ Task("NuGetRestore")
     .IsDependentOn("Clean")
     .Does(() =>
 {
+    NuGetRestore(buildConfiguration.SolutionFile);
     DotNetCoreRestore(buildConfiguration.SolutionFile);
 });
 
@@ -332,10 +331,9 @@ Task("SonarBegin")
   .Does(() => {
      SonarBegin(new SonarBeginSettings{
         Url = "http://rhm-d-dock01.boolhosting.tld:9000/",
-        Login = "5779d7544d436849f9f8afc51c42331def4e700d",
-        Password = "admin",
+        Key = string.Format("Appollo-{0}", buildConfiguration.MainProjectName),
         Name = string.Format("Appollo-{0}", buildConfiguration.MainProjectName),
-        Version = "123",
+        Version = "123", // TODO
         Verbose = true
      });
   });
@@ -348,9 +346,9 @@ Task("SonarEnd")
      });
   });
 
-Task("Sonar")
+Task("Sonar-xUnit")
   .IsDependentOn("SonarBegin")
-  .IsDependentOn("NUnitTestWithCoverage")
+  .IsDependentOn("xUnitTestWithCoverage")
   .IsDependentOn("SonarEnd");
 
 //////////////////////////////////////////////////////////////////////
