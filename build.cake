@@ -258,7 +258,7 @@ DotCoverCover(tool => {
             buildConfiguration.TestProjectDirectory,
             "xunit",
             new ProcessArgumentBuilder()
-                .AppendSwitchQuoted("-xml", "result")
+                .AppendSwitchQuoted("-xml", "result.xml")
                 .AppendSwitch("-configuration", configuration)
                 .Append("-noshadow")
                 .Append("-nobuild"),
