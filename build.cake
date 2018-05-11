@@ -296,9 +296,9 @@ Task("AppCenterSettings")
     {
         appCenterSettings = new AppCenterSettings();
         appCenterSettings.Owner = EvaluateTfsBuildVariable("appcenter_owner", EnvironmentVariable("appcenter_owner") ?? Argument("appcenter_owner", string.Empty));
-        appCenterSettings.AppName = EnvironmentVariable("appcenter_appname") ?? Argument("appcenter_appname", string.Empty);
-        appCenterSettings.DistributionGroup = EnvironmentVariable("appcenter_distributiongroup") ?? Argument("appcenter_distributiongroup", string.Empty);
-
+        appCenterSettings.AppName = EvaluateTfsBuildVariable("appcenter_appname", EnvironmentVariable("appcenter_appname") ?? Argument("appcenter_appname", string.Empty));
+        appCenterSettings.DistributionGroup = EvaluateTfsBuildVariable("appcenter_distributiongroup", EnvironmentVariable("appcenter_distributiongroup") ?? Argument("appcenter_distributiongroup", string.Empty));
+        
         Information("Owner: " + appCenterSettings.Owner);
         Information("AppName: " + appCenterSettings.AppName);
         Information("DistributionGroup: " + appCenterSettings.DistributionGroup);
