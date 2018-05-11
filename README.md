@@ -30,3 +30,5 @@ https://github.com/ghuntley/appstore-automation-with-fastlane/blob/master/build.
 
 ## ANDROID TEST BUILD & UPLOAD
 ./build.sh --target=AppCenterRelease-Droid --configuration=Debug --appcenter_owner=CakeTestApp --appcenter_appname=CakeTestApp-Dev-1 --appcenter_distributiongroup=Collaborator
+
+ ./build.sh --target=Build-Droid --configuration=Debug --android_keystorefile=CakeTestApp/keystore/CakeTestApp.keystore --android_keystorealias=CakeTestApp --android_keystorepasswd=2:Tweerondjes

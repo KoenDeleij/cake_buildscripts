@@ -13,5 +13,18 @@ public class BuildConfiguration
     public string TestProjectFile { get; set; }
 
     public string NuspecFile { get; set; }
+
+    public string AndroidKeystoreFile { get; set; }
+
+    public string AndroidKeystoreAlias { get; set; }
+
+    public string AndroidKeystorePassword { get; set; }
+
+    public bool IsValidForAndroidSigning => 
+        !string.IsNullOrEmpty(AndroidKeystoreFile) &&
+        !string.IsNullOrEmpty(AndroidKeystoreAlias) &&
+        !string.IsNullOrEmpty(AndroidKeystorePassword);
+
+
 }
 

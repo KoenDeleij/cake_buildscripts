@@ -96,6 +96,13 @@ Setup(context =>
             }
         }
 
+        if(!string.IsNullOrEmpty(buildConfiguration.AndroidProjectFile))
+        {
+            buildConfiguration.AndroidKeystoreFile = EvaluateTfsBuildVariable("android_keystorefile", EnvironmentVariable("android_keystorefile") ?? Argument("android_keystorefile", string.Empty));
+            buildConfiguration.AndroidKeystoreAlias = EvaluateTfsBuildVariable("android_keystorealias", EnvironmentVariable("android_keystorealias") ?? Argument("android_keystorealias", string.Empty));
+            buildConfiguration.AndroidKeystorePassword = EvaluateTfsBuildVariable("android_keystorepasswd", EnvironmentVariable("android_keystorepasswd") ?? Argument("android_keystorepasswd", string.Empty));            
+        }
+
         var testPath = "./**/*.Tests.csproj";
         var testFiles = GetFiles(testPath);
 
@@ -120,7 +127,13 @@ Setup(context =>
         Information("iOS project: NOT FOUND!");
 
     if(!string.IsNullOrEmpty(buildConfiguration.AndroidProjectFile))
+    {
         Information("Droid project: " + buildConfiguration.AndroidProjectFile);
+        Information("Droid keystore: " + buildConfiguration.AndroidKeystoreFile);
+        Information("Droid keystore alias: " + buildConfiguration.AndroidKeystoreAlias);
+        if(!string.IsNullOrEmpty(buildConfiguration.AndroidKeystorePassword))
+            Information("Droid keystore password set.");
+    }
     else
         Information("Droid project: NOT FOUND!");
 
@@ -189,10 +202,21 @@ Task("Build")
 
 Task("Build-Droid")
     .WithCriteria(HasDroidPropjectFile)
+    .WithCriteria(() => buildConfiguration.IsValidForAndroidSigning)
 	.IsDependentOn("NuGetRestore")
 	.Does(() =>
 { 		
-        var file = BuildAndroidApk(buildConfiguration.AndroidProjectFile);
+        //https://docs.microsoft.com/en-us/xamarin/android/deploy-test/building-apps/build-process
+        // TODO: verify & validate
+        var file = BuildAndroidApk(buildConfiguration.AndroidProjectFile, true, configuration, settings =>
+            settings.SetConfiguration(configuration)
+                    .WithProperty("AndroidKeyStore", "true")
+                    .WithProperty("AndroidSigningStorePass", "keyStorePassword")
+                    .WithProperty("AndroidSigningKeyStore", "keyStore")
+                    .WithProperty("AndroidSigningKeyAlias", "keyStoreAlias")
+                    .WithProperty("AndroidSigningKeyPass", "keyStorePassword")
+            );
+
         Information(file.ToString());
 });
 
