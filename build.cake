@@ -211,10 +211,10 @@ Task("Build-Droid")
         var file = BuildAndroidApk(buildConfiguration.AndroidProjectFile, true, configuration, settings =>
             settings.SetConfiguration(configuration)
                     .WithProperty("AndroidKeyStore", "true")
-                    .WithProperty("AndroidSigningStorePass", "keyStorePassword")
-                    .WithProperty("AndroidSigningKeyStore", "keyStore")
-                    .WithProperty("AndroidSigningKeyAlias", "keyStoreAlias")
-                    .WithProperty("AndroidSigningKeyPass", "keyStorePassword")
+                    .WithProperty("AndroidSigningStorePass", buildConfiguration.AndroidKeystorePassword)
+                    .WithProperty("AndroidSigningKeyStore", buildConfiguration.AndroidKeystoreFile)
+                    .WithProperty("AndroidSigningKeyAlias", buildConfiguration.AndroidKeystoreAlias)
+                    .WithProperty("AndroidSigningKeyPass", buildConfiguration.AndroidKeystorePassword)
             );
 
         Information(file.ToString());
