@@ -18,7 +18,6 @@ using Newtonsoft.Json;
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
-// var workingDirectory = Argument("workingdirectory", "./");
 
 BuildConfiguration buildConfiguration;
 
@@ -272,7 +271,8 @@ DotCoverCover(tool => {
                 WorkingDirectory = buildConfiguration.TestProjectDirectory,
                 // EnvironmentVariables = GitVersionEnvironmentVariables,
             }
-            .WithFilter("+:OmniSharp.*")
+            .WithFilter("+:" + buildConfiguration.MainProjectName + ".*")
+            .WithFilter("-:" + buildConfiguration.MainProjectName + ".Tests*")
     );
 
         // DotCoverCover(tool => {
