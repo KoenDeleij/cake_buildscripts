@@ -4,11 +4,12 @@
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
 #tool "nuget:?package=xunit.runner.console"
 
-#addin nuget:?package=Cake.CoreCLR
-#addin nuget:?package=Cake.Figlet
-#addin nuget:?package=Newtonsoft.Json
-#addin nuget:?package=Cake.Sonar
-#addin nuget:?package=Cake.Xamarin
+#addin "nuget:?package=Cake.CoreCLR"
+#addin "nuget:?package=Cake.Figlet"
+#addin "nuget:?package=Newtonsoft.Json"
+#addin "nuget:?package=Cake.Sonar"
+#addin "nuget:?package=Cake.Xamarin"
+#addin "nuget:?package=Cake.AppCenter"
 
 #load "./models/BuildConfiguration.cake"
 
@@ -193,16 +194,27 @@ Task("Build-iOS")
 	.Does (() =>
 	{
         // TODO: test is iOS project exists
-            // var path = "./*.iOS/*.csproj";
+        // var path = "./*.iOS/*.csproj";
 
-    		MSBuild(buildConfiguration.IOSProjectFile, settings => 
-			settings.SetConfiguration(configuration)   
-			.WithTarget("Build")
-			.WithProperty("Platform", "iPhone")
-			.WithProperty("OutputPath", "bin/iPhone")
-            .WithProperty("BuildIpa", "true")
-			.WithProperty("TreatWarningsAsErrors", "false"));
+        MSBuild(buildConfiguration.IOSProjectFile, settings => 
+        settings.SetConfiguration(configuration)   
+        .WithTarget("Build")
+        .WithProperty("Platform", "iPhone")
+        .WithProperty("OutputPath", "bin/iPhone")
+        .WithProperty("BuildIpa", "true")
+        .WithProperty("TreatWarningsAsErrors", "false"));
 	});
+
+Task("AppCenterRelease-iOS")
+    .IsDependentOn("Build-iOS")
+    .Does(() =>
+    {
+        MobileCenterLogin(new MobileCenterLoginSettings { Token = "8600137f6b1b07c5e1a4d7792da999249631e148" });
+    })
+    .Finally(() =>
+    {  
+        MobileCenterLogout(new MobileCenterLoginSettings { Token = "8600137f6b1b07c5e1a4d7792da999249631e148" });
+    });
 
 //////////////////////////////////////////////////////////////////////
 // ETC
