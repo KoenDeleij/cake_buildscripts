@@ -11,19 +11,25 @@
 #addin "nuget:?package=Cake.Xamarin"
 #addin "nuget:?package=Cake.AppCenter"
 #addin "nuget:?package=Cake.Tfs.Build.Variables"
+// #addin "nuget:?package=Cake.AndroidAppManifest"
 
+// #load "nuget:https://www.myget.org/F/cake-contrib/api/v2?package=Cake.Recipe&prerelease"
+// #load "./helpers/Configurator.cake"
+#load "./helpers/Configurator.cake"
 #load "./models/BuildConfiguration.cake"
 #load "./models/AppCenterSettings.cake"
 
 using Newtonsoft.Json;
 
-var target = Argument("target", "Default");
+var target = Argument("target", "Help");
 var configuration = Argument("configuration", "Release");
 
 var artifacts = new DirectoryPath("./artifacts").MakeAbsolute(Context.Environment);
 
 BuildConfiguration buildConfiguration;
 AppCenterSettings appCenterSettings;
+
+// Helpers.Configurator().Initialize(Context);
 
 //////////////////////////////////////////////////////////////////////
 // Criteria
@@ -39,120 +45,14 @@ Func<bool> HasDroidPropjectFile => () => !string.IsNullOrEmpty(buildConfiguratio
 
 Setup(context =>
 {
-    // Read config or find projects
-    var currentDirectory = Environment.CurrentDirectory;
-    Information("Current directory: " + currentDirectory);
-
-    FilePath filePaths = File("build.config");
-
-    if (FileExists(filePaths.FullPath))
+    if(target.ToLower() != "help")
     {
-        // TODO: find out if using cake.config is better
-        Information("Using configuration file (build.config)");
-        
-        var configData = System.IO.File.ReadAllText(filePaths.FullPath, Encoding.UTF8);
+        Configurator.Initialize(Context);
 
-        buildConfiguration = JsonConvert.DeserializeObject<BuildConfiguration>(configData);
-    }
-    else
-    {
-        Information("Configuration file does not exists (build.config).");
-        Information("Trying to find solution & projects.");
-
-        buildConfiguration = new BuildConfiguration();
-
-        var solutionPath = "./**/*.sln";
-        var solutionFiles = GetFiles(solutionPath);
-
-        if(solutionFiles.Any())
-        {
-            buildConfiguration.SolutionFile = solutionFiles.FirstOrDefault().ToString();
-            buildConfiguration.MainProjectName = solutionFiles.FirstOrDefault().GetFilenameWithoutExtension().ToString();
-        }
-
-        var iosPath = "./**/*iOS*.csproj";
-        var iosFiles = GetFiles(iosPath);
-
-        if(iosFiles.Any())
-        {
-            buildConfiguration.IOSProjectFile = iosFiles.FirstOrDefault().ToString();
-        }
-
-        var droidPath = "./**/*Droid*.csproj";
-        var droidFiles = GetFiles(droidPath);
-
-        if(droidFiles.Any())
-        {
-            buildConfiguration.AndroidProjectFile = droidFiles.FirstOrDefault().ToString();
-        }
-        else
-        {
-            droidPath = "./**/*Android*.csproj";
-            droidFiles = GetFiles(droidPath);
-
-            if(droidFiles.Any())
-            {
-                buildConfiguration.AndroidProjectFile = droidFiles.FirstOrDefault().ToString();
-            }
-        }
-
-        if(!string.IsNullOrEmpty(buildConfiguration.AndroidProjectFile))
-        {
-            buildConfiguration.AndroidKeystoreFile = EvaluateTfsBuildVariable("android_keystorefile", EnvironmentVariable("android_keystorefile") ?? Argument("android_keystorefile", string.Empty));
-            buildConfiguration.AndroidKeystoreAlias = EvaluateTfsBuildVariable("android_keystorealias", EnvironmentVariable("android_keystorealias") ?? Argument("android_keystorealias", string.Empty));
-            buildConfiguration.AndroidKeystorePassword = EvaluateTfsBuildVariable("android_keystorepasswd", EnvironmentVariable("android_keystorepasswd") ?? Argument("android_keystorepasswd", string.Empty));            
-        }
-
-        var testPath = "./**/*.Tests.csproj";
-        var testFiles = GetFiles(testPath);
-
-        if(testFiles.Any())
-        {
-            buildConfiguration.TestProjectFile = testFiles.FirstOrDefault().ToString();
-            buildConfiguration.TestProjectDirectory = testFiles.FirstOrDefault().GetDirectory().ToString();
-        }
-    }
-
-    // TODO: validate config, should have solution
-    Information(Figlet(buildConfiguration.MainProjectName));
-
-    if(string.IsNullOrEmpty(buildConfiguration.SolutionFile))
-        throw new Exception("Cannot start without solution file.");
-
-    Information("Solution: " + buildConfiguration.SolutionFile);
-
-    if(!string.IsNullOrEmpty(buildConfiguration.IOSProjectFile))
-        Information("iOS project: " + buildConfiguration.IOSProjectFile);
-    else
-        Information("iOS project: NOT FOUND!");
-
-    if(!string.IsNullOrEmpty(buildConfiguration.AndroidProjectFile))
-    {
-        Information("Droid project: " + buildConfiguration.AndroidProjectFile);
-        Information("Droid keystore: " + buildConfiguration.AndroidKeystoreFile);
-        Information("Droid keystore alias: " + buildConfiguration.AndroidKeystoreAlias);
-        if(!string.IsNullOrEmpty(buildConfiguration.AndroidKeystorePassword))
-            Information("Droid keystore password set.");
-    }
-    else
-        Information("Droid project: NOT FOUND!");
-
-    if(!string.IsNullOrEmpty(buildConfiguration.TestProjectFile))
-    {
-        Information("Test project: " + buildConfiguration.TestProjectFile);
-        Information("Test project directory: " + buildConfiguration.TestProjectDirectory);
-    }
-    else
-    {
-        Information("Test project: NOT FOUND!");
-        Information("Test project directory: NOT FOUND!");
-    }
-
-    Information("Build configuration: " + configuration);
-    
-    EnsureDirectoryExists(artifacts);
-    EnsureDirectoryExists(artifacts + "/tests");
-    EnsureDirectoryExists(artifacts + "/coverage");
+        EnsureDirectoryExists(artifacts);
+        EnsureDirectoryExists(artifacts + "/tests");
+        EnsureDirectoryExists(artifacts + "/coverage");
+    }    
 });
 
 
@@ -200,9 +100,12 @@ Task("Build")
 // BUILDING ANDROID
 //////////////////////////////////////////////////////////////////////
 
+
+//https://github.com/cake-contrib/Cake.AndroidAppManifest
 Task("Build-Droid")
     .WithCriteria(HasDroidPropjectFile)
     .WithCriteria(() => buildConfiguration.IsValidForAndroidSigning)
+    .WithCriteria(() => buildConfiguration.IsValidForAndroidBuilding)
 	.IsDependentOn("NuGetRestore")
 	.Does(() =>
 { 		
@@ -487,6 +390,28 @@ Task("Sonar-xUnit")
   .IsDependentOn("SonarBegin")
   .IsDependentOn("xUnitTestWithCoverage")
   .IsDependentOn("SonarEnd");
+
+//////////////////////////////////////////////////////////////////////
+// Help
+//////////////////////////////////////////////////////////////////////
+
+Task("Help")
+    .Does(() => 
+    {
+
+        Information(target);
+        //--target
+        Information("--target {target name}");
+        Information("Specify target. Available targets: many");
+        Information("");
+        Information("For more info & questions: ask Jacob.");
+    });
+
+Task("Test")
+    .Does(() =>
+    {
+
+    });
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION

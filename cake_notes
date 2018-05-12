@@ -1,0 +1,8 @@
+// Use the globber to find any .apk files within the tree
+            return context.Globber
+                .GetFiles(searchPattern)
+                .OrderByDescending(f => new FileInfo(f.FullPath).LastWriteTimeUtc)
+                .FirstOrDefault();
+
+
+                

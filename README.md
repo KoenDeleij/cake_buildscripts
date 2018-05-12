@@ -26,9 +26,11 @@ https://github.com/ghuntley/appstore-automation-with-fastlane/blob/master/build.
 ## Nice
 
 ## iOS TEST BUILD & UPLOAD
-./build.sh --target=AppCenterRelease-iOS --configuration=Debug --appcenter_owner=CakeTestApp --appcenter_appname=CakeTestApp-Dev --appcenter_distributiongroup=Collaborator
+./build.sh --target=AppCenterRelease-iOS --configuration=Debug --appcenter_owner=CakeTestApp --appcenter_appname=CakeTestApp-Dev --appcenter_distributiongroup=Collaborators
 
 ## ANDROID TEST BUILD & UPLOAD
-./build.sh --target=AppCenterRelease-Droid --configuration=Debug --appcenter_owner=CakeTestApp --appcenter_appname=CakeTestApp-Dev-1 --appcenter_distributiongroup=Collaborator
+./build.sh --target=AppCenterRelease-Droid --configuration=Debug --appcenter_owner=CakeTestApp --appcenter_appname=CakeTestApp-Dev-1 --appcenter_distributiongroup=Collaborators
 
  ./build.sh --target=Build-Droid --configuration=Debug --android_keystorefile=CakeTestApp/keystore/CakeTestApp.keystore --android_keystorealias=CakeTestApp --android_keystorepasswd=2:Tweerondjes
+ 
+ ./build.sh --target=AppCenterRelease-Droid --configuration=Debug --android_keystorefile=/Users/jacob.duijzer/Documents/Projecten/Appcell/Redhotminute.Appollo.Cake.BuildScripts/CakeTestApp/keystore/CakeTestApp.keystore --android_keystorealias=CakeTestApp --android_keystorepasswd=2:Tweerondjes --appcenter_owner=CakeTestApp --appcenter_appname=CakeTestApp-Dev-1 --appcenter_distributiongroup=Collaborators
