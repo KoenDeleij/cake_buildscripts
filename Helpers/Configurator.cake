@@ -36,6 +36,19 @@ public static class Configurator
     public static bool IsValidForRunningTests => !string.IsNullOrEmpty(TestProjectFile) && 
                                                     !string.IsNullOrEmpty(TestProjectDirectory);
 
+    /// AppCenter 
+
+    public static string AppCenterOwner { get; private set; }
+
+    public static string AppCenterAppName { get; private set; }
+
+    public static string AppCenterDistributionGroup { get; private set; }
+
+    public static bool IsValidForAppCenterDistribution => 
+        !string.IsNullOrEmpty(AppCenterOwner) &&
+        !string.IsNullOrEmpty(AppCenterAppName) &&
+        !string.IsNullOrEmpty(AppCenterDistributionGroup);
+
     ///
 
     private static ICakeContext _context;
@@ -54,13 +67,15 @@ public static class Configurator
 
         ReadTestBuildSettings();
 
+        ReadAppCenterSettings();
+
         ShowSettings();
     }
 
     private static void ShowSettings()
     {
-         _context.Information(_context.Figlet(ProjectName));
-         _context.Information("");
+        _context.Information(_context.Figlet(ProjectName));
+        _context.Information("");
         _context.Information("============ Main ============");
         _context.Information(string.Format("Solution: {0}", !string.IsNullOrEmpty(SolutionFile) ? SolutionFile : "NOT FOUND"));
         _context.Information("");
@@ -81,7 +96,13 @@ public static class Configurator
         _context.Information(string.Format("Test project: {0}", !string.IsNullOrEmpty(TestProjectFile) ? TestProjectFile : "NOT FOUND"));
         _context.Information(string.Format("Test directory: {0}", !string.IsNullOrEmpty(TestProjectDirectory) ? TestProjectDirectory : "NOT SET"));
         _context.Information(string.Format("Configuration complete for running tests: {0}", IsValidForRunningTests));
-        
+
+        _context.Information("");
+        _context.Information("============ AppCenter ============");
+        _context.Information(string.Format("Owner: {0}", !string.IsNullOrEmpty(AppCenterOwner) ? AppCenterOwner : "NOT SET"));
+        _context.Information(string.Format("App name: {0}", !string.IsNullOrEmpty(AppCenterAppName) ? AppCenterAppName : "NOT SET"));
+        _context.Information(string.Format("Distribution group: {0}", !string.IsNullOrEmpty(AppCenterDistributionGroup) ? AppCenterDistributionGroup : "NOT SET"));
+        _context.Information(string.Format("Configuration complete for appcenter release: {0}", IsValidForAppCenterDistribution));
     }
 
     private static void ReadMainBuildSettings()
@@ -138,5 +159,12 @@ public static class Configurator
             TestProjectFile = testFiles.FirstOrDefault().ToString();
             TestProjectDirectory = testFiles.FirstOrDefault().GetDirectory().ToString();
         }
+    }
+
+    private static void ReadAppCenterSettings()
+    {
+        AppCenterOwner = _context.EvaluateTfsBuildVariable("appcenter_owner", _context.EnvironmentVariable("appcenter_owner") ?? _context.Argument("appcenter_owner", string.Empty));
+        AppCenterAppName = _context.EvaluateTfsBuildVariable("appcenter_appname", _context.EnvironmentVariable("appcenter_appname") ?? _context.Argument("appcenter_appname", string.Empty));
+        AppCenterDistributionGroup = _context.EvaluateTfsBuildVariable("appcenter_distributiongroup", _context.EnvironmentVariable("appcenter_distributiongroup") ?? _context.Argument("appcenter_distributiongroup", string.Empty));
     }
 }
