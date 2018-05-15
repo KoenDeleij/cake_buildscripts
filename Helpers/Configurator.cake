@@ -107,13 +107,20 @@ public static class Configurator
 
     private static void ReadMainBuildSettings()
     {
-        var solutionPath = "./**/*.sln";
-        var solutionFiles = GlobbingAliases.GetFiles(_context, solutionPath);
-
-        if(solutionFiles.Any())
+        SolutionFile = _context.EvaluateTfsBuildVariable("solution_file", _context.EnvironmentVariable("solution_file") ?? _context.Argument("solution_file", string.Empty));
+        ProjectName = _context.EvaluateTfsBuildVariable("project_name", _context.EnvironmentVariable("project_name") ?? _context.Argument("project_name", string.Empty));
+        if(string.IsNullOrEmpty(SolutionFile))
         {
-            ProjectName = solutionFiles.FirstOrDefault().GetFilenameWithoutExtension().ToString();
-            SolutionFile = solutionFiles.FirstOrDefault().ToString();
+            var solutionPath = "./**/*.sln";
+            var solutionFiles = GlobbingAliases.GetFiles(_context, solutionPath);
+
+            if(solutionFiles.Any())
+            {
+                SolutionFile = solutionFiles.FirstOrDefault().ToString();
+
+                if(string.IsNullOrEmpty(ProjectName))
+                    ProjectName = solutionFiles.FirstOrDefault().GetFilenameWithoutExtension().ToString();
+            }
         }
     }
 

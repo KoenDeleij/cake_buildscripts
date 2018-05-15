@@ -59,7 +59,7 @@ Task("NuGetRestore")
     })
     .OnError(exception =>
     {
-        Information("Possible errors with restoring packages");
+        Information("Possible errors while restoring packages, continuing seems to work.");
         Information(exception);
     });
 
@@ -143,8 +143,8 @@ Task("AppCenterRelease-Droid")
 
 Task("Build-iOS")
     .WithCriteria(IsRunningOnUnix())
-    .WithCriteria(Configurator.IsValidForBuildingIOS)
-	.IsDependentOn("NuGetRestore")
+    .WithCriteria(() => Configurator.IsValidForBuildingIOS)
+	.IsDependentOn("UnitTest")
 	.Does (() =>
 	{
         // TODO: BuildiOSIpa (Cake.Xamarin, https://github.com/Redth/Cake.Xamarin/blob/master/src/Cake.Xamarin/Aliases.cs)
@@ -158,9 +158,9 @@ Task("Build-iOS")
 	});
 
 Task("AppCenterRelease-iOS")
+    .WithCriteria(() => Configurator.IsValidForAppCenterDistribution)
     .IsDependentOn("Build-iOS")
     .IsDependentOn("AppCenterLogin")
-    .WithCriteria(() => Configurator.IsValidForAppCenterDistribution)
     .Does(() =>
     {
         //https://cakebuild.net/api/Cake.AppCenter/
@@ -191,9 +191,8 @@ Task("AppCenterRelease-iOS")
     });
 
 //////////////////////////////////////////////////////////////////////
-// AppCenter Tasks]
 //
-// Make sure the appcenter cli tools are installed
+// AppCenter Tasks
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -365,12 +364,15 @@ Task("Sonar-xUnit")
 Task("Help")
     .Does(() => 
     {
-
         Information(target);
         //--target
         Information("--target {target name}");
         Information("Specify target. Available targets: many");
         Information("");
+
+        Information("--solution_file: path to the solution file");
+        Information("--project_name: name of the project");
+
         Information("For more info & questions: ask Jacob.");
     });
 
