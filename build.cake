@@ -58,6 +58,8 @@ Task("NuGetRestore")
         var projectFiles = GetFiles(projectsPath);
         foreach(var projFile in projectFiles)
         {
+            Information("Restoring " + projFile.ToString());
+
             NuGetRestore(projFile);
             DotNetCoreRestore(projFile.ToString());
         }
