@@ -62,8 +62,8 @@ Task("NuGetRestore")
     {
         Information("Possible errors while restoring packages, continuing seems to work.");
         Information(exception);
-    });
-    // .DeferOnError();
+    })
+    .DeferOnError();
 
 //////////////////////////////////////////////////////////////////////
 // BUILDING
