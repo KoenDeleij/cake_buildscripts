@@ -51,19 +51,19 @@ Task("Clean")
 
 Task("NuGetRestore")
     .IsDependentOn("Clean")
-    .ContinueOnError()
+    // .ContinueOnError()
     .DoesForEach(GetFiles("**/*.csproj"), (file) => 
     {
         Information("Restoring " + file.ToString());
         NuGetRestore(file);
         DotNetCoreRestore(file.ToString());
-    });
-    // .ReportError(exception =>
-    // {
-    //     Information("Possible errors while restoring packages, continuing seems to work.");
-    //     Information(exception);
-    // })
-    // .DeferOnError();
+    })
+    .OnError(exception =>
+    {
+        Information("Possible errors while restoring packages, continuing seems to work.");
+        Information(exception);
+    })
+    .DeferOnError();
 
 //////////////////////////////////////////////////////////////////////
 // BUILDING
