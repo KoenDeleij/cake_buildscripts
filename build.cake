@@ -53,7 +53,13 @@ Task("NuGetRestore")
     .IsDependentOn("Clean")
     .Does(() =>
     {
-        NuGetRestore(Configurator.SolutionFile);
+        // test: restore all csproj
+        var projectsPath = "./**/*.csproj";
+        var projectFiles = GetFiles(projectsPath);
+        foreach(var projFile in projectFiles)
+        {
+            NuGetRestore(projFile);
+        }
 
         DotNetCoreRestore(Configurator.SolutionFile);
     })
