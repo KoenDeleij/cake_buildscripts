@@ -51,27 +51,22 @@ Task("Clean")
 
 Task("NuGetRestore")
     .IsDependentOn("Clean")
-    .Does(() =>
+    // .Does(() => 
+    // { 
+    //     throw new Exception(); 
+    // })
+    .DoesForEach(GetFiles("**/*.csproj"), (file) => 
     {
-        // test: restore all csproj
-        var projectsPath = "./**/*.csproj";
-        var projectFiles = GetFiles(projectsPath);
-        foreach(var projFile in projectFiles)
-        {
-            Information("Restoring " + projFile.ToString());
-
-            NuGetRestore(projFile);
-            DotNetCoreRestore(projFile.ToString());
-        }
-
-        // DotNetCoreRestore(Configurator.SolutionFile);
+        Information("Restoring " + file.ToString());
+        NuGetRestore(file);
+        DotNetCoreRestore(file.ToString());
     })
     .OnError(exception =>
     {
         Information("Possible errors while restoring packages, continuing seems to work.");
         Information(exception);
-    });
-
+    })
+    .DeferOnError();
 
 //////////////////////////////////////////////////////////////////////
 // BUILDING
