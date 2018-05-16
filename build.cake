@@ -57,13 +57,13 @@ Task("NuGetRestore")
         Information("Restoring " + file.ToString());
         NuGetRestore(file);
         DotNetCoreRestore(file.ToString());
-    })
-    .ReportError(exception =>
-    {
-        Information("Possible errors while restoring packages, continuing seems to work.");
-        Information(exception);
-    })
-    .DeferOnError();
+    });
+    // .ReportError(exception =>
+    // {
+    //     Information("Possible errors while restoring packages, continuing seems to work.");
+    //     Information(exception);
+    // })
+    // .DeferOnError();
 
 //////////////////////////////////////////////////////////////////////
 // BUILDING
