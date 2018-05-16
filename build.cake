@@ -59,7 +59,7 @@ Task("NuGetRestore")
         foreach(var projFile in projectFiles)
         {
             NuGetRestore(projFile);
-            DotNetCoreRestore(projFile);
+            DotNetCoreRestore(projFile.ToString());
         }
 
         // DotNetCoreRestore(Configurator.SolutionFile);
