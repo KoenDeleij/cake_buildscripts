@@ -22,6 +22,8 @@ var configuration = Argument("configuration", "Release");
 
 var artifacts = new DirectoryPath("./artifacts").MakeAbsolute(Context.Environment);
 
+bool ShouldClean = true;
+
 //////////////////////////////////////////////////////////////////////
 // PREPARING
 //////////////////////////////////////////////////////////////////////
@@ -46,9 +48,11 @@ Task("Clean")
     CleanDirectory(artifacts + "/tests");
     CleanDirectory(artifacts + "/coverage");
 
-    // TODO: find a way to skip this when running sonarqube
-    // CleanDirectories("./**/bin");
-    // CleanDirectories("./**/obj");
+    if(ShouldClean)
+    {
+        CleanDirectories("./**/bin");
+        CleanDirectories("./**/obj");
+    }
 });
 
 Task("NuGetRestore")
@@ -146,7 +150,7 @@ Task("AppCenterRelease-Droid")
 Task("Build-iOS")
     .WithCriteria(IsRunningOnUnix())
     .WithCriteria(() => Configurator.IsValidForBuildingIOS)
-	.IsDependentOn("UnitTest")
+	.IsDependentOn("NuGetRestore")
 	.Does (() =>
 	{
         // TODO: BuildiOSIpa (Cake.Xamarin, https://github.com/Redth/Cake.Xamarin/blob/master/src/Cake.Xamarin/Aliases.cs)
