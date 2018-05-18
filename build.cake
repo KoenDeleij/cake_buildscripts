@@ -45,8 +45,8 @@ Task("Clean")
     CleanDirectory(artifacts);
     CleanDirectory(artifacts + "/tests");
     CleanDirectory(artifacts + "/coverage");
-    CleanDirectories("./**/bin");
-    CleanDirectories("./**/obj");
+    // CleanDirectories("./**/bin");
+    // CleanDirectories("./**/obj");
 });
 
 Task("NuGetRestore")
@@ -335,7 +335,6 @@ Task("xUnitTestWithCoverage")
 });
 
 Task("SonarBegin")
-    .IsDependentOn("xUnitTestWithCoverage")
   .Does(() => {
      SonarBegin(new SonarBeginSettings{
         Url = "http://rhm-d-dock01.boolhosting.tld:9000/",
@@ -356,6 +355,7 @@ Task("SonarEnd")
 
 Task("Sonar-xUnit")
   .IsDependentOn("SonarBegin")
+  .IsDependentOn("xUnitTestWithCoverage")
   .IsDependentOn("SonarEnd");
 
 //////////////////////////////////////////////////////////////////////
