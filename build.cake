@@ -45,13 +45,14 @@ Task("Clean")
     CleanDirectory(artifacts);
     CleanDirectory(artifacts + "/tests");
     CleanDirectory(artifacts + "/coverage");
+
+    // TODO: find a way to skip this when running sonarqube
     // CleanDirectories("./**/bin");
     // CleanDirectories("./**/obj");
 });
 
 Task("NuGetRestore")
     .IsDependentOn("Clean")
-    // .ContinueOnError()
     .DoesForEach(GetFiles("**/*.csproj"), (file) => 
     {
         Information("Restoring " + file.ToString());
@@ -312,7 +313,8 @@ Task("xUnitTestWithCoverage")
                 // EnvironmentVariables = GitVersionEnvironmentVariables,
             }
             .WithFilter("+:" + Configurator.ProjectName + ".*")
-            .WithFilter("-:" + Configurator.ProjectName + ".Tests*")
+            .WithFilter("-:*Tests*")
+            // .WithFilter("-:" + Configurator.ProjectName + ".Tests*")
     );
 })
 .Finally(() => 
