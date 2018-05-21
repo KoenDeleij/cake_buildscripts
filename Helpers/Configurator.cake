@@ -6,6 +6,8 @@ public static class Configurator
 
     public static string SolutionFile { get; private set; }
 
+    public static bool ShouldClean { get; private set; } 
+
     /// iOS
 
     public static string IOSProjectFile { get; private set; }
@@ -78,6 +80,7 @@ public static class Configurator
         _context.Information("");
         _context.Information("============ Main ============");
         _context.Information(string.Format("Solution: {0}", !string.IsNullOrEmpty(SolutionFile) ? SolutionFile : "NOT FOUND"));
+        _context.Information(string.Format("Cleaning: {0}", ShouldClean));
         _context.Information("");
         _context.Information("============ iOS ============");
         _context.Information(string.Format("iOS project: {0}", !string.IsNullOrEmpty(IOSProjectFile) ? IOSProjectFile : "NOT FOUND"));
@@ -109,6 +112,9 @@ public static class Configurator
     {
         SolutionFile = _context.EvaluateTfsBuildVariable("solution_file", _context.EnvironmentVariable("solution_file") ?? _context.Argument("solution_file", string.Empty));
         ProjectName = _context.EvaluateTfsBuildVariable("project_name", _context.EnvironmentVariable("project_name") ?? _context.Argument("project_name", string.Empty));
+
+        ShouldClean = _context.Argument("clean", false);
+
         if(string.IsNullOrEmpty(SolutionFile))
         {
             var solutionPath = "./**/*.sln";

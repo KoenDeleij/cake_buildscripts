@@ -22,8 +22,6 @@ var configuration = Argument("configuration", "Release");
 
 var artifacts = new DirectoryPath("./artifacts").MakeAbsolute(Context.Environment);
 
-bool ShouldClean = true;
-
 //////////////////////////////////////////////////////////////////////
 // PREPARING
 //////////////////////////////////////////////////////////////////////
@@ -48,7 +46,7 @@ Task("Clean")
     CleanDirectory(artifacts + "/tests");
     CleanDirectory(artifacts + "/coverage");
 
-    if(ShouldClean)
+    if(Configurator.ShouldClean)
     {
         CleanDirectories("./**/bin");
         CleanDirectories("./**/obj");
