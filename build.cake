@@ -85,7 +85,6 @@ Task("FixVersion")
 
 Task("Build")
     .IsDependentOn("NuGetRestore")
-    .IsDependentOn("FixVersion")
     .Does(() =>
 {
     MSBuild (Configurator.SolutionFile, c => {
@@ -176,6 +175,7 @@ Task("Build-iOS")
 Task("AppCenterRelease-iOS")
     .WithCriteria(() => Configurator.IsValidForAppCenterDistribution)
     .IsDependentOn("Build-iOS")
+    .IsDependentOn("FixVersion")
     .IsDependentOn("AppCenterLogin")
     .Does(() =>
     {
