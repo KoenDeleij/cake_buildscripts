@@ -315,7 +315,7 @@ Task("xUnitTestWithCoverage")
                 // EnvironmentVariables = GitVersionEnvironmentVariables,
             }
             .WithFilter("+:" + Configurator.ProjectName + ".*")
-            .WithFilter("-:*Tests*")
+            .WithFilter("-:" + Configurator.ProjectName + ".Tests*")
             // .WithFilter("-:" + Configurator.ProjectName + ".Tests*")
     );
 })
