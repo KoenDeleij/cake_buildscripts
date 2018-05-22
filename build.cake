@@ -3,6 +3,7 @@
 #tool "nuget:?package=NUnit.ConsoleRunner"
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
 #tool "nuget:?package=xunit.runner.console"
+#tool "nuget:?package=GitVersion.CommandLine"
 
 #addin "nuget:?package=Cake.CoreCLR"
 #addin "nuget:?package=Cake.Figlet"
@@ -72,8 +73,19 @@ Task("NuGetRestore")
 // BUILDING
 //////////////////////////////////////////////////////////////////////
 
+Task("FixVersion")
+    .Description("Korrektur der Version in Assembly durch GitVersion :)")
+    .Does(() => {
+        var versionSettings = new GitVersionSettings {
+            UpdateAssemblyInfo = true,
+            WorkingDirectory = "./"
+        };
+        GitVersion(versionSettings);
+    });
+
 Task("Build")
     .IsDependentOn("NuGetRestore")
+    .IsDependentOn("FixVersion")
     .Does(() =>
 {
     MSBuild (Configurator.SolutionFile, c => {
