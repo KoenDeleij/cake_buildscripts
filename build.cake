@@ -79,8 +79,12 @@ Task("GitVersion")
         // var versionInfo = GitVersion(versionSettings);
 
         //  Information("GitResults -> {0}", versionInfo.Dump());
-         var gitVersionResults = GitVersion(new GitVersionSettings());
- Information("GitResults -> {0}", gitVersionResults.Dump());
+        var gitVersionResults = GitVersion(new GitVersionSettings());
+        Information("GitResults -> {0}", gitVersionResults.Dump());
+    }).OnError(exception =>
+    {
+        Information("Possible errors while restoring packages, continuing seems to work.");
+        Information(exception);
     });
 
 //////////////////////////////////////////////////////////////////////
