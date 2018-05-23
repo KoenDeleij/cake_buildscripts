@@ -6,10 +6,11 @@
 
 #addin "nuget:?package=Cake.CoreCLR"
 #addin "nuget:?package=Cake.Figlet"
-#addin "nuget:?package=Newtonsoft.Json"
 #addin "nuget:?package=Cake.Xamarin"
 #addin "nuget:?package=Cake.AppCenter"
 #addin "nuget:?package=Cake.Tfs.Build.Variables"
+#addin "nuget:?package=Cake.Incubator"
+#addin "nuget:?package=Newtonsoft.Json"
 
 #load "./helpers/Configurator.cake"
 
@@ -65,21 +66,31 @@ Task("NuGetRestore")
     })
     .DeferOnError();
 
-//////////////////////////////////////////////////////////////////////
-// BUILDING
-//////////////////////////////////////////////////////////////////////
-
 Task("GitVersion")
     .Description("Korrektur der Version in Assembly durch GitVersion :)")
     .Does(() => {
         var versionSettings = new GitVersionSettings {
             UpdateAssemblyInfo = true,
-            WorkingDirectory = "./"
+            WorkingDirectory = "./CakeTestApp",
+            OutputType = GitVersionOutput.BuildServer
         };
-        GitVersion(versionSettings);
+        // var versionInfo = GitVersion(new GitVersionSettings{ OutputType = GitVersionOutput.Json });
+        // Information(versionInfo.NuGetVersion);
+        // var versionInfo = GitVersion(versionSettings);
+
+        //  Information("GitResults -> {0}", versionInfo.Dump());
+         var gitVersionResults = GitVersion(new GitVersionSettings());
+ Information("GitResults -> {0}", gitVersionResults.Dump());
     });
 
+//////////////////////////////////////////////////////////////////////
+// BUILDING
+//////////////////////////////////////////////////////////////////////
+
 Task("Build")
+    .IsDependentOn("Clean")
+    .IsDependentOn("NuGetRestore")
+    .IsDependentOn("GitVersion")
     .Does(() =>
 {
     MSBuild (Configurator.SolutionFile, c => {
@@ -97,7 +108,7 @@ Task("Build")
 //https://github.com/cake-contrib/Cake.AndroidAppManifest
 Task("Build-Droid")
     .WithCriteria(() => Configurator.IsValidForBuildingAndroid)
-	.IsDependentOn("NuGetRestore")
+	.IsDependentOn("Build")
 	.Does(() =>
 { 		
         //https://docs.microsoft.com/en-us/xamarin/android/deploy-test/building-apps/build-process
@@ -154,9 +165,6 @@ Task("AppCenterRelease-Droid")
 Task("Build-iOS")
     .WithCriteria(IsRunningOnUnix())
     .WithCriteria(() => Configurator.IsValidForBuildingIOS)
-	.IsDependentOn("Clean")
-    .IsDependentOn("NuGetRestore")
-    .IsDependentOn("GitVersion")
     .IsDependentOn("Build")
 	.Does (() =>
 	{
@@ -301,9 +309,6 @@ Task("NUnitTestWithCoverage")
 });
 
 Task("xUnitTestWithCoverage")
-    .IsDependentOn("Clean")
-    .IsDependentOn("NuGetRestore")
-    .IsDependentOn("GitVersion")
     .IsDependentOn("Build")
     .Does(() =>
 {
