@@ -1,4 +1,3 @@
-#tool "nuget:?package=MSBuild.SonarQube.Runner.Tool"
 #tool "nuget:?package=JetBrains.dotCover.CommandLineTools"
 #tool "nuget:?package=NUnit.ConsoleRunner"
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
@@ -8,11 +7,9 @@
 #addin "nuget:?package=Cake.CoreCLR"
 #addin "nuget:?package=Cake.Figlet"
 #addin "nuget:?package=Newtonsoft.Json"
-#addin "nuget:?package=Cake.Sonar"
 #addin "nuget:?package=Cake.Xamarin"
 #addin "nuget:?package=Cake.AppCenter"
 #addin "nuget:?package=Cake.Tfs.Build.Variables"
-// #addin "nuget:?package=Cake.AndroidAppManifest"
 
 #load "./helpers/Configurator.cake"
 
@@ -55,7 +52,6 @@ Task("Clean")
 });
 
 Task("NuGetRestore")
-    .IsDependentOn("Clean")
     .DoesForEach(GetFiles("**/*.csproj"), (file) => 
     {
         Information("Restoring " + file.ToString());
@@ -73,7 +69,7 @@ Task("NuGetRestore")
 // BUILDING
 //////////////////////////////////////////////////////////////////////
 
-Task("FixVersion")
+Task("GitVersion")
     .Description("Korrektur der Version in Assembly durch GitVersion :)")
     .Does(() => {
         var versionSettings = new GitVersionSettings {
@@ -84,7 +80,6 @@ Task("FixVersion")
     });
 
 Task("Build")
-    .IsDependentOn("NuGetRestore")
     .Does(() =>
 {
     MSBuild (Configurator.SolutionFile, c => {
@@ -159,7 +154,10 @@ Task("AppCenterRelease-Droid")
 Task("Build-iOS")
     .WithCriteria(IsRunningOnUnix())
     .WithCriteria(() => Configurator.IsValidForBuildingIOS)
-	.IsDependentOn("NuGetRestore")
+	.IsDependentOn("Clean")
+    .IsDependentOn("NuGetRestore")
+    .IsDependentOn("GitVersion")
+    .IsDependentOn("Build")
 	.Does (() =>
 	{
         // TODO: BuildiOSIpa (Cake.Xamarin, https://github.com/Redth/Cake.Xamarin/blob/master/src/Cake.Xamarin/Aliases.cs)
@@ -175,7 +173,6 @@ Task("Build-iOS")
 Task("AppCenterRelease-iOS")
     .WithCriteria(() => Configurator.IsValidForAppCenterDistribution)
     .IsDependentOn("Build-iOS")
-    .IsDependentOn("FixVersion")
     .IsDependentOn("AppCenterLogin")
     .Does(() =>
     {
@@ -304,6 +301,9 @@ Task("NUnitTestWithCoverage")
 });
 
 Task("xUnitTestWithCoverage")
+    .IsDependentOn("Clean")
+    .IsDependentOn("NuGetRestore")
+    .IsDependentOn("GitVersion")
     .IsDependentOn("Build")
     .Does(() =>
 {
@@ -349,30 +349,6 @@ Task("xUnitTestWithCoverage")
         }
     );
 });
-
-Task("SonarBegin")
-  .Does(() => {
-     SonarBegin(new SonarBeginSettings{
-        Url = "http://rhm-d-dock01.boolhosting.tld:9000/",
-        Key = string.Format("Appollo-{0}", Configurator.ProjectName),
-        Name = string.Format("Appollo-{0}", Configurator.ProjectName),
-        Version = "123", // TODO
-        Verbose = true
-     });
-  });
-
-Task("SonarEnd")
-  .Does(() => {
-     SonarEnd(new SonarEndSettings
-     {
-        
-     });
-  });
-
-Task("Sonar-xUnit")
-  .IsDependentOn("SonarBegin")
-  .IsDependentOn("xUnitTestWithCoverage")
-  .IsDependentOn("SonarEnd");
 
 //////////////////////////////////////////////////////////////////////
 // Help
