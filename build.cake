@@ -10,6 +10,7 @@
 #addin "nuget:?package=Cake.Tfs.Build.Variables"
 #addin "nuget:?package=Cake.Incubator"
 #addin "nuget:?package=Cake.Plist"
+#addin "nuget:?package=Cake.AndroidAppManifest"
 #addin "nuget:?package=Newtonsoft.Json"
 
 #load "./helpers/Configurator.cake"
@@ -86,11 +87,10 @@ Task("Build")
 // BUILDING ANDROID
 //////////////////////////////////////////////////////////////////////
 
-
-//https://github.com/cake-contrib/Cake.AndroidAppManifest
 Task("Build-Droid")
     .WithCriteria(() => Configurator.IsValidForBuildingAndroid)
 	.IsDependentOn("Build")
+    .IsDependentOn("SetDroidVersion")
 	.Does(() =>
 { 		
         //https://docs.microsoft.com/en-us/xamarin/android/deploy-test/building-apps/build-process
@@ -106,6 +106,39 @@ Task("Build-Droid")
 
         Information(file.ToString());
 });
+
+Task("SetDroidVersion")
+    .Does(() =>
+    {
+        var manifestPattern = "./**/AndroidManifest.xml";
+        var foundManifestFiles = GetFiles(manifestPattern);
+        if(foundManifestFiles.Any())
+        {
+            var manifestPath = foundManifestFiles.FirstOrDefault();
+            var manifest = DeserializeAppManifest(manifestPath);
+
+            Information("manifest -> {0}", manifest.Dump());
+
+            //manifest.PackageName = "com.example.mycoolapp";
+            manifest.VersionName = Configurator.FullVersion;
+            manifest.VersionCode = int.Parse(Configurator.FullVersion.Replace(".",""));
+            // manifest.ApplicationIcon = "@mipmap/ic_launcher";
+            // manifest.ApplicationLabel = "Android Application";
+            // manifest.Debuggable = false;
+
+            // data["CFBundleShortVersionString"] = Configurator.Version;
+            // data["CFBundleVersion"] = Configurator.FullVersion;
+
+            // data["CFBundleShortVersionString"] = Configurator.Version;
+            // data["CFBundleVersion"] = Configurator.FullVersion;
+
+            SerializeAppManifest(manifestPath, manifest);
+        }
+        else
+        {
+            throw new Exception("Can't find AndroidManifest.xml");
+        }
+    });
 
 Task("AppCenterRelease-Droid")
     .IsDependentOn("Build-Droid")
@@ -188,13 +221,6 @@ Task("AppCenterRelease-iOS")
     .IsDependentOn("AppCenterLogin")
     .Does(() =>
     {
-        //https://cakebuild.net/api/Cake.AppCenter/
-        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ appcenter apps set-current CakeTestApp/CakeTestApp-Dev
-        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ appcenter distribute release -f CakeTestApp.iOS/bin/iPhone/CakeTestApp.iOS.ipa -g Collaborators
-        // Error: binary file 'CakeTestApp.iOS/bin/iPhone/CakeTestApp.iOS.ipa' doesn't exist
-        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ ls CakeTestApp
-        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ appcenter distribute release -f CakeTestApp/CakeTestApp.iOS/bin/iPhone/CakeTestApp.iOS.ipa -g Collaborators
-
         var ipaFilePattern = "./**/*iOS*.ipa";
         var foundIpaFiles = GetFiles(ipaFilePattern);
 
@@ -212,7 +238,7 @@ Task("AppCenterRelease-iOS")
     .Finally(() =>
     {  
         // TODO: move to settings
-        AppCenterLogout(new AppCenterLogoutSettings { Token = "8600137f6b1b07c5e1a4d7792da999249631e148" });
+        AppCenterLogout(new AppCenterLogoutSettings { Token = Configurator.AppCenterToken });
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -225,7 +251,7 @@ Task("AppCenterLogin")
     .Does(() => 
     {
         // TODO: move to settings
-        AppCenterLogin(new AppCenterLoginSettings { Token = "8600137f6b1b07c5e1a4d7792da999249631e148" });
+        AppCenterLogin(new AppCenterLoginSettings { Token = Configurator.AppCenterToken });
     })
     .OnError(exception =>
     {

@@ -44,6 +44,8 @@ public static class Configurator
 
     /// AppCenter 
 
+    public static string AppCenterToken { get; private set; }
+
     public static string AppCenterOwner { get; private set; }
 
     public static string AppCenterAppName { get; private set; }
@@ -51,6 +53,7 @@ public static class Configurator
     public static string AppCenterDistributionGroup { get; private set; }
 
     public static bool IsValidForAppCenterDistribution => 
+        !string.IsNullOrEmpty(AppCenterToken) &&
         !string.IsNullOrEmpty(AppCenterOwner) &&
         !string.IsNullOrEmpty(AppCenterAppName) &&
         !string.IsNullOrEmpty(AppCenterDistributionGroup);
@@ -108,6 +111,7 @@ public static class Configurator
 
         _context.Information("");
         _context.Information("============ AppCenter ============");
+        _context.Information(string.Format("Token: {0}", !string.IsNullOrEmpty(AppCenterToken) ? AppCenterToken : "NOT SET"));
         _context.Information(string.Format("Owner: {0}", !string.IsNullOrEmpty(AppCenterOwner) ? AppCenterOwner : "NOT SET"));
         _context.Information(string.Format("App name: {0}", !string.IsNullOrEmpty(AppCenterAppName) ? AppCenterAppName : "NOT SET"));
         _context.Information(string.Format("Distribution group: {0}", !string.IsNullOrEmpty(AppCenterDistributionGroup) ? AppCenterDistributionGroup : "NOT SET"));
@@ -184,6 +188,7 @@ public static class Configurator
 
     private static void ReadAppCenterSettings()
     {
+        AppCenterOwner = _context.EvaluateTfsBuildVariable("appcenter_token", _context.EnvironmentVariable("appcenter_token") ?? _context.Argument("appcenter_token", string.Empty));
         AppCenterOwner = _context.EvaluateTfsBuildVariable("appcenter_owner", _context.EnvironmentVariable("appcenter_owner") ?? _context.Argument("appcenter_owner", string.Empty));
         AppCenterAppName = _context.EvaluateTfsBuildVariable("appcenter_appname", _context.EnvironmentVariable("appcenter_appname") ?? _context.Argument("appcenter_appname", string.Empty));
         AppCenterDistributionGroup = _context.EvaluateTfsBuildVariable("appcenter_distributiongroup", _context.EnvironmentVariable("appcenter_distributiongroup") ?? _context.Argument("appcenter_distributiongroup", string.Empty));
