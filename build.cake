@@ -12,7 +12,6 @@
 #addin "nuget:?package=Cake.Plist"
 #addin "nuget:?package=Newtonsoft.Json"
 
-
 #load "./helpers/Configurator.cake"
 
 using Newtonsoft.Json;
@@ -149,6 +148,7 @@ Task("Build-iOS")
     .WithCriteria(IsRunningOnUnix())
     .WithCriteria(() => Configurator.IsValidForBuildingIOS)
     .IsDependentOn("Build")
+    .IsDependentOn("SetIOSVersion")
 	.Does (() =>
 	{
         // TODO: BuildiOSIpa (Cake.Xamarin, https://github.com/Redth/Cake.Xamarin/blob/master/src/Cake.Xamarin/Aliases.cs)
@@ -160,6 +160,27 @@ Task("Build-iOS")
             .WithProperty("BuildIpa", "true")
             .WithProperty("TreatWarningsAsErrors", "false"));
 	});
+
+Task("SetIOSVersion")
+    .Does(() =>
+    {
+        var plistPattern = "./**/Info.plist";
+        var foundPListFiles = GetFiles(plistPattern);
+        if(foundPListFiles.Any())
+        {
+            var plistPath = foundPListFiles.FirstOrDefault().ToString();
+            dynamic data = DeserializePlist(plistPath);
+
+            data["CFBundleShortVersionString"] = Configurator.Version;
+            data["CFBundleVersion"] = Configurator.FullVersion;
+
+            SerializePlist(plistPath, data);
+        }
+        else
+        {
+            throw new Exception("Can't find Info.plist");
+        }
+    });
 
 Task("AppCenterRelease-iOS")
     .WithCriteria(() => Configurator.IsValidForAppCenterDistribution)

@@ -8,6 +8,8 @@ public static class Configurator
 
     public static string Version { get; private set; }
 
+    public static string FullVersion { get; private set; }
+
     public static bool ShouldClean { get; private set; } 
 
     /// iOS
@@ -82,6 +84,7 @@ public static class Configurator
         _context.Information("");
         _context.Information("============ Main ============");
         _context.Information(string.Format("Solution: {0}", !string.IsNullOrEmpty(SolutionFile) ? SolutionFile : "NOT FOUND"));
+        _context.Information(string.Format("FullVersion: {0}", !string.IsNullOrEmpty(FullVersion) ? FullVersion : "NOT SET"));
         _context.Information(string.Format("Version: {0}", !string.IsNullOrEmpty(Version) ? Version : "NOT SET"));
         _context.Information(string.Format("Cleaning: {0}", ShouldClean));
         _context.Information("");
@@ -115,7 +118,8 @@ public static class Configurator
     {
         SolutionFile = _context.EvaluateTfsBuildVariable("solution_file", _context.EnvironmentVariable("solution_file") ?? _context.Argument("solution_file", string.Empty));
         ProjectName = _context.EvaluateTfsBuildVariable("project_name", _context.EnvironmentVariable("project_name") ?? _context.Argument("project_name", string.Empty));
-        Version = _context.EvaluateTfsBuildVariable("buildversion", _context.EnvironmentVariable("buildversion") ?? _context.Argument("buildversion", string.Empty));
+        FullVersion = _context.EvaluateTfsBuildVariable("buildversion", _context.EnvironmentVariable("buildversion") ?? _context.Argument("buildversion", string.Empty));
+        Version = _context.EvaluateTfsBuildVariable("AppVersion", _context.EnvironmentVariable("AppVersion") ?? _context.Argument("AppVersion", string.Empty));
 
         ShouldClean = _context.Argument("clean", false);
 
