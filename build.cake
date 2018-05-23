@@ -2,7 +2,6 @@
 #tool "nuget:?package=NUnit.ConsoleRunner"
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
 #tool "nuget:?package=xunit.runner.console"
-#tool "nuget:?package=GitVersion.CommandLine"
 
 #addin "nuget:?package=Cake.CoreCLR"
 #addin "nuget:?package=Cake.Figlet"
@@ -10,7 +9,9 @@
 #addin "nuget:?package=Cake.AppCenter"
 #addin "nuget:?package=Cake.Tfs.Build.Variables"
 #addin "nuget:?package=Cake.Incubator"
+#addin "nuget:?package=Cake.Plist"
 #addin "nuget:?package=Newtonsoft.Json"
+
 
 #load "./helpers/Configurator.cake"
 
@@ -66,27 +67,6 @@ Task("NuGetRestore")
     })
     .DeferOnError();
 
-Task("GitVersion")
-    .Description("Korrektur der Version in Assembly durch GitVersion :)")
-    .Does(() => {
-        var versionSettings = new GitVersionSettings {
-            UpdateAssemblyInfo = true,
-            WorkingDirectory = "./CakeTestApp",
-            OutputType = GitVersionOutput.BuildServer
-        };
-        // var versionInfo = GitVersion(new GitVersionSettings{ OutputType = GitVersionOutput.Json });
-        // Information(versionInfo.NuGetVersion);
-        // var versionInfo = GitVersion(versionSettings);
-
-        //  Information("GitResults -> {0}", versionInfo.Dump());
-        var gitVersionResults = GitVersion(new GitVersionSettings());
-        Information("GitResults -> {0}", gitVersionResults.Dump());
-    }).OnError(exception =>
-    {
-        Information("Possible errors while restoring packages, continuing seems to work.");
-        Information(exception);
-    });
-
 //////////////////////////////////////////////////////////////////////
 // BUILDING
 //////////////////////////////////////////////////////////////////////
@@ -94,7 +74,6 @@ Task("GitVersion")
 Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("NuGetRestore")
-    .IsDependentOn("GitVersion")
     .Does(() =>
 {
     MSBuild (Configurator.SolutionFile, c => {
