@@ -130,8 +130,8 @@ public static class Configurator
 
         _context.Information("");
         _context.Information("============ Nuget ============");
-        _context.Information(string.Format("API: {0}", !string.IsNullOrEmpty(NugetUrl) ? AppCenterToken : "NOT SET: nuget_url"));
-        _context.Information(string.Format("Token: {0}", !string.IsNullOrEmpty(NugetToken) ? AppCenterOwner : "NOT SET: nuget_token"));     
+        _context.Information(string.Format("API: {0}", !string.IsNullOrEmpty(NugetUrl) ? NugetUrl : "NOT SET: nuget_url"));
+        _context.Information(string.Format("Token: {0}", !string.IsNullOrEmpty(NugetToken) ? NugetToken : "NOT SET: nuget_token"));     
         _context.Information(string.Format("Configuration complete for pushing nuget packages: {0}", IsValidForPushingPackage));          
     }
 
