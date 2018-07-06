@@ -276,17 +276,22 @@ Task("CreateNugetPackage")
 
 Task("PushNugetPackage")    
     .WithCriteria(() => Configurator.IsValidForPushingPackage)
-    .DoesForEach(GetFiles("./**/" + Configurator.ProjectName + "*.nupkg"), (file) => 
+    .Does(() => 
     {
-        Information("Pushing " + file.ToString());
-        NuGetPush(file, new NuGetPushSettings {
-            Source = Configurator.NugetUrl,
-            ApiKey = Configurator.NugetToken
-        });
-    })
-    .OnError(exception =>
-    {
-        Information(exception);
+        var path = string.Format("./**/{0}*.nupkg", Configurator.ProjectName);
+        var files = GetFiles(path);
+        if(files.Any())
+        {
+            foreach (var file in files)
+            {
+                Information("Pushing " + file.ToString());
+                NuGetPush(file, new NuGetPushSettings 
+                {
+                    Source = Configurator.NugetUrl,
+                    ApiKey = Configurator.NugetToken
+                });
+            }
+        }
     });
     
 
@@ -396,10 +401,28 @@ Task("Help")
     });
 
 Task("Test")
-    .Does(() =>
+.Does(() => 
     {
-
+        var path = string.Format("./**/{0}*.nupkg", Configurator.ProjectName);
+        var files = GetFiles(path);
+        if(files.Any())
+        {
+foreach (var file in files)
+{
+    Information(file);
+}
+        }
     });
+    // .DoesForEach(GetFiles(string.Format("./**/{0}*.nupkg", Configurator.ProjectName)), (file) => 
+    // {
+    //     var path = string.Format("./**/{0}*.nupkg", Configurator.ProjectName);
+    //     Information(path);
+    //     // Information("Pushing " + file.ToString());
+    // })
+    // .OnError(exception =>
+    // {
+    //     Information(exception);
+    // });
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
