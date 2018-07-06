@@ -274,28 +274,20 @@ Task("CreateNugetPackage")
         // NuGetPack(buildConfiguration.NuspecFile, new NuGetPackSettings());
     });
 
-Task("PushNugetPackage")
-    .IsDependentOn("CreateNugetPackage")
+Task("PushNugetPackage")    
     .Does(() =>
-    {
-        throw new NotImplementedException();
-        // var nugetUrl = Environment.GetEnvironmentVariable("NugetUrl");
-        // var nugetApiKey = Environment.GetEnvironmentVariable("NugetApiKey");
+    {   
+        var path = "./*.nupkg";
+        var files = GetFiles(path);
 
-        // Information(nugetUrl);
-        // Information(nugetApiKey);
-
-        // var path = "./*.nupkg";
-        // var files = GetFiles(path);
-
-        // foreach(FilePath file in files)
-        // {
-        //     Information("Uploading " + file);
-        //     NuGetPush(file, new NuGetPushSettings {
-        //         Source = nugetUrl,
-        //         ApiKey = nugetApiKey
-        //     });
-        // }
+        foreach(FilePath file in files)
+        {
+            Information("Uploading " + file);
+            NuGetPush(file, new NuGetPushSettings {
+                Source = Configurator.NugetUrl,
+                ApiKey = Configurator.NugetToken
+            });
+        }
     });
     
 

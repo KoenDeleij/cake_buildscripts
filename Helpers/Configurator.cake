@@ -58,6 +58,12 @@ public static class Configurator
         !string.IsNullOrEmpty(AppCenterAppName) &&
         !string.IsNullOrEmpty(AppCenterDistributionGroup);
 
+    /// Nuget
+
+    public static string NugetUrl { get; private set; }
+
+    public static string NugetToken { get; private set; }
+
     ///
 
     private static ICakeContext _context;
@@ -77,6 +83,8 @@ public static class Configurator
         ReadTestBuildSettings();
 
         ReadAppCenterSettings();
+
+        ReadNugetSettings();
 
         ShowSettings();
     }
@@ -116,6 +124,11 @@ public static class Configurator
         _context.Information(string.Format("App name: {0}", !string.IsNullOrEmpty(AppCenterAppName) ? AppCenterAppName : "NOT SET: appcenter_appname"));
         _context.Information(string.Format("Distribution group: {0}", !string.IsNullOrEmpty(AppCenterDistributionGroup) ? AppCenterDistributionGroup : "NOT SET: appcenter_distributiongroup"));
         _context.Information(string.Format("Configuration complete for appcenter release: {0}", IsValidForAppCenterDistribution));
+
+        _context.Information("");
+        _context.Information("============ Nuget ============");
+        _context.Information(string.Format("API: {0}", !string.IsNullOrEmpty(NugetUrl) ? AppCenterToken : "NOT SET: nuget_url"));
+        _context.Information(string.Format("Token: {0}", !string.IsNullOrEmpty(NugetToken) ? AppCenterOwner : "NOT SET: nuget_token"));        
     }
 
     private static void ReadMainBuildSettings()
@@ -198,5 +211,11 @@ public static class Configurator
         AppCenterOwner = _context.EvaluateTfsBuildVariable("appcenter_owner", _context.EnvironmentVariable("appcenter_owner") ?? _context.Argument("appcenter_owner", string.Empty));
         AppCenterAppName = _context.EvaluateTfsBuildVariable("appcenter_appname", _context.EnvironmentVariable("appcenter_appname") ?? _context.Argument("appcenter_appname", string.Empty));
         AppCenterDistributionGroup = _context.EvaluateTfsBuildVariable("appcenter_distributiongroup", _context.EnvironmentVariable("appcenter_distributiongroup") ?? _context.Argument("appcenter_distributiongroup", string.Empty));
+    }
+
+    private static void ReadNugetSettings()
+    {
+        NugetUrl = _context.EvaluateTfsBuildVariable("nuget_url", _context.EnvironmentVariable("nuget_url") ?? _context.Argument("nuget_url", string.Empty));
+        NugetToken = _context.EvaluateTfsBuildVariable("nuget_token", _context.EnvironmentVariable("nuget_token") ?? _context.Argument("nuget_token", string.Empty));
     }
 }
