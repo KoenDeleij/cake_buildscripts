@@ -276,7 +276,7 @@ Task("CreateNugetPackage")
 
 Task("PushNugetPackage")    
     .WithCriteria(() => Configurator.IsValidForPushingPackage)
-    .DoesForEach(GetFiles("**/*.nupkg"), (file) => 
+    .DoesForEach(GetFiles("**/" + Configurator.ProjectName + "*.nupkg"), (file) => 
     {
         Information("Pushing " + file.ToString());
         NuGetPush(file, new NuGetPushSettings {
