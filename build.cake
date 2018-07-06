@@ -1,4 +1,3 @@
-#tool "nuget:?package=MSBuild.SonarQube.Runner.Tool"
 #tool "nuget:?package=JetBrains.dotCover.CommandLineTools"
 #tool "nuget:?package=NUnit.ConsoleRunner"
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
@@ -6,12 +5,13 @@
 
 #addin "nuget:?package=Cake.CoreCLR"
 #addin "nuget:?package=Cake.Figlet"
-#addin "nuget:?package=Newtonsoft.Json"
-#addin "nuget:?package=Cake.Sonar"
 #addin "nuget:?package=Cake.Xamarin"
 #addin "nuget:?package=Cake.AppCenter"
 #addin "nuget:?package=Cake.Tfs.Build.Variables"
-// #addin "nuget:?package=Cake.AndroidAppManifest"
+#addin "nuget:?package=Cake.Incubator"
+#addin "nuget:?package=Cake.Plist"
+#addin "nuget:?package=Cake.AndroidAppManifest"
+#addin "nuget:?package=Newtonsoft.Json"
 
 #load "./helpers/Configurator.cake"
 
@@ -45,36 +45,34 @@ Task("Clean")
     CleanDirectory(artifacts);
     CleanDirectory(artifacts + "/tests");
     CleanDirectory(artifacts + "/coverage");
-    CleanDirectories("./**/bin");
-    CleanDirectories("./**/obj");
+
+    if(Configurator.ShouldClean)
+    {
+        CleanDirectories("./**/bin");
+        CleanDirectories("./**/obj");
+    }
 });
 
 Task("NuGetRestore")
-    .IsDependentOn("Clean")
-    .Does(() =>
+    .DoesForEach(GetFiles("**/*.csproj"), (file) => 
     {
-        // test: restore all csproj
-        var projectsPath = "./**/*.csproj";
-        var projectFiles = GetFiles(projectsPath);
-        foreach(var projFile in projectFiles)
-        {
-            NuGetRestore(projFile);
-        }
-
-        DotNetCoreRestore(Configurator.SolutionFile);
+        Information("Restoring " + file.ToString());
+        NuGetRestore(file);
+        DotNetCoreRestore(file.ToString());
     })
     .OnError(exception =>
     {
         Information("Possible errors while restoring packages, continuing seems to work.");
         Information(exception);
-    });
-
+    })
+    .DeferOnError();
 
 //////////////////////////////////////////////////////////////////////
 // BUILDING
 //////////////////////////////////////////////////////////////////////
 
 Task("Build")
+    .IsDependentOn("Clean")
     .IsDependentOn("NuGetRestore")
     .Does(() =>
 {
@@ -89,11 +87,10 @@ Task("Build")
 // BUILDING ANDROID
 //////////////////////////////////////////////////////////////////////
 
-
-//https://github.com/cake-contrib/Cake.AndroidAppManifest
 Task("Build-Droid")
     .WithCriteria(() => Configurator.IsValidForBuildingAndroid)
-	.IsDependentOn("NuGetRestore")
+	.IsDependentOn("Build")
+    .IsDependentOn("SetDroidVersion")
 	.Does(() =>
 { 		
         //https://docs.microsoft.com/en-us/xamarin/android/deploy-test/building-apps/build-process
@@ -109,6 +106,39 @@ Task("Build-Droid")
 
         Information(file.ToString());
 });
+
+Task("SetDroidVersion")
+    .Does(() =>
+    {
+        var manifestPattern = "./**/AndroidManifest.xml";
+        var foundManifestFiles = GetFiles(manifestPattern);
+        if(foundManifestFiles.Any())
+        {
+            var manifestPath = foundManifestFiles.FirstOrDefault();
+            var manifest = DeserializeAppManifest(manifestPath);
+
+            Information("manifest -> {0}", manifest.Dump());
+
+            //manifest.PackageName = "com.example.mycoolapp";
+            manifest.VersionName = Configurator.FullVersion;
+            manifest.VersionCode = int.Parse(Configurator.FullVersion.Replace(".",""));
+            // manifest.ApplicationIcon = "@mipmap/ic_launcher";
+            // manifest.ApplicationLabel = "Android Application";
+            // manifest.Debuggable = false;
+
+            // data["CFBundleShortVersionString"] = Configurator.Version;
+            // data["CFBundleVersion"] = Configurator.FullVersion;
+
+            // data["CFBundleShortVersionString"] = Configurator.Version;
+            // data["CFBundleVersion"] = Configurator.FullVersion;
+
+            SerializeAppManifest(manifestPath, manifest);
+        }
+        else
+        {
+            throw new Exception("Can't find AndroidManifest.xml");
+        }
+    });
 
 Task("AppCenterRelease-Droid")
     .IsDependentOn("Build-Droid")
@@ -150,7 +180,8 @@ Task("AppCenterRelease-Droid")
 Task("Build-iOS")
     .WithCriteria(IsRunningOnUnix())
     .WithCriteria(() => Configurator.IsValidForBuildingIOS)
-	.IsDependentOn("UnitTest")
+    .IsDependentOn("Build")
+    .IsDependentOn("SetIOSVersion")
 	.Does (() =>
 	{
         // TODO: BuildiOSIpa (Cake.Xamarin, https://github.com/Redth/Cake.Xamarin/blob/master/src/Cake.Xamarin/Aliases.cs)
@@ -163,19 +194,33 @@ Task("Build-iOS")
             .WithProperty("TreatWarningsAsErrors", "false"));
 	});
 
+Task("SetIOSVersion")
+    .Does(() =>
+    {
+        var plistPattern = "./**/Info.plist";
+        var foundPListFiles = GetFiles(plistPattern);
+        if(foundPListFiles.Any())
+        {
+            var plistPath = foundPListFiles.FirstOrDefault().ToString();
+            dynamic data = DeserializePlist(plistPath);
+
+            data["CFBundleShortVersionString"] = Configurator.Version;
+            data["CFBundleVersion"] = Configurator.FullVersion;
+
+            SerializePlist(plistPath, data);
+        }
+        else
+        {
+            throw new Exception("Can't find Info.plist");
+        }
+    });
+
 Task("AppCenterRelease-iOS")
     .WithCriteria(() => Configurator.IsValidForAppCenterDistribution)
     .IsDependentOn("Build-iOS")
     .IsDependentOn("AppCenterLogin")
     .Does(() =>
     {
-        //https://cakebuild.net/api/Cake.AppCenter/
-        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ appcenter apps set-current CakeTestApp/CakeTestApp-Dev
-        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ appcenter distribute release -f CakeTestApp.iOS/bin/iPhone/CakeTestApp.iOS.ipa -g Collaborators
-        // Error: binary file 'CakeTestApp.iOS/bin/iPhone/CakeTestApp.iOS.ipa' doesn't exist
-        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ ls CakeTestApp
-        // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ appcenter distribute release -f CakeTestApp/CakeTestApp.iOS/bin/iPhone/CakeTestApp.iOS.ipa -g Collaborators
-
         var ipaFilePattern = "./**/*iOS*.ipa";
         var foundIpaFiles = GetFiles(ipaFilePattern);
 
@@ -193,7 +238,7 @@ Task("AppCenterRelease-iOS")
     .Finally(() =>
     {  
         // TODO: move to settings
-        AppCenterLogout(new AppCenterLogoutSettings { Token = "8600137f6b1b07c5e1a4d7792da999249631e148" });
+        AppCenterLogout(new AppCenterLogoutSettings { Token = Configurator.AppCenterToken });
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -206,7 +251,7 @@ Task("AppCenterLogin")
     .Does(() => 
     {
         // TODO: move to settings
-        AppCenterLogin(new AppCenterLoginSettings { Token = "8600137f6b1b07c5e1a4d7792da999249631e148" });
+        AppCenterLogin(new AppCenterLoginSettings { Token = Configurator.AppCenterToken });
     })
     .OnError(exception =>
     {
@@ -229,28 +274,20 @@ Task("CreateNugetPackage")
         // NuGetPack(buildConfiguration.NuspecFile, new NuGetPackSettings());
     });
 
-Task("PushNugetPackage")
-    .IsDependentOn("CreateNugetPackage")
+Task("PushNugetPackage")    
     .Does(() =>
-    {
-        throw new NotImplementedException();
-        // var nugetUrl = Environment.GetEnvironmentVariable("NugetUrl");
-        // var nugetApiKey = Environment.GetEnvironmentVariable("NugetApiKey");
+    {   
+        var path = "./*.nupkg";
+        var files = GetFiles(path);
 
-        // Information(nugetUrl);
-        // Information(nugetApiKey);
-
-        // var path = "./*.nupkg";
-        // var files = GetFiles(path);
-
-        // foreach(FilePath file in files)
-        // {
-        //     Information("Uploading " + file);
-        //     NuGetPush(file, new NuGetPushSettings {
-        //         Source = nugetUrl,
-        //         ApiKey = nugetApiKey
-        //     });
-        // }
+        foreach(FilePath file in files)
+        {
+            Information("Uploading " + file);
+            NuGetPush(file, new NuGetPushSettings {
+                Source = Configurator.NugetUrl,
+                ApiKey = Configurator.NugetToken
+            });
+        }
     });
     
 
@@ -318,6 +355,7 @@ Task("xUnitTestWithCoverage")
             }
             .WithFilter("+:" + Configurator.ProjectName + ".*")
             .WithFilter("-:" + Configurator.ProjectName + ".Tests*")
+            // .WithFilter("-:" + Configurator.ProjectName + ".Tests*")
     );
 })
 .Finally(() => 
@@ -338,30 +376,6 @@ Task("xUnitTestWithCoverage")
         }
     );
 });
-
-Task("SonarBegin")
-  .Does(() => {
-     SonarBegin(new SonarBeginSettings{
-        Url = "http://rhm-d-dock01.boolhosting.tld:9000/",
-        Key = string.Format("Appollo-{0}", Configurator.ProjectName),
-        Name = string.Format("Appollo-{0}", Configurator.ProjectName),
-        Version = "123", // TODO
-        Verbose = true
-     });
-  });
-
-Task("SonarEnd")
-  .Does(() => {
-     SonarEnd(new SonarEndSettings
-     {
-        
-     });
-  });
-
-Task("Sonar-xUnit")
-  .IsDependentOn("SonarBegin")
-  .IsDependentOn("xUnitTestWithCoverage")
-  .IsDependentOn("SonarEnd");
 
 //////////////////////////////////////////////////////////////////////
 // Help

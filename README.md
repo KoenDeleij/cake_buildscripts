@@ -1,7 +1,18 @@
-#Introduction 
-Cake build scripts for Xamarin / C# / MvvmCross / Whatever projects
+#Redhotminute.Appollo.Cake.BuildScripts
+
+Cake build scripts for Xamarin / C# / MvvmCross / Whatever projects you want to build
 
 Author: Jacob Duijzer
+
+## TL;DR
+- TFS Repo: http://rhm-p-tfs01.kantoor.tld:8080/tfs/RedHotMinute/Apps/_git/Redhotminute.Appollo.Cake.BuildScripts
+- Nexus: http://rhm-p-repo01.kantoor.tld:8081/repository/raw-rhm-mobile/cake/cakebuild-latest.zip
+
+## How it works (basically)
+Voor het builden haalt het script de laatste versie van de Cake scripts op en pakt deze uit. Daarna kan je Cake builds starten. In de log zie je de output van de settings, deze spreken voor zich en zijn volgens mij duidelijk genoeg om te achterhalen wat je nog mist.
+
+
+
 
 ## NOTES
 
