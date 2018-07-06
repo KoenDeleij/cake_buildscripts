@@ -275,19 +275,17 @@ Task("CreateNugetPackage")
     });
 
 Task("PushNugetPackage")    
-    .Does(() =>
-    {   
-        var path = "./*.nupkg";
-        var files = GetFiles(path);
-
-        foreach(FilePath file in files)
-        {
-            Information("Uploading " + file);
-            NuGetPush(file, new NuGetPushSettings {
-                Source = Configurator.NugetUrl,
-                ApiKey = Configurator.NugetToken
-            });
-        }
+    .DoesForEach(GetFiles("**/*.nupkg"), (file) => 
+    {
+        Information("Pushing " + file.ToString());
+        NuGetPush(file, new NuGetPushSettings {
+            Source = Configurator.NugetUrl,
+            ApiKey = Configurator.NugetToken
+        });
+    })
+    .OnError(exception =>
+    {
+        Information(exception);
     });
     
 
