@@ -12,6 +12,7 @@
 #addin "nuget:?package=Cake.Plist"
 #addin "nuget:?package=Cake.AndroidAppManifest"
 #addin "nuget:?package=Newtonsoft.Json"
+#addin "nuget:?package=Cake.Coverlet"
 
 #load "./helpers/Configurator.cake"
 
@@ -403,15 +404,16 @@ Task("Help")
 Task("Test")
 .Does(() => 
     {
-        var path = string.Format("./**/{0}*.nupkg", Configurator.ProjectName);
-        var files = GetFiles(path);
-        if(files.Any())
-        {
-foreach (var file in files)
-{
-    Information(file);
-}
-        }
+        var testSettings = new DotNetCoreTestSettings { };
+
+        var coveletSettings = new CoverletSettings {
+            CollectCoverage = true,
+            CoverletOutputFormat = CoverletOutputFormat.opencover,
+            CoverletOutputDirectory = Directory("artifacts/coverage/"),
+            CoverletOutputName = $"results-{DateTime.UtcNow:dd-MM-yyyy-HH-mm-ss-FFF}"
+        };
+
+        DotNetCoreTest(Configurator.TestProjectFile, testSettings, coveletSettings);
     });
     // .DoesForEach(GetFiles(string.Format("./**/{0}*.nupkg", Configurator.ProjectName)), (file) => 
     // {
