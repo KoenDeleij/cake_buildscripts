@@ -404,7 +404,10 @@ Task("Help")
 Task("Test")
 .Does(() => 
     {
-        var testSettings = new DotNetCoreTestSettings { };
+        var testSettings = new DotNetCoreTestSettings 
+        { 
+            Configuration = configuration
+        };
 
         var coveletSettings = new CoverletSettings {
             CollectCoverage = true,
