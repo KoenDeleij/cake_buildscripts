@@ -41,3 +41,7 @@ Thumbs.db
 Resource.designer.cs
 .droidres
 UserPrefs.xml
+
+artifacts/coverage/
+
+artifacts/tests/

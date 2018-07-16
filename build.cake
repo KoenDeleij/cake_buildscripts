@@ -401,34 +401,72 @@ Task("Help")
         Information("For more info & questions: ask Jacob.");
     });
 
-Task("Test")
+Task("TestCoverageReport")
 .IsDependentOn("Build")
 .Does(() => 
     {
+        Information(Context.Environment.WorkingDirectory.ToString());
         var testSettings = new DotNetCoreTestSettings 
         { 
-            Configuration = configuration
+            Configuration = configuration,
+            // ArgumentCustomization = args => args.Append("--logger \"trx;LogFileName=TestResults.xml\""),
+            NoBuild = true
         };
 
-        var coveletSettings = new CoverletSettings {
+        var coverletSettings = new CoverletSettings {
             CollectCoverage = true,
             CoverletOutputFormat = CoverletOutputFormat.opencover,
-            CoverletOutputDirectory = Directory("artifacts/coverage/"),
+            CoverletOutputDirectory = Context.Environment.WorkingDirectory,
             CoverletOutputName = $"results-{DateTime.UtcNow:dd-MM-yyyy-HH-mm-ss-FFF}"
         };
+        
+        // 16-7-18: new version will fix the issue with overriding report settings, just waiting...
+        DotNetCoreTest(Configurator.TestProjectFile, testSettings, coverletSettings);
 
-        DotNetCoreTest(Configurator.TestProjectFile, testSettings, coveletSettings);
+        var path = "./**/coverage.opencover.xml";
+
+        var files = GetFiles(path);
+        if(files.Any())
+        {
+            foreach(var file in files)
+            {
+                Information(string.Format("Copy {0}", file.ToString()));
+                CopyFile(file, string.Format("{0}/coverage/{1}", artifacts, file.GetFilename()));
+            }
+        }
     });
-    // .DoesForEach(GetFiles(string.Format("./**/{0}*.nupkg", Configurator.ProjectName)), (file) => 
-    // {
-    //     var path = string.Format("./**/{0}*.nupkg", Configurator.ProjectName);
-    //     Information(path);
-    //     // Information("Pushing " + file.ToString());
-    // })
-    // .OnError(exception =>
-    // {
-    //     Information(exception);
-    // });
+
+Task("TestTestReport")
+.IsDependentOn("TestCoverageReport")
+.Does(() => 
+    {
+        Information(Context.Environment.WorkingDirectory.ToString());
+        var testSettings = new DotNetCoreTestSettings 
+        { 
+            Configuration = configuration,
+            ArgumentCustomization = args => args.Append("--logger \"trx;LogFileName=TestResults.xml\""),
+            NoBuild = true
+        };
+        
+        // 16-7-18: new version will fix the issue with overriding report settings, just waiting...
+        DotNetCoreTest(Configurator.TestProjectFile, testSettings);
+
+        var path = "./**/TestResults.xml";
+
+        var files = GetFiles(path);
+        if(files.Any())
+        {
+            var file = files.FirstOrDefault();
+            Information(string.Format("Copy {0}", file.ToString()));
+            CopyFile(file, string.Format("{0}/tests/{1}", artifacts, file.GetFilename()));
+        }
+    });
+
+Task("Test")
+.Does(() => 
+{
+    //Nothing
+});
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
