@@ -402,6 +402,7 @@ Task("Help")
     });
 
 Task("Test")
+.IsDependentOn("Build")
 .Does(() => 
     {
         var testSettings = new DotNetCoreTestSettings 
