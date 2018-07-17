@@ -199,13 +199,20 @@ public static class Configurator
 
     private static void ReadTestBuildSettings()
     {
-        var testPath = "./**/*.Tests.csproj";
-        var testFiles = GlobbingAliases.GetFiles(_context, testPath);
+        TestProjectFile = _context.EvaluateTfsBuildVariable("test_solution_file", _context.EnvironmentVariable("test_solution_file") ?? _context.Argument("test_solution_file", string.Empty));
+        TestProjectDirectory = _context.EvaluateTfsBuildVariable("test_solution_directory", _context.EnvironmentVariable("test_solution_directory") ?? _context.Argument("test_solution_directory", string.Empty));
 
-        if(testFiles.Any())
+        if(string.IsNullOrEmpty(TestProjectFile))
         {
-            TestProjectFile = testFiles.FirstOrDefault().ToString();
-            TestProjectDirectory = testFiles.FirstOrDefault().GetDirectory().ToString();
+
+            var testPath = "./**/*.Tests.csproj";
+            var testFiles = GlobbingAliases.GetFiles(_context, testPath);
+
+            if(testFiles.Any())
+            {
+                TestProjectFile = testFiles.FirstOrDefault().ToString();
+                TestProjectDirectory = testFiles.FirstOrDefault().GetDirectory().ToString();
+            }
         }
     }
 
