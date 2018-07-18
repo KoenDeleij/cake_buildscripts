@@ -198,18 +198,27 @@ Task("Build-iOS")
 Task("SetIOSParameters")
     .Does(() =>
     {
+        Information("SetIOSParameters");
         var plistPattern = "./**/Info.plist";
         var foundPListFiles = GetFiles(plistPattern);
         if(foundPListFiles.Any())
         {
             var plistPath = foundPListFiles.FirstOrDefault().ToString();
+
+            Information(string.Format("Plist file: {0}", plistPath.ToString()));
+
+
             dynamic data = DeserializePlist(plistPath);
 
             data["CFBundleShortVersionString"] = Configurator.Version;
             data["CFBundleVersion"] = Configurator.FullVersion;
 
             if(!string.IsNullOrEmpty(Configurator.IOSBundleIdentifier))
+            {
+                Information(string.Format("Writing bundle identifier: {0}", Configurator.IOSBundleIdentifier));
                 data["CFBundleIdentifier"] = Configurator.IOSBundleIdentifier;
+            }
+                
 
             SerializePlist(plistPath, data);
         }
