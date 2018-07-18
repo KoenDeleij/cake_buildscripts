@@ -215,7 +215,7 @@ public static class Configurator
         }
         else
         {
-            var testPath = "./**/*.Tests.csproj";
+            var testPath = "./**/*Tests.csproj";
             var testFiles = GlobbingAliases.GetFiles(_context, testPath);
 
             if(testFiles.Any())
