@@ -1,3 +1,5 @@
+#load "../models/UnitTestProject.cake"
+
 public static class Configurator
 {
     /// Main
@@ -35,12 +37,10 @@ public static class Configurator
 
     /// Tests
     
-    public static string TestProjectFile { get; private set; }
+    public static List<UnitTestProject> UnitTestProjects { get; private set;}
 
-    public static string TestProjectDirectory { get; private set; }
-
-    public static bool IsValidForRunningTests => !string.IsNullOrEmpty(TestProjectFile) && 
-                                                    !string.IsNullOrEmpty(TestProjectDirectory);
+    public static bool IsValidForRunningTests => UnitTestProjects != null &&
+                                                    UnitTestProjects.Any();
 
     /// AppCenter 
 
@@ -116,8 +116,13 @@ public static class Configurator
 
         _context.Information("");
         _context.Information("============ Test ============");
-        _context.Information(string.Format("Test project: {0}", !string.IsNullOrEmpty(TestProjectFile) ? TestProjectFile : "NOT FOUND"));
-        _context.Information(string.Format("Test directory: {0}", !string.IsNullOrEmpty(TestProjectDirectory) ? TestProjectDirectory : "NOT SET"));
+        foreach(var testProject in UnitTestProjects)
+        {
+            _context.Information(string.Format("Test project: {0}", testProject.ProjectFile));
+            _context.Information(string.Format("Test project name: {0}", testProject.ProjectName));            
+            _context.Information(string.Format("Test directory: {0}", testProject.ProjectDirectory));
+        }
+        
         _context.Information(string.Format("Configuration complete for running tests: {0}", IsValidForRunningTests));
 
         _context.Information("");
@@ -199,21 +204,28 @@ public static class Configurator
 
     private static void ReadTestBuildSettings()
     {
-        TestProjectFile = _context.EvaluateTfsBuildVariable("test_solution_file", _context.EnvironmentVariable("test_solution_file") ?? _context.Argument("test_solution_file", string.Empty));
-        TestProjectDirectory = _context.EvaluateTfsBuildVariable("test_solution_directory", _context.EnvironmentVariable("test_solution_directory") ?? _context.Argument("test_solution_directory", string.Empty));
+        UnitTestProjects = new List<UnitTestProject>();
 
-        if(string.IsNullOrEmpty(TestProjectFile))
+        var testProjectFile = _context.EvaluateTfsBuildVariable("test_solution_file", _context.EnvironmentVariable("test_solution_file") ?? _context.Argument("test_solution_file", string.Empty));
+        var testProjectDirectory = _context.EvaluateTfsBuildVariable("test_solution_directory", _context.EnvironmentVariable("test_solution_directory") ?? _context.Argument("test_solution_directory", string.Empty));
+
+        if(!string.IsNullOrEmpty(testProjectFile) && !string.IsNullOrEmpty(testProjectDirectory))
         {
-
+            UnitTestProjects.Add(new UnitTestProject(testProjectFile, testProjectDirectory, testProjectFile.Replace(".csproj", "")));
+        }
+        else
+        {
             var testPath = "./**/*.Tests.csproj";
             var testFiles = GlobbingAliases.GetFiles(_context, testPath);
 
             if(testFiles.Any())
             {
-                TestProjectFile = testFiles.FirstOrDefault().ToString();
-                TestProjectDirectory = testFiles.FirstOrDefault().GetDirectory().ToString();
+                foreach(var testFile in testFiles)
+                {
+                    UnitTestProjects.Add(new UnitTestProject(testFile.ToString(), testFile.GetDirectory().ToString(), ProjectName = testFile.GetFilenameWithoutExtension().ToString()));
+                }                
             }
-        }
+        }        
     }
 
     private static void ReadAppCenterSettings()
