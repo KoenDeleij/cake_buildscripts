@@ -311,7 +311,7 @@ Task("UnitTest")
     foreach(var testProject in Configurator.UnitTestProjects)
     {
         DotNetCoreTest(
-                testProject.ProjectFile,
+                testProject.File,
                 new DotNetCoreTestSettings()
                 {
                     Configuration = configuration,
@@ -333,10 +333,10 @@ Task("NUnitTestWithCoverage")
         //var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
         //Information(path);
 
-        DotNetCorePublish(testProject.ProjectFile);
+        DotNetCorePublish(testProject.File);
 
         DotCoverAnalyse((ctx) => {
-            ctx.NUnit3(testProject.ProjectDirectory);
+            ctx.NUnit3(testProject.Directory);
         },
         "coverage.html",
         new DotCoverAnalyseSettings {
@@ -356,7 +356,7 @@ Task("xUnitTestWithCoverage")
     {
         DotCoverCover(tool => {
         tool.DotNetCoreTool(
-            testProject.ProjectDirectory,
+            testProject.Directory,
             "xunit",
             new ProcessArgumentBuilder()
                 .AppendSwitchQuoted("-xml", artifacts + "/tests/results.xml")
@@ -369,8 +369,8 @@ Task("xUnitTestWithCoverage")
         },
         artifacts + "/coverage/coverage.dcvr",
         new DotCoverCoverSettings() {
-                TargetWorkingDir = testProject.ProjectDirectory,
-                WorkingDirectory = testProject.ProjectDirectory,
+                TargetWorkingDir = testProject.Directory,
+                WorkingDirectory = testProject.Directory,
                 // EnvironmentVariables = GitVersionEnvironmentVariables,
             }
             .WithFilter("+:" + Configurator.ProjectName + ".*")
@@ -425,7 +425,7 @@ Task("TestCoverageReport")
     {
         foreach(var testProject in Configurator.UnitTestProjects)
         {
-            var reportName = string.Format("coverage.opencover.{0}.xml", testProject.ProjectName);
+            var reportName = string.Format("coverage.opencover.{0}.xml", testProject.Name);
 
             var testSettings = new DotNetCoreTestSettings 
             { 
@@ -442,9 +442,9 @@ Task("TestCoverageReport")
             };
             
             // 16-7-18: new version will fix the issue with overriding report settings, just waiting...
-            DotNetCoreTest(testProject.ProjectFile, testSettings, coverletSettings);
+            DotNetCoreTest(testProject.File, testSettings, coverletSettings);
 
-            var path = string.Format("{0}/coverage.opencover.xml", testProject.ProjectDirectory);
+            var path = string.Format("{0}/coverage.opencover.xml", testProject.Directory);
 
             var files = GetFiles(path);
             if(files.Any())
@@ -465,7 +465,7 @@ Task("TestTestReport")
     {
         foreach(var testProject in Configurator.UnitTestProjects)
         {
-            var reportName = string.Format("TestResults.{0}.xml", testProject.ProjectName);
+            var reportName = string.Format("TestResults.{0}.xml", testProject.Name);
 
             var testSettings = new DotNetCoreTestSettings 
             { 
@@ -476,9 +476,9 @@ Task("TestTestReport")
             };
         
             // 16-7-18: new version will fix the issue with overriding report settings, just waiting...
-            DotNetCoreTest(testProject.ProjectFile, testSettings);
+            DotNetCoreTest(testProject.File, testSettings);
 
-            var path = string.Format("{0}/TestResults/{1}", testProject.ProjectDirectory, reportName);
+            var path = string.Format("{0}/TestResults/{1}", testProject.Directory, reportName);
 
             var files = GetFiles(path);
             if(files.Any())

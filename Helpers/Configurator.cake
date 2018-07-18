@@ -121,9 +121,9 @@ public static class Configurator
         _context.Information("============ Test ============");
         foreach(var testProject in UnitTestProjects)
         {
-            _context.Information(string.Format("Test project: {0}", testProject.ProjectFile));
-            _context.Information(string.Format("Test project name: {0}", testProject.ProjectName));            
-            _context.Information(string.Format("Test directory: {0}", testProject.ProjectDirectory));
+            _context.Information(string.Format("Test project: {0}", testProject.File));
+            _context.Information(string.Format("Test project name: {0}", testProject.Name));            
+            _context.Information(string.Format("Test directory: {0}", testProject.Directory));
         }
         
         _context.Information(string.Format("Configuration complete for running tests: {0}", IsValidForRunningTests));
@@ -216,7 +216,7 @@ public static class Configurator
 
         if(!string.IsNullOrEmpty(testProjectFile) && !string.IsNullOrEmpty(testProjectDirectory))
         {
-            UnitTestProjects.Add(new UnitTestProject(testProjectFile, testProjectDirectory, testProjectFile.Replace(".csproj", "")));
+            UnitTestProjects.Add(new UnitTestProject(testProjectFile, testProjectFile.Replace(".csproj", ""), testProjectDirectory));
         }
         else
         {
@@ -227,7 +227,7 @@ public static class Configurator
             {
                 foreach(var testFile in testFiles)
                 {
-                    UnitTestProjects.Add(new UnitTestProject(testFile.ToString(), testFile.GetDirectory().ToString(), ProjectName = testFile.GetFilenameWithoutExtension().ToString()));
+                    UnitTestProjects.Add(new UnitTestProject(testFile.ToString(), testFile.GetFilenameWithoutExtension().ToString(), testFile.GetDirectory().ToString()));
                 }                
             }
         }        

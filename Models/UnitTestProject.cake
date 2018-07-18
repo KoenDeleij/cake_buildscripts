@@ -1,15 +1,17 @@
 public class UnitTestProject
 {
-    public string ProjectFile { get; private set; }
+    public string File { get; private set; }
 
-    public string ProjectDirectory { get; private set; }
+    public string Name { get; private set; }
 
-    public string ProjectName { get; private set; }
+    public string Directory { get; private set; }
 
-    public UnitTestProject(string projectFile, string projectDirectory, string projectName)
+    
+
+    public UnitTestProject(string file, string name, string directory)
     {
-        ProjectFile = projectFile;
-        ProjectDirectory = projectDirectory;
-        ProjectName = projectName;
+        File = file;
+        Name = name;
+        Directory = directory;
     }
 }
