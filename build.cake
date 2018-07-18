@@ -182,7 +182,7 @@ Task("Build-iOS")
     .WithCriteria(IsRunningOnUnix())
     .WithCriteria(() => Configurator.IsValidForBuildingIOS)
     .IsDependentOn("Build")
-    .IsDependentOn("SetIOSVersion")
+    .IsDependentOn("SetIOSParameters")
 	.Does (() =>
 	{
         // TODO: BuildiOSIpa (Cake.Xamarin, https://github.com/Redth/Cake.Xamarin/blob/master/src/Cake.Xamarin/Aliases.cs)
@@ -195,7 +195,7 @@ Task("Build-iOS")
             .WithProperty("TreatWarningsAsErrors", "false"));
 	});
 
-Task("SetIOSVersion")
+Task("SetIOSParameters")
     .Does(() =>
     {
         var plistPattern = "./**/Info.plist";
@@ -207,6 +207,9 @@ Task("SetIOSVersion")
 
             data["CFBundleShortVersionString"] = Configurator.Version;
             data["CFBundleVersion"] = Configurator.FullVersion;
+
+            if(!string.IsNullOrEmpty(Configurator.IOSBundleIdentifier))
+                data["CFBundleIdentifier"] = Configurator.IOSBundleIdentifier;
 
             SerializePlist(plistPath, data);
         }

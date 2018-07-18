@@ -18,6 +18,8 @@ public static class Configurator
 
     public static string IOSProjectFile { get; private set; }
 
+    public static string IOSBundleIdentifier { get; private set; }
+
     public static bool IsValidForBuildingIOS => !string.IsNullOrEmpty(IOSProjectFile);
 
     /// Android
@@ -104,6 +106,7 @@ public static class Configurator
         _context.Information("");
         _context.Information("============ iOS ============");
         _context.Information(string.Format("iOS project: {0}", !string.IsNullOrEmpty(IOSProjectFile) ? IOSProjectFile : "NOT FOUND"));
+        _context.Information(string.Format("iOS bundle identifier: {0}", !string.IsNullOrEmpty(IOSBundleIdentifier) ? IOSBundleIdentifier : "NOT SET"));        
         _context.Information(string.Format("Configuration complete for building iOS: {0}", IsValidForBuildingIOS));
 
         _context.Information("");
@@ -171,6 +174,8 @@ public static class Configurator
 
         if(iosFiles.Any())
             IOSProjectFile = iosFiles.FirstOrDefault().ToString();
+
+        IOSBundleIdentifier = _context.EvaluateTfsBuildVariable("ios_bundle_identifier",  _context.EnvironmentVariable("ios_bundle_identifier") ??  _context.Argument("ios_bundle_identifier", string.Empty));    
     }
 
     private static void ReadDroidBuildSettings()
