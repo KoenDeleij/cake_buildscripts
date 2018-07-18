@@ -181,8 +181,8 @@ Task("AppCenterRelease-Droid")
 Task("Build-iOS")
     .WithCriteria(IsRunningOnUnix())
     .WithCriteria(() => Configurator.IsValidForBuildingIOS)
-    .IsDependentOn("Build")
     .IsDependentOn("SetIOSParameters")
+    .IsDependentOn("Build")
 	.Does (() =>
 	{
         // TODO: BuildiOSIpa (Cake.Xamarin, https://github.com/Redth/Cake.Xamarin/blob/master/src/Cake.Xamarin/Aliases.cs)
