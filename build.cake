@@ -436,13 +436,15 @@ Task("TestCoverageReport")
     {
         foreach(var testProject in Configurator.UnitTestProjects)
         {
-            var reportName = string.Format("coverage.opencover.{0}.xml", testProject.Name);
+            var coverageReportName = string.Format("coverage.opencover.{0}.xml", testProject.Name);
+            var testsReportName = string.Format("TestResults.{0}.xml", testProject.Name);
+
 
             var testSettings = new DotNetCoreTestSettings 
             { 
                 Configuration = configuration,
                 NoBuild = true,
-                ArgumentCustomization = args => args.Append(string.Format("--logger \"trx;LogFileName={0}\"", reportName)),
+                ArgumentCustomization = args => args.Append(string.Format("--logger \"trx;LogFileName={0}\"", testsReportName)),
             };
             
             var coverletSettings = new CoverletSettings {
@@ -452,7 +454,7 @@ Task("TestCoverageReport")
             
             DotNetCoreTest(testProject.File, testSettings, coverletSettings);
 
-            var coveragePath = string.Format("{0}/{1}", testProject.Directory, reportName); 
+            var coveragePath = string.Format("{0}/coverage.opencover.xml", testProject.Directory); 
 
             var coverageFiles = GetFiles(coveragePath);
             if(coverageFiles.Any())
@@ -460,10 +462,10 @@ Task("TestCoverageReport")
                 var file = coverageFiles.FirstOrDefault();
 
                 Information(string.Format("Copy {0}", file.ToString()));
-                CopyFile(file, string.Format("{0}/tests/{1}", artifacts, file.GetFilename()));
+                CopyFile(file, string.Format("{0}/coverage/{1}", artifacts, coverageReportName));
             }
 
-            var testsPath = string.Format("{0}/TestResults/{1}", testProject.Directory, reportName);
+            var testsPath = string.Format("{0}/TestResults/{1}", testProject.Directory, testsReportName);
 
             var testsFiles = GetFiles(testsPath);
             if(testsFiles.Any())
@@ -476,52 +478,6 @@ Task("TestCoverageReport")
         }
         
     });
-
-// Task("TestTestReport")
-// .IsDependentOn("TestCoverageReport")
-// .WithCriteria(() => Configurator.IsValidForRunningTests)
-// .Does(() => 
-//     {
-//         foreach(var testProject in Configurator.UnitTestProjects)
-//         {
-//             var reportName = string.Format("TestResults.{0}.xml", testProject.Name);
-
-//             var testSettings = new DotNetCoreTestSettings 
-//             { 
-//                 Configuration = configuration,
-//                 ArgumentCustomization = args => args.Append(string.Format("--logger \"trx;LogFileName={0}\"", reportName)),
-//                 NoBuild = true,
-//                 Verbosity = DotNetCoreVerbosity.Normal
-//             };
-        
-//             // 16-7-18: new version will fix the issue with overriding report settings, just waiting...
-//             DotNetCoreTest(testProject.File, testSettings);
-
-//             var coveragePath = string.Format("{0}/TestResults/{1}", testProject.Directory, reportName);
-
-//             var coverageFiles = GetFiles(coveragePath);
-//             if(coverageFiles.Any())
-//             {
-//                 var file = coverageFiles.FirstOrDefault();
-
-//                 Information(string.Format("Copy {0}", file.ToString()));
-//                 CopyFile(file, string.Format("{0}/tests/{1}", artifacts, file.GetFilename()));
-//             }
-
-//             var testsPath = string.Format("{0}/TestResults/{1}", testProject.Directory, reportName);
-
-//             var testsFiles = GetFiles(testsPath);
-//             if(testsFiles.Any())
-//             {
-//                 var file = testsFiles.FirstOrDefault();
-
-//                 Information(string.Format("Copy {0}", file.ToString()));
-//                 CopyFile(file, string.Format("{0}/tests/{1}", artifacts, file.GetFilename()));
-//             }
-//         }
-
-        
-//     });
 
 Task("Test")
 .Does(() => 
