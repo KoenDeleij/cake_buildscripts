@@ -12,7 +12,7 @@
 #addin "nuget:?package=Cake.Plist"
 #addin "nuget:?package=Cake.AndroidAppManifest"
 #addin "nuget:?package=Newtonsoft.Json"
-#addin "nuget:?package=Cake.Coverlet"
+#addin "nuget:?package=Cake.Coverlet&version=1.0.4"
 
 #load "./helpers/Configurator.cake"
 
@@ -31,8 +31,10 @@ Setup(context =>
 {
     if(target.ToLower() != "help")
     {
+        Information("Initialize Configuration");
         Configurator.Initialize(Context);
 
+        Information("Creating artifact directories");
         EnsureDirectoryExists(artifacts);
         EnsureDirectoryExists(artifacts + "/tests");
         EnsureDirectoryExists(artifacts + "/coverage");
@@ -439,18 +441,16 @@ Task("TestCoverageReport")
             var testSettings = new DotNetCoreTestSettings 
             { 
                 Configuration = configuration,
-                NoBuild = true,
-                Verbosity = DotNetCoreVerbosity.Normal
-            };
-
-            var coverletSettings = new CoverletSettings {
-                CollectCoverage = true,
-                CoverletOutputFormat = CoverletOutputFormat.opencover,
-                CoverletOutputDirectory = Context.Environment.WorkingDirectory,
-                CoverletOutputName = $"results-{DateTime.UtcNow:dd-MM-yyyy-HH-mm-ss-FFF}"
+                NoBuild = true
             };
             
-            // 16-7-18: new version will fix the issue with overriding report settings, just waiting...
+            var coverletSettings = new CoverletSettings {
+                CollectCoverage = true,
+                CoverletOutputFormat = CoverletOutputFormat.opencover
+                // CoverletOutputDirectory = Directory(@".\coverage-results\"),
+                // CoverletOutputName = $"results-{DateTime.UtcNow:dd-MM-yyyy-HH-mm-ss-FFF}"
+            };
+            
             DotNetCoreTest(testProject.File, testSettings, coverletSettings);
 
             var path = string.Format("{0}/coverage.opencover.xml", testProject.Directory);
