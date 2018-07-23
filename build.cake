@@ -444,12 +444,19 @@ Task("TestCoverageReport")
             { 
                 Configuration = configuration,
                 NoBuild = true,
-                ArgumentCustomization = args => args.Append(string.Format("--logger \"trx;LogFileName={0}\"", testsReportName)),
+                ArgumentCustomization = args => args.Append(string.Format("--logger \"trx;LogFileName={0}\"", testsReportName))
+                
             };
-            
+
+            var excludes = new List<string>
+            {
+                { "**/minified.cs" }
+            };
+
             var coverletSettings = new CoverletSettings {
                 CollectCoverage = true,
-                CoverletOutputFormat = CoverletOutputFormat.opencover
+                CoverletOutputFormat = CoverletOutputFormat.opencover,
+                ExcludeByFile = excludes
             };
             
             DotNetCoreTest(testProject.File, testSettings, coverletSettings);
