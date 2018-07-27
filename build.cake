@@ -256,12 +256,20 @@ Task("AppCenterRelease-iOS")
 
         if(foundSymbols.Any())
         {
+            var symbolFile = foundSymbols.FirstOrDefault();
+
+            Information(string.Format("Symbol file found: {0}!", symbolFile));
+
             AppCenterCrashesUploadSymbols(
                 new AppCenterCrashesUploadSymbolsSettings() 
                 { 
                     App = Configurator.AppCenterOwner + "/" + Configurator.AppCenterAppName, 
                     Symbol = foundSymbols.FirstOrDefault().ToString()
                 });
+        }
+        else
+        {
+            Information("No symbols found!");
         }
     })
     .Finally(() =>
