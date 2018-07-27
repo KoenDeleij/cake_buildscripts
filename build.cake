@@ -249,6 +249,20 @@ Task("AppCenterRelease-iOS")
                     Group = Configurator.AppCenterDistributionGroup
                 });
         }
+
+        // upload symbols
+        var symbolsPattern = "./**/*.dSYM";
+        var foundSymbols = GetFiles(symbolsPattern);
+
+        if(foundSymbols.Any())
+        {
+            AppCenterCrashesUploadSymbols(
+                new AppCenterCrashesUploadSymbolsSettings() 
+                { 
+                    App = Configurator.AppCenterOwner + "/" + Configurator.AppCenterAppName, 
+                    Symbol = foundSymbols.FirstOrDefault().ToString()
+                });
+        }
     })
     .Finally(() =>
     {  
