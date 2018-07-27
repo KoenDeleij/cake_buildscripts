@@ -250,13 +250,26 @@ Task("AppCenterRelease-iOS")
                 });
         }
 
-        // TODO: Find dSym folder
-        AppCenterCrashesUploadSymbols(
-            new AppCenterCrashesUploadSymbolsSettings() 
-            { 
-                App = Configurator.AppCenterOwner + "/" + Configurator.AppCenterAppName, 
-                Symbol = "ValkApp.MobileApp/ValkApp.iOS/bin/iPhoneValkApp.iOS.app.dSYM"
-            });
+        // upload symbols
+        var symbolsPattern = "./**/*.dSYM";
+        var foundSymbols = GetDirectories(symbolsPattern);
+
+        if(foundSymbols.Any())
+        {
+            var symbolsDirectory = foundSymbols.FirstOrDefault();
+            Information(string.Format("Symbols directory found: {0}", symbolsDirectory.ToString()));
+
+            AppCenterCrashesUploadSymbols(
+                new AppCenterCrashesUploadSymbolsSettings() 
+                { 
+                    App = Configurator.AppCenterOwner + "/" + Configurator.AppCenterAppName, 
+                    Symbol = symbolsDirectory.ToString()
+                });
+        }
+        else
+        {
+            Information("No symbols directory found!");
+        }
     })
     .Finally(() =>
     {  
