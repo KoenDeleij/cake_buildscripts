@@ -80,7 +80,7 @@ Task("Build")
     .Does(() =>
 {
     MSBuild (Configurator.SolutionFile, c => {
-		c.Configuration = configuration;
+		c.Configuration = configuration;        
 		c.MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
         c.MaxCpuCount = 10;
 	});
@@ -184,7 +184,7 @@ Task("Build-iOS")
     .WithCriteria(IsRunningOnUnix())
     .WithCriteria(() => Configurator.IsValidForBuildingIOS)
     .IsDependentOn("SetIOSParameters")
-    .IsDependentOn("Build")
+    // .IsDependentOn("Build")
 	.Does (() =>
 	{
         // TODO: BuildiOSIpa (Cake.Xamarin, https://github.com/Redth/Cake.Xamarin/blob/master/src/Cake.Xamarin/Aliases.cs)
