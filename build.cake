@@ -183,6 +183,8 @@ Task("AppCenterRelease-Droid")
 Task("Build-iOS")
     .WithCriteria(IsRunningOnUnix())
     .WithCriteria(() => Configurator.IsValidForBuildingIOS)
+    .IsDependentOn("Clean")
+    .IsDependentOn("NuGetRestore")
     .IsDependentOn("SetIOSParameters")
     // .IsDependentOn("Build")
 	.Does (() =>
