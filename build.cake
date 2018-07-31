@@ -92,7 +92,8 @@ Task("Build")
 
 Task("Build-Droid")
     .WithCriteria(() => Configurator.IsValidForBuildingAndroid)
-	.IsDependentOn("Build")
+	.IsDependentOn("Clean")
+    .IsDependentOn("NuGetRestore")
     .IsDependentOn("SetDroidVersion")
 	.Does(() =>
 { 		
@@ -186,7 +187,6 @@ Task("Build-iOS")
     .IsDependentOn("Clean")
     .IsDependentOn("NuGetRestore")
     .IsDependentOn("SetIOSParameters")
-    // .IsDependentOn("Build")
 	.Does (() =>
 	{
         // TODO: BuildiOSIpa (Cake.Xamarin, https://github.com/Redth/Cake.Xamarin/blob/master/src/Cake.Xamarin/Aliases.cs)
