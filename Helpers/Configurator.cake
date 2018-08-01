@@ -8,10 +8,12 @@ public static class Configurator
 
     public static string SolutionFile { get; private set; }
 
+    public static string AppDisplayName { get; private set; }
+
     public static string Version { get; private set; }
 
     public static string FullVersion { get; private set; }
-
+    
     public static bool ShouldClean { get; private set; } 
 
     /// iOS
@@ -19,6 +21,8 @@ public static class Configurator
     public static string IOSProjectFile { get; private set; }
 
     public static string IOSBundleIdentifier { get; private set; }
+
+    public static string IOSSplashXib { get; private set; }
 
     public static bool IsValidForBuildingIOS => !string.IsNullOrEmpty(IOSProjectFile);
 
@@ -100,13 +104,16 @@ public static class Configurator
         _context.Information("");
         _context.Information("============ Main ============");
         _context.Information(string.Format("Solution: {0}", !string.IsNullOrEmpty(SolutionFile) ? SolutionFile : "NOT FOUND"));
+        _context.Information(string.Format("AppDisplayName: {0}", !string.IsNullOrEmpty(AppDisplayName) ? AppDisplayName : "NOT SET: app_display_name"));        
         _context.Information(string.Format("FullVersion: {0}", !string.IsNullOrEmpty(FullVersion) ? FullVersion : "NOT SET: buildversion"));
         _context.Information(string.Format("Version: {0}", !string.IsNullOrEmpty(Version) ? Version : "NOT SET: AppVersion"));
         _context.Information(string.Format("Cleaning: {0}", ShouldClean));
         _context.Information("");
         _context.Information("============ iOS ============");
         _context.Information(string.Format("iOS project: {0}", !string.IsNullOrEmpty(IOSProjectFile) ? IOSProjectFile : "NOT FOUND"));
-        _context.Information(string.Format("iOS bundle identifier: {0}", !string.IsNullOrEmpty(IOSBundleIdentifier) ? IOSBundleIdentifier : "NOT SET"));        
+        _context.Information(string.Format("iOS bundle identifier: {0}", !string.IsNullOrEmpty(IOSBundleIdentifier) ? IOSBundleIdentifier : "NOT SET: ios_bundle_identifier"));    
+        _context.Information(string.Format("iOS Splash XIB: {0}", !string.IsNullOrEmpty(IOSSplashXib) ? IOSSplashXib : "NOT SET: ios_splash_xib"));    
+            
         _context.Information(string.Format("Configuration complete for building iOS: {0}", IsValidForBuildingIOS));
 
         _context.Information("");
@@ -151,6 +158,8 @@ public static class Configurator
     {
         SolutionFile = _context.EvaluateTfsBuildVariable("solution_file", _context.EnvironmentVariable("solution_file") ?? _context.Argument("solution_file", string.Empty));
         ProjectName = _context.EvaluateTfsBuildVariable("project_name", _context.EnvironmentVariable("project_name") ?? _context.Argument("project_name", string.Empty));
+        AppDisplayName = _context.EvaluateTfsBuildVariable("app_display_name", _context.EnvironmentVariable("app_display_name") ?? _context.Argument("app_display_name", string.Empty));
+
         FullVersion = _context.EvaluateTfsBuildVariable("buildversion", _context.EnvironmentVariable("buildversion") ?? _context.Argument("buildversion", string.Empty));
         Version = _context.EvaluateTfsBuildVariable("AppVersion", _context.EnvironmentVariable("AppVersion") ?? _context.Argument("AppVersion", string.Empty));
 
@@ -180,6 +189,7 @@ public static class Configurator
             IOSProjectFile = iosFiles.FirstOrDefault().ToString();
 
         IOSBundleIdentifier = _context.EvaluateTfsBuildVariable("ios_bundle_identifier",  _context.EnvironmentVariable("ios_bundle_identifier") ??  _context.Argument("ios_bundle_identifier", string.Empty));    
+        IOSSplashXib = _context.EvaluateTfsBuildVariable("ios_splash_xib",  _context.EnvironmentVariable("ios_splash_xib") ??  _context.Argument("ios_splash_xib", string.Empty));            
     }
 
     private static void ReadDroidBuildSettings()
