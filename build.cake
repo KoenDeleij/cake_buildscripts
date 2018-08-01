@@ -235,7 +235,12 @@ Task("SetIOSParameters")
                 Information(string.Format("Writing app icon set: {0}", Configurator.IOSAppIconsSet));
                 data["XSAppIconAssets"] = Configurator.IOSAppIconsSet;
             }
-                       
+
+            if(!string.IsNullOrEmpty(Configurator.IOSSplashXib))
+            {
+                Information(string.Format("Writing splash: {0}", Configurator.IOSSplashXib));
+                data["UILaunchStoryboardName"] = Configurator.IOSSplashXib;
+            }
 
             SerializePlist(plistPath, data);
         }
