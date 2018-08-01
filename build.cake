@@ -228,7 +228,14 @@ Task("SetIOSParameters")
                 Information(string.Format("Writing app name: {0}", Configurator.AppDisplayName));
                 data["CFBundleName"] = Configurator.AppDisplayName;
                 data["CFBundleDisplayName"] = Configurator.AppDisplayName;                
-            }                
+            }     
+
+            if(!string.IsNullOrEmpty(Configurator.IOSAppIconsSet))
+            {
+                Information(string.Format("Writing app icon set: {0}", Configurator.IOSAppIconsSet));
+                data["XSAppIconAssets"] = Configurator.IOSAppIconsSet;
+            }
+                       
 
             SerializePlist(plistPath, data);
         }
