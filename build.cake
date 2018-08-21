@@ -127,8 +127,8 @@ Task("SetDroidVersion")
             manifest.VersionCode = int.Parse(Configurator.FullVersion.Replace(".",""));
 
             if(!string.IsNullOrEmpty(Configurator.AndroidStyle))
-                manifest.ApplicationStyle = Configurator.AndroidStyle;
-                
+                manifest.ApplicationTheme = Configurator.AndroidStyle;
+
             // AndroidStyle
             // manifest.ApplicationIcon = "@mipmap/ic_launcher";
             // manifest.ApplicationLabel = "Android Application";
