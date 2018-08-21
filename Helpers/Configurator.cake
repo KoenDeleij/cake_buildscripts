@@ -126,7 +126,7 @@ public static class Configurator
         _context.Information(string.Format("Droid keystore: {0}", !string.IsNullOrEmpty(AndroidKeystoreFile) ? AndroidKeystoreFile : "NOT SET: android_keystorefile"));
         _context.Information(string.Format("Droid keystore alias: {0}", !string.IsNullOrEmpty(AndroidKeystoreAlias) ? AndroidKeystoreAlias : "NOT SET: android_keystorealias"));
         _context.Information(string.Format("Droid keystore password: {0}", !string.IsNullOrEmpty(AndroidKeystorePassword) ? "SET" : "NOT SET: android_keystorepasswd"));
-        _context.Information(string.Format("Droid style: {0}", !string.IsNullOrEmpty(AndroidStyle) ? "SET" : "NOT SET: android_style"));
+        _context.Information(string.Format("Droid style: {0}", !string.IsNullOrEmpty(AndroidStyle) ? AndroidStyle : "NOT SET: android_style"));
         
         _context.Information(string.Format("Configuration complete for building Android: {0}", IsValidForBuildingAndroid));
 
