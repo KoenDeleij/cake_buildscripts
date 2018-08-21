@@ -41,7 +41,6 @@ Setup(context =>
     }    
 });
 
-
 Task("Clean")
     .Does(() =>
 {
@@ -126,6 +125,11 @@ Task("SetDroidVersion")
             //manifest.PackageName = "com.example.mycoolapp";
             manifest.VersionName = Configurator.FullVersion;
             manifest.VersionCode = int.Parse(Configurator.FullVersion.Replace(".",""));
+
+            if(!string.IsNullOrEmpty(Configurator.AndroidStyle))
+                manifest.ApplicationStyle = Configurator.AndroidStyle;
+                
+            // AndroidStyle
             // manifest.ApplicationIcon = "@mipmap/ic_launcher";
             // manifest.ApplicationLabel = "Android Application";
             // manifest.Debuggable = false;
@@ -174,7 +178,7 @@ Task("AppCenterRelease-Droid")
     .Finally(() =>
     {  
         // TODO: move to settings
-        AppCenterLogout(new AppCenterLogoutSettings { Token = "8600137f6b1b07c5e1a4d7792da999249631e148" });
+        AppCenterLogout(new AppCenterLogoutSettings { Token = Configurator.AppCenterToken });
     });
 
 //////////////////////////////////////////////////////////////////////

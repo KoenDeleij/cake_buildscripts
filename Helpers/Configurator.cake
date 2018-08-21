@@ -38,6 +38,8 @@ public static class Configurator
 
     public static string AndroidKeystorePassword { get; private set; }
 
+    public static string AndroidStyle { get; private set; }
+
     public static bool IsValidForBuildingAndroid => !string.IsNullOrEmpty(AndroidProjectFile) && 
                                                     !string.IsNullOrEmpty(AndroidKeystoreFile) &&
                                                     !string.IsNullOrEmpty(AndroidKeystoreAlias) &&
@@ -124,6 +126,8 @@ public static class Configurator
         _context.Information(string.Format("Droid keystore: {0}", !string.IsNullOrEmpty(AndroidKeystoreFile) ? AndroidKeystoreFile : "NOT SET: android_keystorefile"));
         _context.Information(string.Format("Droid keystore alias: {0}", !string.IsNullOrEmpty(AndroidKeystoreAlias) ? AndroidKeystoreAlias : "NOT SET: android_keystorealias"));
         _context.Information(string.Format("Droid keystore password: {0}", !string.IsNullOrEmpty(AndroidKeystorePassword) ? "SET" : "NOT SET: android_keystorepasswd"));
+        _context.Information(string.Format("Droid style: {0}", !string.IsNullOrEmpty(AndroidStyle) ? "SET" : "NOT SET: android_style"));
+        
         _context.Information(string.Format("Configuration complete for building Android: {0}", IsValidForBuildingAndroid));
 
         _context.Information("");
@@ -222,6 +226,8 @@ public static class Configurator
             AndroidKeystoreFile = _context.EvaluateTfsBuildVariable("android_keystorefile", _context.EnvironmentVariable("android_keystorefile") ?? _context.Argument("android_keystorefile", string.Empty));
         AndroidKeystoreAlias =  _context.EvaluateTfsBuildVariable("android_keystorealias",  _context.EnvironmentVariable("android_keystorealias") ??  _context.Argument("android_keystorealias", string.Empty));
         AndroidKeystorePassword =  _context.EvaluateTfsBuildVariable("android_keystorepasswd",  _context.EnvironmentVariable("android_keystorepasswd") ??  _context.Argument("android_keystorepasswd", string.Empty));            
+
+        AndroidStyle = _context.EvaluateTfsBuildVariable("android_style", _context.EnvironmentVariable("android_style") ?? _context.Argument("android_style", string.Empty));
     }
 
     private static void ReadTestBuildSettings()
