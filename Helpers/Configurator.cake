@@ -243,8 +243,12 @@ public static class Configurator
         }
         else
         {
+            Func<IFileSystemInfo, bool> exclude_ui_tests =
+                fileSystemInfo => !fileSystemInfo.Path.FullPath.EndsWith(
+                    "UI", StringComparison.OrdinalIgnoreCase);
+
             var testPath = "./**/*Tests.csproj";
-            var testFiles = GlobbingAliases.GetFiles(_context, testPath);
+            var testFiles = GlobbingAliases.GetFiles(_context, testPath, exclude_ui_tests);
 
             if(testFiles.Any())
             {
