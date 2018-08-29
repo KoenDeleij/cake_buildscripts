@@ -535,6 +535,25 @@ Task("Test")
 .Does(() => 
 {
     //Nothing
+
+    Func<IFileSystemInfo, bool> exclude_ui_tests =
+            fileSystemInfo => !fileSystemInfo.Path.FullPath.Contains("xUnit");
+
+    var testPath = "./**/*Tests.csproj";
+    var testFiles = GetFiles(testPath, exclude_ui_tests);
+
+    if(testFiles.Any())
+    {
+        foreach(var testFile in testFiles)
+        {
+            Information(testFile);
+        }
+    }
+    else
+    {
+        Information("No files found");
+    }
+
 });
 
 //////////////////////////////////////////////////////////////////////
