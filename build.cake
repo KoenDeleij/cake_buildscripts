@@ -246,6 +246,12 @@ Task("SetIOSParameters")
                 data["UILaunchStoryboardName"] = Configurator.IOSSplashXib;
             }
 
+            if(!string.IsNullOrEmpty(Configurator.IOSURLSchema))
+            {
+                Information(string.Format("Writing splash: {0}", Configurator.IOSURLSchema));
+                data["CFBundleURLTypes"][0][CFBundleURLSchemes][0] = Configurator.IOSURLSchema;
+            }
+
             SerializePlist(plistPath, data);
         }
         else
