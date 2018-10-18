@@ -119,7 +119,8 @@ public static class Configurator
         _context.Information(string.Format("iOS project: {0}", !string.IsNullOrEmpty(IOSProjectFile) ? IOSProjectFile : "NOT FOUND"));
         _context.Information(string.Format("iOS bundle identifier: {0}", !string.IsNullOrEmpty(IOSBundleIdentifier) ? IOSBundleIdentifier : "NOT SET: ios_bundle_identifier"));    
         _context.Information(string.Format("iOS Splash XIB: {0}", !string.IsNullOrEmpty(IOSSplashXib) ? IOSSplashXib : "NOT SET: ios_splash_xib"));    
-        _context.Information(string.Format("iOS App Icons: {0}", !string.IsNullOrEmpty(IOSAppIconsSet) ? IOSAppIconsSet : "NOT SET: ios_appicons_set"));                
+        _context.Information(string.Format("iOS App Icons: {0}", !string.IsNullOrEmpty(IOSAppIconsSet) ? IOSAppIconsSet : "NOT SET: ios_appicons_set"));
+        _context.Information(string.Format("Bundle schemes: {0}", !string.IsNullOrEmpty(IOSURLSchema) ? IOSURLSchema : "NOT SET: ios_url_schema"));                
         _context.Information(string.Format("Configuration complete for building iOS: {0}", IsValidForBuildingIOS));
 
         _context.Information("");
@@ -199,6 +200,7 @@ public static class Configurator
         IOSBundleIdentifier = _context.EvaluateTfsBuildVariable("ios_bundle_identifier",  _context.EnvironmentVariable("ios_bundle_identifier") ??  _context.Argument("ios_bundle_identifier", string.Empty));    
         IOSSplashXib = _context.EvaluateTfsBuildVariable("ios_splash_xib",  _context.EnvironmentVariable("ios_splash_xib") ??  _context.Argument("ios_splash_xib", string.Empty));            
         IOSAppIconsSet = _context.EvaluateTfsBuildVariable("ios_appicons_set",  _context.EnvironmentVariable("ios_appicons_set") ??  _context.Argument("ios_appicons_set", string.Empty));                    
+        IOSURLSchema = _context.EvaluateTfsBuildVariable("ios_url_schema",  _context.EnvironmentVariable("ios_url_schema") ??  _context.Argument("ios_url_schema", string.Empty));  
     }
 
     private static void ReadDroidBuildSettings()
