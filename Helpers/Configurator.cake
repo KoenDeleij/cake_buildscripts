@@ -28,6 +28,8 @@ public static class Configurator
 
     public static string IOSURLSchema { get; private set; }
 
+    public static string IOSURLIdentifier { get; private set; }
+
     public static bool IsValidForBuildingIOS => !string.IsNullOrEmpty(IOSProjectFile);
 
     /// Android
