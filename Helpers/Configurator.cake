@@ -120,7 +120,8 @@ public static class Configurator
         _context.Information(string.Format("iOS bundle identifier: {0}", !string.IsNullOrEmpty(IOSBundleIdentifier) ? IOSBundleIdentifier : "NOT SET: ios_bundle_identifier"));    
         _context.Information(string.Format("iOS Splash XIB: {0}", !string.IsNullOrEmpty(IOSSplashXib) ? IOSSplashXib : "NOT SET: ios_splash_xib"));    
         _context.Information(string.Format("iOS App Icons: {0}", !string.IsNullOrEmpty(IOSAppIconsSet) ? IOSAppIconsSet : "NOT SET: ios_appicons_set"));
-        _context.Information(string.Format("Bundle schemes: {0}", !string.IsNullOrEmpty(IOSURLSchema) ? IOSURLSchema : "NOT SET: ios_url_schema"));                
+        _context.Information(string.Format("iOS Bundle schemes: {0}", !string.IsNullOrEmpty(IOSURLSchema) ? IOSURLSchema : "NOT SET: ios_url_schema"));                
+        _context.Information(string.Format("iOS Url identifier: {0}", !string.IsNullOrEmpty(IOSURLIdentifier) ? IOSURLIdentifier : "NOT SET: ios_url_identifier"));   
         _context.Information(string.Format("Configuration complete for building iOS: {0}", IsValidForBuildingIOS));
 
         _context.Information("");
