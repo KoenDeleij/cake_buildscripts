@@ -342,9 +342,15 @@ Task("UpdateNugetPackageVersion")
     .WithCriteria(() => Configurator.IsValidForPushingPackage)
     .Does(() => 
     {
+        Information("Set Nuget package version");
         var projectFileContent = System.IO.File.ReadAllText(Configurator.NugetRootProject);
-
-        var version = !string.IsNullOrEmpty(Configurator.NugetPreReleaseFlag)?$"{Configurator.NugetPackageVersion} -Configurator.NugetPreReleaseFlag":$"{Configurator.NugetPackageVersion}";
+        
+        Information($"For file :{Configurator.NugetRootProject}");
+        
+        var version = !string.IsNullOrEmpty(Configurator.NugetPreReleaseFlag)?$"{Configurator.NugetPackageVersion} -{Configurator.NugetPreReleaseFlag}":$"{Configurator.NugetPackageVersion}";
+        
+        Information($"Version :{version}");
+        
         projectFileContent = projectFileContent.Replace("<PackageVersion>1.0.0</PackageVersion>", $"<PackageVersion>{version}</PackageVersion>"); 
         System.IO.File.WriteAllText(Configurator.NugetRootProject, projectFileContent);
     });
