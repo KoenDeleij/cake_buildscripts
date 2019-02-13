@@ -82,6 +82,8 @@ public static class Configurator
 
     public static string NugetRootProject { get; private set; }
 
+    public static string NugetPreReleaseFlag { get; private set; }
+
     public static bool IsValidForPushingPackage => !string.IsNullOrEmpty(NugetUrl) && 
                                                    !string.IsNullOrEmpty(NugetToken) && 
                                                    !string.IsNullOrEmpty(NugetPackageVersion) && 
@@ -285,5 +287,6 @@ public static class Configurator
         NugetToken = _context.EvaluateTfsBuildVariable("nuget_token", _context.EnvironmentVariable("nuget_token") ?? _context.Argument("nuget_token", string.Empty));
         NugetPackageVersion = _context.EvaluateTfsBuildVariable("nuget_packageversion", _context.EnvironmentVariable("nuget_packageversion") ?? _context.Argument("nuget_packageversion", string.Empty));
         NugetRootProject = _context.EvaluateTfsBuildVariable("nuget_rootproject", _context.EnvironmentVariable("nuget_rootproject") ?? _context.Argument("nuget_rootproject", string.Empty));
+        NugetPreReleaseFlag = _context.EvaluateTfsBuildVariable("nuget_prerelease_flag", _context.EnvironmentVariable("nuget_prerelease_flag") ?? _context.Argument("nuget_prerelease_flag", string.Empty));
     }
 }

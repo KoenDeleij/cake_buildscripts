@@ -344,8 +344,8 @@ Task("UpdateNugetPackageVersion")
     {
         var projectFileContent = System.IO.File.ReadAllText(Configurator.NugetRootProject);
 
-        projectFileContent = fileContents.Replace("<PackageVersion>1.0.0</PackageVersion>", $"<PackageVersion>{Configurator.NugetPackageVersion}</PackageVersion>"); 
-
+        var version = !string.IsNullOrEmpty(Configurator.NugetPreReleaseFlag)?$"{Configurator.NugetPackageVersion} -Configurator.NugetPreReleaseFlag":$"{Configurator.NugetPackageVersion}";
+        projectFileContent = fileContents.Replace("<PackageVersion>1.0.0</PackageVersion>", $"<PackageVersion>{version}</PackageVersion>"); 
         System.IO.File.WriteAllText(Configurator.NugetRootProject, projectFileContent);
     });
 
