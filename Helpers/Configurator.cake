@@ -78,8 +78,14 @@ public static class Configurator
 
     public static string NugetToken { get; private set; }
 
-    public static bool IsValidForPushingPackage => !string.IsNullOrEmpty(NugetUrl)&& 
-                                                    !string.IsNullOrEmpty(NugetToken);
+    public static string NugetPackageVersion { get; private set; }
+
+    public static string NugetRootProject { get; private set; }
+
+    public static bool IsValidForPushingPackage => !string.IsNullOrEmpty(NugetUrl) && 
+                                                   !string.IsNullOrEmpty(NugetToken) && 
+                                                   !string.IsNullOrEmpty(NugetPackageVersion) && 
+                                                   !string.IsNullOrEmpty(NugetRootProject);
 
     ///
 
@@ -277,5 +283,7 @@ public static class Configurator
     {
         NugetUrl = _context.EvaluateTfsBuildVariable("nuget_url", _context.EnvironmentVariable("nuget_url") ?? _context.Argument("nuget_url", string.Empty));
         NugetToken = _context.EvaluateTfsBuildVariable("nuget_token", _context.EnvironmentVariable("nuget_token") ?? _context.Argument("nuget_token", string.Empty));
+        NugetPackageVersion = _context.EvaluateTfsBuildVariable("nuget_packageversion", _context.EnvironmentVariable("nuget_packageversion") ?? _context.Argument("nuget_packageversion", string.Empty));
+        NugetRootProject = _context.EvaluateTfsBuildVariable("nuget_rootproject", _context.EnvironmentVariable("nuget_rootproject") ?? _context.Argument("nuget_rootproject", string.Empty));
     }
 }

@@ -335,18 +335,22 @@ Task("AppCenterLogin")
 
 
 //////////////////////////////////////////////////////////////////////
-// ETC
+// NUGET
 //////////////////////////////////////////////////////////////////////
 
-Task("CreateNugetPackage")
-    .Does(() =>
+Task("UpdateNugetPackageVersion")   
+    .WithCriteria(() => Configurator.IsValidForPushingPackage)
+    .Does(() => 
     {
-        throw new NotImplementedException();
-        // Information(buildConfiguration.NuspecFile);
-        // NuGetPack(buildConfiguration.NuspecFile, new NuGetPackSettings());
+        var projectFileContent = System.IO.File.ReadAllText(Configurator.NugetRootProject);
+
+        projectFileContent = fileContents.Replace("<PackageVersion>1.0.0</PackageVersion>", $"<PackageVersion>{Configurator.NugetPackageVersion}</PackageVersion>"); 
+
+        System.IO.File.WriteAllText(Configurator.NugetRootProject, projectFileContent);
     });
 
 Task("PushNugetPackage")   
+    .IsDependentOn("UpdateNugetPackageVersion")
     .IsDependentOn("Build")
     .WithCriteria(() => Configurator.IsValidForPushingPackage)
     .Does(() => 
