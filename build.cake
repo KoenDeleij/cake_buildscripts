@@ -346,7 +346,8 @@ Task("CreateNugetPackage")
         // NuGetPack(buildConfiguration.NuspecFile, new NuGetPackSettings());
     });
 
-Task("PushNugetPackage")    
+Task("PushNugetPackage")   
+    .IsDependentOn("Build")
     .WithCriteria(() => Configurator.IsValidForPushingPackage)
     .Does(() => 
     {
