@@ -359,11 +359,12 @@ Task("UpdateNugetPackageVersion")
 Task("CreateNugetBySpec")   
     .Does(() => 
     {
-        if(!string.IsNullOrEmpty(Configurator.NuspecFile)){
+        if(Configurator.IsValidForCustomNuspec){
             Information($"## Create Nupkg {Configurator.NuspecFile}");
             var nuGetPackSettings = new NuGetPackSettings
 	        {
 		        IncludeReferencedProjects = true,
+                Version = Configurator.NugetPackageVersion
 	        };
             NuGetPack(Configurator.NuspecFile, nuGetPackSettings);
         }

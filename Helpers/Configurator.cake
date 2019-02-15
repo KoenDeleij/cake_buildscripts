@@ -91,7 +91,9 @@ public static class Configurator
                                                    !string.IsNullOrEmpty(NugetPackageVersion) && 
                                                    !string.IsNullOrEmpty(NugetRootProject);
 
-    ///
+    public static bool IsValidForCustomNuspec =>   !string.IsNullOrEmpty(Configurator.NuspecFile) &&
+                                                   !string.IsNullOrEmpty(NugetPackageVersion)
+    /// 
 
     private static ICakeContext _context;
 
