@@ -170,6 +170,8 @@ public static class Configurator
         _context.Information(string.Format("API: {0}", !string.IsNullOrEmpty(NugetUrl) ? NugetUrl : "NOT SET: nuget_url"));
         _context.Information(string.Format("Token: {0}", !string.IsNullOrEmpty(NugetToken) ? NugetToken : "NOT SET: nuget_token"));     
         _context.Information(string.Format("Configuration complete for pushing nuget packages: {0}", IsValidForPushingPackage));          
+        _context.Information(string.Format("Nuget package version: {0}", NugetPackageVersion)); 
+        _context.Information(string.Format("Nuspec: {0}", NuspecFile));  
 
         _context.Information("");
         _context.Information("===============================");
@@ -286,6 +288,7 @@ public static class Configurator
     private static void ReadNugetSettings()
     {
         NugetUrl = _context.EvaluateTfsBuildVariable("nuget_url", _context.EnvironmentVariable("nuget_url") ?? _context.Argument("nuget_url", string.Empty));
+        NuspecFile = _context.EvaluateTfsBuildVariable("nuget_spec", _context.EnvironmentVariable("nuget_spec") ?? _context.Argument("nuget_spec", string.Empty));
         NugetToken = _context.EvaluateTfsBuildVariable("nuget_token", _context.EnvironmentVariable("nuget_token") ?? _context.Argument("nuget_token", string.Empty));
         NugetPackageVersion = _context.EvaluateTfsBuildVariable("nuget_packageversion", _context.EnvironmentVariable("nuget_packageversion") ?? _context.Argument("nuget_packageversion", string.Empty));
         NugetRootProject = _context.EvaluateTfsBuildVariable("nuget_rootproject", _context.EnvironmentVariable("nuget_rootproject") ?? _context.Argument("nuget_rootproject", string.Empty));
