@@ -58,7 +58,7 @@ Task("Clean")
 Task("NuGetRestore")
     .DoesForEach(GetFiles("**/*.csproj"), (file) => 
     {
-        Information("Restoring " + file.ToString());
+        Information("## Restoring " + file.ToString());
         NuGetRestore(file);
         DotNetCoreRestore(file.ToString());
     })
@@ -193,6 +193,7 @@ Task("Build-iOS")
     .IsDependentOn("SetIOSParameters")
 	.Does (() =>
 	{
+        Information("## Build");
         // TODO: BuildiOSIpa (Cake.Xamarin, https://github.com/Redth/Cake.Xamarin/blob/master/src/Cake.Xamarin/Aliases.cs)
         MSBuild(Configurator.IOSProjectFile, settings => 
             settings.SetConfiguration(configuration)   
@@ -206,7 +207,7 @@ Task("Build-iOS")
 Task("SetIOSParameters")
     .Does(() =>
     {
-        Information("SetIOSParameters");
+        Information("## SetIOSParameters");
         var plistPattern = "./**/Info.plist";
         var foundPListFiles = GetFiles(plistPattern);
         if(foundPListFiles.Any())
@@ -342,7 +343,7 @@ Task("UpdateNugetPackageVersion")
     .WithCriteria(() => Configurator.IsValidForPushingPackage)
     .Does(() => 
     {
-        Information("Set Nuget package version");
+        Information("## Set Nuget package version");
         var projectFileContent = System.IO.File.ReadAllText(Configurator.NugetRootProject);
         
         Information($"For file :{Configurator.NugetRootProject}");
@@ -359,6 +360,7 @@ Task("CreateNugetBySpec")
     .Does(() => 
     {
         if(!string.IsNullOrEmpty(Configurator.NuspecFile)){
+            Information($"## Create Nupkg {Configurator.NuspecFile}");
             var nuGetPackSettings = new NuGetPackSettings
 	        {
 		        IncludeReferencedProjects = true,
@@ -374,6 +376,8 @@ Task("PushNugetPackage")
     .WithCriteria(() => Configurator.IsValidForPushingPackage)
     .Does(() => 
     {
+        Information("## PushNugetPackage");
+
         var path = string.Format("./**/{0}*.nupkg", Configurator.ProjectName);
         var files = GetFiles(path);
         if(files.Any())
