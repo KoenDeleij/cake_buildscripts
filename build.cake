@@ -355,9 +355,22 @@ Task("UpdateNugetPackageVersion")
         System.IO.File.WriteAllText(Configurator.NugetRootProject, projectFileContent);
     });
 
+Task("CreateNugetBySpec")   
+    .Does(() => 
+    {
+        if(!string.IsNullOrEmpty(Configurator.NuspecFile)){
+            var nuGetPackSettings = new NuGetPackSettings
+	        {
+		        IncludeReferencedProjects = true,
+	        };
+            NuGetPack(Configurator.NuspecFile, nuGetPackSettings);
+        }
+    });
+
 Task("PushNugetPackage")   
     .IsDependentOn("UpdateNugetPackageVersion")
     .IsDependentOn("Build")
+    .IsDependentOn("CreateNugetBySpec")
     .WithCriteria(() => Configurator.IsValidForPushingPackage)
     .Does(() => 
     {

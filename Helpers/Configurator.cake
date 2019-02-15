@@ -84,6 +84,8 @@ public static class Configurator
 
     public static string NugetPreReleaseFlag { get; private set; }
 
+    public static string NuspecFile{ get; private set; }
+
     public static bool IsValidForPushingPackage => !string.IsNullOrEmpty(NugetUrl) && 
                                                    !string.IsNullOrEmpty(NugetToken) && 
                                                    !string.IsNullOrEmpty(NugetPackageVersion) && 
