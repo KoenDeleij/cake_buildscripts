@@ -348,11 +348,9 @@ Task("UpdateNugetPackageVersion")
         
         Information($"For file :{Configurator.NugetRootProject}");
         
-        var version = !string.IsNullOrEmpty(Configurator.NugetPreReleaseFlag)?$"{Configurator.NugetPackageVersion} -{Configurator.NugetPreReleaseFlag}":$"{Configurator.NugetPackageVersion}";
+        Information($"Version :{Configurator.NugetFullPackageVersion}");
         
-        Information($"Version :{version}");
-        
-        projectFileContent = projectFileContent.Replace("<PackageVersion>1.0.0</PackageVersion>", $"<PackageVersion>{version}</PackageVersion>"); 
+        projectFileContent = projectFileContent.Replace("<PackageVersion>1.0.0</PackageVersion>", $"<PackageVersion>{Configurator.NugetFullPackageVersion}</PackageVersion>"); 
         System.IO.File.WriteAllText(Configurator.NugetRootProject, projectFileContent);
     });
 
@@ -361,10 +359,11 @@ Task("CreateNugetBySpec")
     {
         if(Configurator.IsValidForCustomNuspec){
             Information($"## Create Nupkg {Configurator.NuspecFile}");
+
             var nuGetPackSettings = new NuGetPackSettings
 	        {
 		        IncludeReferencedProjects = true,
-                Version = Configurator.NugetPackageVersion
+                Version = Configurator.NugetFullPackageVersion
 	        };
             NuGetPack(Configurator.NuspecFile, nuGetPackSettings);
         }
