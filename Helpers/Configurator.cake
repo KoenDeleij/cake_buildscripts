@@ -100,8 +100,7 @@ public static class Configurator
 
     public static bool IsValidForPushingPackage => !string.IsNullOrEmpty(NugetUrl) && 
                                                    !string.IsNullOrEmpty(NugetToken) && 
-                                                   !string.IsNullOrEmpty(NugetPackageVersion) && 
-                                                   !string.IsNullOrEmpty(NugetRootProject);
+                                                   !string.IsNullOrEmpty(NugetPackageVersion);
 
     public static bool IsValidForCustomNuspec =>   !string.IsNullOrEmpty(Configurator.NuspecFile) &&
                                                    !string.IsNullOrEmpty(NugetPackageVersion);
