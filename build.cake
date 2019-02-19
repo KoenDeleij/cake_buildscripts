@@ -345,15 +345,17 @@ Task("UpdateNugetPackageVersion")
     .WithCriteria(() => Configurator.IsValidForPushingPackage)
     .Does(() => 
     {
-        Information("## Set Nuget package version");
-        var projectFileContent = System.IO.File.ReadAllText(Configurator.NugetRootProject);
-        
-        Information($"For file :{Configurator.NugetRootProject}");
-        
-        Information($"Version :{Configurator.NugetFullPackageVersion}");
-        
-        projectFileContent = projectFileContent.Replace("<PackageVersion>1.0.0</PackageVersion>", $"<PackageVersion>{Configurator.NugetFullPackageVersion}</PackageVersion>"); 
-        System.IO.File.WriteAllText(Configurator.NugetRootProject, projectFileContent);
+        if(!string.IsNullOrEmpty(Configurator.NugetRootProject)){
+            Information("## Set Nuget package version");
+            var projectFileContent = System.IO.File.ReadAllText(Configurator.NugetRootProject);
+            
+            Information($"For file :{Configurator.NugetRootProject}");
+            
+            Information($"Version :{Configurator.NugetFullPackageVersion}");
+            
+            projectFileContent = projectFileContent.Replace("<PackageVersion>1.0.0</PackageVersion>", $"<PackageVersion>{Configurator.NugetFullPackageVersion}</PackageVersion>"); 
+            System.IO.File.WriteAllText(Configurator.NugetRootProject, projectFileContent);
+        }
     });
 
 Task("CreateNugetBySpec")   
