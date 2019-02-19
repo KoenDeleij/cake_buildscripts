@@ -2,6 +2,7 @@
 #tool "nuget:?package=NUnit.ConsoleRunner"
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
 #tool "nuget:?package=xunit.runner.console"
+#tool "nuget:?package=MSBuild.SonarQube.Runner.Tool"
 
 #addin "nuget:?package=Cake.CoreCLR"
 #addin "nuget:?package=Cake.Figlet"
@@ -13,6 +14,7 @@
 #addin "nuget:?package=Cake.AndroidAppManifest"
 #addin "nuget:?package=Newtonsoft.Json"
 #addin "nuget:?package=Cake.Coverlet"
+#addin "nuget:?package=Cake.Sonar"
 
 #load "./helpers/Configurator.cake"
 
@@ -406,93 +408,51 @@ Task("UnitTest")
 {
     foreach(var testProject in Configurator.UnitTestProjects)
     {
+        var outputFolder = $"--logger \"trx;LogFileName=../../{Configurator.TestResultOutputFolder}/TestResults.xml\"";
+
+        Information($"OUTPUT UNITTEST : {outputFolder}");
         DotNetCoreTest(
                 testProject.File,
                 new DotNetCoreTestSettings()
                 {
                     Configuration = configuration,
-                    ArgumentCustomization = args => args.Append("--logger \"trx;LogFileName=TestResults.xml\""),
+                    ArgumentCustomization = args => args.Append(outputFolder),
                     NoBuild = true
                 });
     }
-    
 });
 
-// TODO environ var NUnit / xUnit
-Task("NUnitTestWithCoverage")
-    .IsDependentOn("Build")
-    .WithCriteria(() => Configurator.IsValidForRunningTests)
-    .Does(() =>
+Task("SonarQubeCoverage")
+    .IsDependentOn("UnitTest")
+    .WithCriteria(() => Configurator.IsValidForSonarQube)
+    .Does(() => 
 {
+   SonarBegin(new SonarBeginSettings{
+            Name = $"{Configurator.ProjectName}",
+            Key = $"{Configurator.ProjectName}",
+            Url = Configurator.SonarQubeUrl,
+            Branch = Configurator.SonarQubeBranch,
+            Login = Configurator.SonarQubeToken,
+            Verbose = true,
+            OpenCoverReportsPath= $"./{Configurator.TestResultOutputFolder}"
+        });
+
     foreach(var testProject in Configurator.UnitTestProjects)
     {
-        //var path = "./**/*.Tests/**/bin/**/*.Tests.dll";
-        //Information(path);
+        Information($"TESTING {testProject.File}");
+        var coverletSettings = new CoverletSettings {
+             CollectCoverage = true,
+             CoverletOutputFormat = CoverletOutputFormat.opencover,
+             CoverletOutputDirectory = $"./{Configurator.TestResultOutputFolder}",
+             CoverletOutputName = $"report",
+             Exclude = new List<string>(){"[xunit.*]*"}
+        };
 
-        DotNetCorePublish(testProject.File);
-
-        DotCoverAnalyse((ctx) => {
-            ctx.NUnit3(testProject.Directory);
-        },
-        "coverage.html",
-        new DotCoverAnalyseSettings {
-            ReportType = DotCoverReportType.HTML
-        }
-        .WithFilter(string.Format("+:{0}.*", Configurator.ProjectName))
-        .WithFilter(string.Format("-:{0}.Tests", Configurator.ProjectName)));
+        Coverlet(FilePath.FromString(testProject.File), coverletSettings);
     }
-});
-
-Task("xUnitTestWithCoverage")
-    .IsDependentOn("Build")
-    .WithCriteria(() => Configurator.IsValidForRunningTests)
-    .Does(() =>
-{
-    foreach(var testProject in Configurator.UnitTestProjects)
-    {
-        DotCoverCover(tool => {
-        tool.DotNetCoreTool(
-            testProject.Directory,
-            "xunit",
-            new ProcessArgumentBuilder()
-                .AppendSwitchQuoted("-xml", artifacts + "/tests/results.xml")
-                .AppendSwitch("-configuration", configuration)
-                .Append("-noshadow")
-                .Append("-nobuild"),
-            new DotNetCoreToolSettings() {
-                // EnvironmentVariables = GitVersionEnvironmentVariables,
-            });
-        },
-        artifacts + "/coverage/coverage.dcvr",
-        new DotCoverCoverSettings() {
-                TargetWorkingDir = testProject.Directory,
-                WorkingDirectory = testProject.Directory,
-                // EnvironmentVariables = GitVersionEnvironmentVariables,
-            }
-            .WithFilter("+:" + Configurator.ProjectName + ".*")
-            .WithFilter("-:" + Configurator.ProjectName + ".Tests*")
-            // .WithFilter("-:" + Configurator.ProjectName + ".Tests*")
-    );
-    }
-    
-})
-.Finally(() => 
-{
-    DotCoverReport(
-        artifacts + "/coverage/coverage.dcvr",
-        new FilePath("coverage.xml"),
-        new DotCoverReportSettings {
-            ReportType = DotCoverReportType.DetailedXML
-        }
-    );
-
-    DotCoverReport(
-        artifacts + "/coverage/coverage.dcvr",
-        new FilePath(artifacts + "/coverage/coverage.html"),
-        new DotCoverReportSettings {
-            ReportType = DotCoverReportType.HTML
-        }
-    );
+}).Finally(()=>{
+    //ReportGenerator(FilePath.FromString(@".\coverage-results\report.opencover.xml"), DirectoryPath.FromString(@".\coverage-results\"));
+    SonarEnd(new SonarEndSettings(){ Login = Configurator.SonarQubeToken});
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -514,87 +474,6 @@ Task("Help")
         Information("For more info & questions: ask Jacob.");
     });
 
-Task("TestCoverageReport")
-.IsDependentOn("Build")
-.WithCriteria(() => Configurator.IsValidForRunningTests)
-.Does(() => 
-    {
-        foreach(var testProject in Configurator.UnitTestProjects)
-        {
-            var coverageReportName = string.Format("coverage.opencover.{0}.xml", testProject.Name);
-            var testsReportName = string.Format("TestResults.{0}.xml", testProject.Name);
-
-
-            var testSettings = new DotNetCoreTestSettings 
-            { 
-                Configuration = configuration,
-                NoBuild = true,
-                ArgumentCustomization = args => args.Append(string.Format("--logger \"trx;LogFileName={0}\"", testsReportName))
-                
-            };
-
-            var excludes = new List<string>
-            {
-                { "**/minified.cs" }
-            };
-
-            var coverletSettings = new CoverletSettings {
-                CollectCoverage = true,
-                CoverletOutputFormat = CoverletOutputFormat.opencover,
-                ExcludeByFile = excludes
-            };
-            
-            DotNetCoreTest(testProject.File, testSettings, coverletSettings);
-
-            var coveragePath = string.Format("{0}/coverage.opencover.xml", testProject.Directory); 
-
-            var coverageFiles = GetFiles(coveragePath);
-            if(coverageFiles.Any())
-            {
-                var file = coverageFiles.FirstOrDefault();
-
-                Information(string.Format("Copy {0}", file.ToString()));
-                CopyFile(file, string.Format("{0}/coverage/{1}", artifacts, coverageReportName));
-            }
-
-            var testsPath = string.Format("{0}/TestResults/{1}", testProject.Directory, testsReportName);
-
-            var testsFiles = GetFiles(testsPath);
-            if(testsFiles.Any())
-            {
-                var file = testsFiles.FirstOrDefault();
-
-                Information(string.Format("Copy {0}", file.ToString()));
-                CopyFile(file, string.Format("{0}/tests/{1}", artifacts, file.GetFilename()));
-            }
-        }
-        
-    });
-
-Task("Test")
-.Does(() => 
-{
-    //Nothing
-
-    Func<IFileSystemInfo, bool> exclude_ui_tests =
-            fileSystemInfo => !fileSystemInfo.Path.FullPath.Contains("xUnit");
-
-    var testPath = "./**/*Tests.csproj";
-    var testFiles = GetFiles(testPath, exclude_ui_tests);
-
-    if(testFiles.Any())
-    {
-        foreach(var testFile in testFiles)
-        {
-            Information(testFile);
-        }
-    }
-    else
-    {
-        Information("No files found");
-    }
-
-});
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION

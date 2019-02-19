@@ -56,6 +56,18 @@ public static class Configurator
     public static bool IsValidForRunningTests => UnitTestProjects != null &&
                                                     UnitTestProjects.Any();
 
+    public static string TestResultOutputFolder => "TestResults";
+
+    public static string SonarQubeUrl { get; private set; }   
+    
+    public static string SonarQubeBranch { get; private set; }
+    
+    public static string SonarQubeToken { get; private set; }
+
+    public static bool IsValidForSonarQube => !string.IsNullOrEmpty(SonarQubeUrl) && 
+                                              !string.IsNullOrEmpty(SonarQubeBranch) &&
+                                              !string.IsNullOrEmpty(SonarQubeToken);
+
     /// AppCenter 
 
     public static string AppCenterToken { get; private set; }
@@ -84,7 +96,7 @@ public static class Configurator
 
     public static string NugetPreReleaseFlag { get; private set; }
 
-    public static string NuspecFile{ get; private set; }
+    public static string NuspecFile { get; private set; }
 
     public static bool IsValidForPushingPackage => !string.IsNullOrEmpty(NugetUrl) && 
                                                    !string.IsNullOrEmpty(NugetToken) && 
@@ -95,8 +107,7 @@ public static class Configurator
                                                    !string.IsNullOrEmpty(NugetPackageVersion);
 
     public static string NugetFullPackageVersion => !string.IsNullOrEmpty(Configurator.NugetPreReleaseFlag)?$"{Configurator.NugetPackageVersion} -{Configurator.NugetPreReleaseFlag}":$"{Configurator.NugetPackageVersion}";
-        
-    /// 
+
 
     private static ICakeContext _context;
 
@@ -279,7 +290,11 @@ public static class Configurator
                     UnitTestProjects.Add(new UnitTestProject(testFile.ToString(), testFile.GetFilenameWithoutExtension().ToString(), testFile.GetDirectory().ToString()));
                 }                
             }
-        }        
+        }    
+
+        SonarQubeUrl = _context.EvaluateTfsBuildVariable("sonarqube_url", _context.EnvironmentVariable("sonarqube_url") ?? _context.Argument("sonarqube_url", string.Empty));    //"http://rhm-d-ranch01.boolhosting.tld:9000/""52ad219e8d1eec9bc631beb648e78fa0f6390425"
+        SonarQubeBranch = _context.EvaluateTfsBuildVariable("sonarqube_branch", _context.EnvironmentVariable("sonarqube_branch") ?? _context.Argument("sonarqube_branch", string.Empty));
+        SonarQubeToken = _context.EvaluateTfsBuildVariable("sonarqube_token", _context.EnvironmentVariable("sonarqube_token") ?? _context.Argument("sonarqube_token", string.Empty));    
     }
 
     private static void ReadAppCenterSettings()
