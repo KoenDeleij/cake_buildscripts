@@ -105,7 +105,7 @@ public static class Configurator
     public static bool IsValidForCustomNuspec =>   !string.IsNullOrEmpty(Configurator.NuspecFile) &&
                                                    !string.IsNullOrEmpty(NugetPackageVersion);
 
-    public static string NugetFullPackageVersion => !string.IsNullOrEmpty(Configurator.NugetPreReleaseFlag)?$"{Configurator.NugetPackageVersion} -{Configurator.NugetPreReleaseFlag}":$"{Configurator.NugetPackageVersion}";
+    public static string NugetFullPackageVersion => !string.IsNullOrEmpty(Configurator.NugetPreReleaseFlag)?$"{Configurator.NugetPackageVersion}-{Configurator.NugetPreReleaseFlag}":$"{Configurator.NugetPackageVersion}";
 
 
     private static ICakeContext _context;
