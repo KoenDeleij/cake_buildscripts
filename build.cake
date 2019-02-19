@@ -354,6 +354,7 @@ Task("UpdateNugetPackageVersion")
             Information($"Version :{Configurator.NugetFullPackageVersion}");
             
             projectFileContent = projectFileContent.Replace("<PackageVersion>1.0.0</PackageVersion>", $"<PackageVersion>{Configurator.NugetFullPackageVersion}</PackageVersion>"); 
+            projectFileContent = projectFileContent.Replace("<PackageVersion></PackageVersion>", $"<PackageVersion>{Configurator.NugetFullPackageVersion}</PackageVersion>"); 
             System.IO.File.WriteAllText(Configurator.NugetRootProject, projectFileContent);
         }
     });
@@ -361,6 +362,7 @@ Task("UpdateNugetPackageVersion")
 Task("CreateNugetBySpec")   
     .Does(() => 
     {
+        Information($"## Valid nuspec {Configurator.IsValidForCustomNuspec}");
         if(Configurator.IsValidForCustomNuspec){
             Information($"## Create Nupkg {Configurator.NuspecFile}");
 
