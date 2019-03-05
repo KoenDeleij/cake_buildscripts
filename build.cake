@@ -412,7 +412,7 @@ Task("UnitTest")
 {
     foreach(var testProject in Configurator.UnitTestProjects)
     {
-        var outputFolder = $"--logger \"trx;LogFileName=../../{Configurator.TestResultOutputFolder}/TestResults.xml\"";
+        var outputFolder = $"--logger \"trx;LogFileName=TestResults.xml\"";//../../{Configurator.TestResultOutputFolder}/
 
         Information($"OUTPUT UNITTEST : {outputFolder}");
         DotNetCoreTest(
