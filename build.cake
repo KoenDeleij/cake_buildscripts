@@ -431,7 +431,7 @@ Task("SonarQubeCoverage")
     .WithCriteria(() => Configurator.IsValidForSonarQube)
     .Does(() => 
 {
-    Information($"SQ BEGIN {Configurator.ProjectName} with output {Configurator.SQResultOutputFolder}");
+    Information($"SQ BEGIN {Configurator.ProjectName} with output ./{Configurator.SQResultOutputFolder}");
 
     SonarBegin(new SonarBeginSettings{
             Name = $"{Configurator.ProjectName}",
@@ -448,7 +448,7 @@ Task("SonarQubeCoverage")
         var coverletSettings = new CoverletSettings {
              CollectCoverage = true,
              CoverletOutputFormat = CoverletOutputFormat.opencover,
-             CoverletOutputDirectory = $"./{Configurator.SQResultOutputFolder}",
+             CoverletOutputDirectory = Directory(Configurator.SQResultOutputFolder),
              CoverletOutputName = $"report",
              Exclude = new List<string>(){"[xunit.*]*"}
         };
