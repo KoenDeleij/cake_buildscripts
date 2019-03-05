@@ -66,6 +66,8 @@ public static class Configurator
     
     public static string SonarQubeToken { get; private set; }
 
+    public static string SonarQubeExclusions => "**/*Should.cs,**/*Test.cs,**/*Tests.cs";
+
     public static bool IsValidForSonarQube => !string.IsNullOrEmpty(SonarQubeUrl) && 
                                               !string.IsNullOrEmpty(SonarQubeBranch) &&
                                               !string.IsNullOrEmpty(SonarQubeToken);

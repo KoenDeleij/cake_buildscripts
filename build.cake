@@ -412,7 +412,7 @@ Task("UnitTest")
 {
     foreach(var testProject in Configurator.UnitTestProjects)
     {
-        var outputFolder = $"--logger \"trx;LogFileName=TestResults.xml\"";//../../{Configurator.TestResultOutputFolder}/
+        var outputFolder = $"--logger \"trx;LogFileName=../../{Configurator.TestResultOutputFolder}/TestResults.xml\"";
 
         Information($"OUTPUT UNITTEST : {outputFolder}");
         DotNetCoreTest(
@@ -426,29 +426,33 @@ Task("UnitTest")
     }
 });
 
-Task("SonarQubeCoverage")
-    .IsDependentOn("UnitTest")
+Task("SonarBegin")
     .WithCriteria(() => Configurator.IsValidForSonarQube)
     .Does(() => 
 {
-    Information($"SQ BEGIN {Configurator.ProjectName} with output ./{Configurator.SQResultOutputFolder}");
+    Information($"SQ BEGIN {Configurator.ProjectName} with output ./{Configurator.TestResultOutputFolder}");
 
     SonarBegin(new SonarBeginSettings{
-            Name = $"{Configurator.ProjectName}",
-            Key = $"{Configurator.ProjectName}",
+            Name = $"{Configurator.ProjectName}_{Configurator.SonarQubeBranch}",
+            Key = $"{Configurator.ProjectName}_{Configurator.SonarQubeBranch}",
             Url = Configurator.SonarQubeUrl,
-            Branch = Configurator.SonarQubeBranch,
             Login = Configurator.SonarQubeToken,
             Verbose = true,
-            OpenCoverReportsPath= $"./{Configurator.SQResultOutputFolder}"
+            CoverageExclusions = Configurator.SonarQubeExclusions,
+            OpenCoverReportsPath= $"./{Configurator.TestResultOutputFolder}/report.opencover.xml"
         });
+});
+
+Task("CoverletCoverage")
+    .Does(() => 
+{
     foreach(var testProject in Configurator.UnitTestProjects)
     {
         Information($"TESTING {testProject.File}");
         var coverletSettings = new CoverletSettings {
              CollectCoverage = true,
              CoverletOutputFormat = CoverletOutputFormat.opencover,
-             CoverletOutputDirectory = Directory(Configurator.SQResultOutputFolder),
+             CoverletOutputDirectory = Directory($"./{Configurator.TestResultOutputFolder}/"),
              CoverletOutputName = $"report",
              Exclude = new List<string>(){"[xunit.*]*"}
         };
@@ -456,13 +460,25 @@ Task("SonarQubeCoverage")
         Information($"COVERLET {testProject.File}");
         Coverlet(FilePath.FromString(testProject.File), coverletSettings);
     }
-}).Finally(()=>{
-    //ReportGenerator(FilePath.FromString(@".\coverage-results\report.opencover.xml"), DirectoryPath.FromString(@".\coverage-results\"));
-    
-    Information($"SQ END");
+});
 
+Task("SonarEnd")
+    .WithCriteria(() => Configurator.IsValidForSonarQube)
+    .Does(() => 
+{    
+    //ReportGenerator(FilePath.FromString(@".\coverage-results\report.opencover.xml"), DirectoryPath.FromString(@".\coverage-results\"));
+
+    Information($"SQ END");
     SonarEnd(new SonarEndSettings(){ Login = Configurator.SonarQubeToken});
 });
+
+Task("SonarQubeCoverage")
+    .IsDependentOn("SonarBegin")
+    .IsDependentOn("UnitTest")
+    .IsDependentOn("CoverletCoverage")
+    .IsDependentOn("SonarEnd")
+    .WithCriteria(() => Configurator.IsValidForSonarQube);
+
 
 //////////////////////////////////////////////////////////////////////
 // Help
