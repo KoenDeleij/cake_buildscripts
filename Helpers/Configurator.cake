@@ -58,6 +58,8 @@ public static class Configurator
 
     public static string TestResultOutputFolder => "TestResults";
 
+    public static string SQResultOutputFolder => "SQResults";
+
     public static string SonarQubeUrl { get; private set; }   
     
     public static string SonarQubeBranch { get; private set; }
