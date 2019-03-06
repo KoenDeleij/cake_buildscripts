@@ -31,11 +31,11 @@ var artifacts = new DirectoryPath("./artifacts").MakeAbsolute(Context.Environmen
 
 Setup(context =>
 {
+    Information("Initialize Configuration");
+    Configurator.Initialize(Context);
+
     if(target.ToLower() != "help")
     {
-        Information("Initialize Configuration");
-        Configurator.Initialize(Context);
-
         Information("Creating artifact directories");
         EnsureDirectoryExists(artifacts);
         EnsureDirectoryExists(artifacts + "/tests");
@@ -97,20 +97,23 @@ Task("Build-Droid")
     .IsDependentOn("NuGetRestore")
     .IsDependentOn("SetDroidVersion")
 	.Does(() =>
-{ 		
+    { 		
+        Information($"## Build Droid {configuration}");
+
+        Information($"With keystore {Configurator.AndroidKeystoreFile}");
         //https://docs.microsoft.com/en-us/xamarin/android/deploy-test/building-apps/build-process
         // TODO: verify & validate
         var file = BuildAndroidApk(Configurator.AndroidProjectFile, true, configuration, settings =>
-            settings.SetConfiguration(configuration)
+            settings.SetConfiguration(configuration) 
                     .WithProperty("AndroidKeyStore", "true")
                     .WithProperty("AndroidSigningStorePass", Configurator.AndroidKeystorePassword)
-                    .WithProperty("AndroidSigningKeyStore", Configurator.AndroidKeystoreFile)
+                    .WithProperty("AndroidSigningKeyStore", Configurator.AndroidKeystoreFile.Quote())
                     .WithProperty("AndroidSigningKeyAlias", Configurator.AndroidKeystoreAlias)
                     .WithProperty("AndroidSigningKeyPass", Configurator.AndroidKeystorePassword)
             );
 
         Information(file.ToString());
-});
+    });
 
 Task("SetDroidVersion")
     .Does(() =>
@@ -412,7 +415,7 @@ Task("UnitTest")
 {
     foreach(var testProject in Configurator.UnitTestProjects)
     {
-        var outputFolder = $"--logger \"trx;LogFileName=../../{Configurator.TestResultOutputFolder}/TestResults.xml\"";
+        var outputFolder = $"--logger \"trx;LogFileName={Configurator.TestResultOutputFolder}/TestResults.xml\"";
 
         Information($"OUTPUT UNITTEST : {outputFolder}");
         DotNetCoreTest(
@@ -430,7 +433,7 @@ Task("SonarBegin")
     .WithCriteria(() => Configurator.IsValidForSonarQube)
     .Does(() => 
 {
-    Information($"SQ BEGIN {Configurator.ProjectName} with output ./{Configurator.TestResultOutputFolder}");
+    Information($"SQ BEGIN {Configurator.ProjectName} with output {Configurator.TestResultOutputFolder}");
 
     SonarBegin(new SonarBeginSettings{
             Name = $"{Configurator.ProjectName}_{Configurator.SonarQubeBranch}",
@@ -439,7 +442,7 @@ Task("SonarBegin")
             Login = Configurator.SonarQubeToken,
             Verbose = true,
             CoverageExclusions = Configurator.SonarQubeExclusions,
-            OpenCoverReportsPath= $"./{Configurator.TestResultOutputFolder}/report.opencover.xml"
+            OpenCoverReportsPath= Configurator.OpenCoverOutputFolder
         });
 });
 
@@ -452,13 +455,13 @@ Task("CoverletCoverage")
         var coverletSettings = new CoverletSettings {
              CollectCoverage = true,
              CoverletOutputFormat = CoverletOutputFormat.opencover,
-             CoverletOutputDirectory = Directory($"./{Configurator.TestResultOutputFolder}/"),
+             CoverletOutputDirectory = Directory($"{Configurator.TestResultOutputFolder}"),
              CoverletOutputName = $"report",
              Exclude = new List<string>(){"[xunit.*]*"}
         };
 
-        Information($"COVERLET {testProject.File}");
-        Coverlet(FilePath.FromString(testProject.File), coverletSettings);
+        Information($"COVERLET {testProject.Directory}");
+        Coverlet(DirectoryPath.FromString(testProject.Directory), coverletSettings);
     }
 });
 

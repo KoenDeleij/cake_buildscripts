@@ -56,9 +56,9 @@ public static class Configurator
     public static bool IsValidForRunningTests => UnitTestProjects != null &&
                                                     UnitTestProjects.Any();
 
-    public static string TestResultOutputFolder => "TestResults";
+    public static string TestResultOutputFolder => FilePath.FromString("TestResults").MakeAbsolute(_context.Environment).ToString();
 
-    public static string SQResultOutputFolder => "SQResults";
+    public static string OpenCoverOutputFolder => $"{Configurator.TestResultOutputFolder}/report.opencover.xml";
 
     public static string SonarQubeUrl { get; private set; }   
     
@@ -173,7 +173,10 @@ public static class Configurator
             _context.Information(string.Format("Test project name: {0}", testProject.Name));            
             _context.Information(string.Format("Test directory: {0}", testProject.Directory));
         }
-        
+
+        _context.Information($"TestResult outputFolder : {TestResultOutputFolder}");
+        _context.Information($"OpenCover outputFolder : {OpenCoverOutputFolder}");
+
         _context.Information(string.Format("Configuration complete for running tests: {0}", IsValidForRunningTests));
 
         _context.Information("");
