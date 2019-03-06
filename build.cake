@@ -411,9 +411,20 @@ Task("PushNugetPackage")
 //////////////////////////////////////////////////////////////////////
 // TESTING
 //////////////////////////////////////////////////////////////////////
+Task("TestBuild")
+    .IsDependentOn("Clean")
+    .IsDependentOn("NuGetRestore")
+    .Does(() =>
+{
+    MSBuild (Configurator.SolutionFile, c => {
+		c.Configuration = Configurator.TestConfiguration;        
+		c.MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
+        c.MaxCpuCount = 10;
+	});
+});
 
 Task("UnitTest")
-    .IsDependentOn("Build")
+    .IsDependentOn("TestBuild")
     .WithCriteria(() => Configurator.IsValidForRunningTests)
     .Does(() =>
 {
