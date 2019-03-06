@@ -412,8 +412,8 @@ Task("PushNugetPackage")
 // TESTING
 //////////////////////////////////////////////////////////////////////
 Task("TestBuild")
-    //.IsDependentOn("Clean")
-    //.IsDependentOn("NuGetRestore")
+    .IsDependentOn("Clean")
+    .IsDependentOn("NuGetRestore")
     .Does(() =>
 {
     MSBuild (Configurator.SolutionFile, c => {
