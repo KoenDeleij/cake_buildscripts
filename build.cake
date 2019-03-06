@@ -453,6 +453,8 @@ Task("SonarBegin")
 Task("CoverletCoverage")
     .Does(() => 
 {
+    Func<IFileSystemInfo, bool> exclude_ui_tests = fileSystemInfo => !fileSystemInfo.Path.FullPath.Contains("UI");
+
     foreach(var testProject in Configurator.UnitTestProjects)
     {
         Information($"TESTING {testProject.File}");
@@ -464,8 +466,16 @@ Task("CoverletCoverage")
              Exclude = new List<string>(){"[xunit.*]*"}
         };
 
-        Information($"COVERLET {testProject.Directory}");
-        Coverlet(DirectoryPath.FromString(testProject.Directory), coverletSettings);
+        var projectFile = FilePath.FromString(testProject.File);
+        var dllOutputPath = $"{testProject.Directory.ToString()}/bin/{Configurator.TestConfiguration}/**/*Tests.dll";
+
+        var testDll = GlobbingAliases.GetFiles(Context, dllOutputPath, exclude_ui_tests);
+
+        if(testDll.Any())
+        {
+            Information($"COVERLET {dllOutputPath} {projectFile}");
+            Coverlet(testDll,projectFile, coverletSettings);
+        }
     }
 });
 
