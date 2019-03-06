@@ -254,14 +254,18 @@ public static class Configurator
                 AndroidProjectFile = droidFiles.FirstOrDefault().ToString();
             }
         }
+        
+        var storeFile = _context.EvaluateTfsBuildVariable("android_keystorefile", _context.EnvironmentVariable("android_keystorefile") ?? _context.Argument("android_keystorefile", string.Empty));
 
-        var keystorePath = "./**/*.keystore";
-        var keystoreFiles = GlobbingAliases.GetFiles(_context, keystorePath);
+        if(string.IsNullOrEmpty(storeFile)){
+            var keystorePath = "./**/*.keystore";
+            var keystoreFiles = GlobbingAliases.GetFiles(_context, keystorePath);
 
-        if(keystoreFiles.Any())
-            AndroidKeystoreFile = keystoreFiles.FirstOrDefault().ToString();
-        else
-            AndroidKeystoreFile = _context.EvaluateTfsBuildVariable("android_keystorefile", _context.EnvironmentVariable("android_keystorefile") ?? _context.Argument("android_keystorefile", string.Empty));
+            if(keystoreFiles.Any())
+                AndroidKeystoreFile = keystoreFiles.FirstOrDefault().ToString();
+        }else{
+            AndroidKeystoreFile = FilePath.FromString(storeFile).MakeAbsolute(_context.Environment).ToString();
+        }
         AndroidKeystoreAlias =  _context.EvaluateTfsBuildVariable("android_keystorealias",  _context.EnvironmentVariable("android_keystorealias") ??  _context.Argument("android_keystorealias", string.Empty));
         AndroidKeystorePassword =  _context.EvaluateTfsBuildVariable("android_keystorepasswd",  _context.EnvironmentVariable("android_keystorepasswd") ??  _context.Argument("android_keystorepasswd", string.Empty));            
 
