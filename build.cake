@@ -474,7 +474,7 @@ Task("CoverletCoverage")
         if(testDll.Any())
         {
             Information($"COVERLET {dllOutputPath} {projectFile}");
-            Coverlet(testDll,projectFile, coverletSettings);
+            Coverlet(testDll.FirstOrDefault(),projectFile, coverletSettings);
         }
     }
 });
