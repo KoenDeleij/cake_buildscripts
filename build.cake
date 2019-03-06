@@ -412,8 +412,8 @@ Task("PushNugetPackage")
 // TESTING
 //////////////////////////////////////////////////////////////////////
 Task("TestBuild")
-    .IsDependentOn("Clean")
-    .IsDependentOn("NuGetRestore")
+    //.IsDependentOn("Clean")
+    //.IsDependentOn("NuGetRestore")
     .Does(() =>
 {
     MSBuild (Configurator.SolutionFile, c => {
@@ -478,15 +478,15 @@ Task("CoverletCoverage")
         };
 
         var projectFile = FilePath.FromString(testProject.File);
-        var dllOutputPath = $"{testProject.Directory.ToString()}/bin/{Configurator.TestConfiguration}/**/*Tests.dll";
+        
+        Information($"COVERLET  {projectFile} {Configurator.TestConfiguration}");
 
-        var testDll = GlobbingAliases.GetFiles(Context, dllOutputPath, exclude_ui_tests);
+        var testSettings = new DotNetCoreTestSettings {
+            Configuration = Configurator.TestConfiguration,
+            Verbosity =	DotNetCoreVerbosity.Detailed
+        };
 
-        if(testDll.Any())
-        {
-            Information($"COVERLET {dllOutputPath} {testDll.FirstOrDefault()} {projectFile}");
-            Coverlet(testDll.FirstOrDefault(),projectFile, coverletSettings);
-        }
+        DotNetCoreTest(projectFile, testSettings, coverletSettings);
     }
 });
 
