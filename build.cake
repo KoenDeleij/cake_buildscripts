@@ -81,12 +81,17 @@ Task("Build")
     .Does(() =>
 {
     MSBuild (Configurator.SolutionFile, c => {
-		c.Configuration = configuration;        
+		c.Configuration = Configurator.BuildConfiguration;        
 		c.MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
         c.MaxCpuCount = 10;
 	});
 });
 
+Task("Build-Apps")
+    .IsDependentOn("SonarQubeCoverage")
+    .IsDependentOn("Build-Droid")
+    .IsDependentOn("Build-iOS");
+    
 //////////////////////////////////////////////////////////////////////
 // BUILDING ANDROID
 //////////////////////////////////////////////////////////////////////
@@ -98,13 +103,13 @@ Task("Build-Droid")
     .IsDependentOn("SetDroidVersion")
 	.Does(() =>
     { 		
-        Information($"## Build Droid {configuration}");
+        Information($"## Build Droid {Configurator.BuildConfiguration}");
 
         Information($"With keystore {Configurator.AndroidKeystoreFile}");
         //https://docs.microsoft.com/en-us/xamarin/android/deploy-test/building-apps/build-process
         // TODO: verify & validate
-        var file = BuildAndroidApk(Configurator.AndroidProjectFile, true, configuration, settings =>
-            settings.SetConfiguration(configuration) 
+        var file = BuildAndroidApk(Configurator.AndroidProjectFile, true, Configurator.BuildConfiguration, settings =>
+            settings.SetConfiguration(Configurator.BuildConfiguration) 
                     .WithProperty("AndroidKeyStore", "true")
                     .WithProperty("AndroidSigningStorePass", Configurator.AndroidKeystorePassword)
                     .WithProperty("AndroidSigningKeyStore", Configurator.AndroidKeystoreFile.Quote())
@@ -201,7 +206,7 @@ Task("Build-iOS")
         Information("## Build");
         // TODO: BuildiOSIpa (Cake.Xamarin, https://github.com/Redth/Cake.Xamarin/blob/master/src/Cake.Xamarin/Aliases.cs)
         MSBuild(Configurator.IOSProjectFile, settings => 
-            settings.SetConfiguration(configuration)   
+            settings.SetConfiguration(Configurator.BuildConfiguration)   
             .WithTarget("Build")
             .WithProperty("Platform", "iPhone")
             .WithProperty("OutputPath", "bin/iPhone")
@@ -223,7 +228,6 @@ Task("SetIOSParameters")
 
             dynamic data = DeserializePlist(plistPath);
             
-
             data["CFBundleShortVersionString"] = Configurator.Version;
             data["CFBundleVersion"] = Configurator.FullVersion;
 
@@ -422,7 +426,7 @@ Task("UnitTest")
                 testProject.File,
                 new DotNetCoreTestSettings()
                 {
-                    Configuration = configuration,
+                    Configuration = Configurator.TestConfiguration,
                     ArgumentCustomization = args => args.Append(outputFolder),
                     NoBuild = true
                 });

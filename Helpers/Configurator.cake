@@ -16,6 +16,8 @@ public static class Configurator
     
     public static bool ShouldClean { get; private set; } 
 
+    public static string BuildConfiguration { get; private set; }
+
     /// iOS
 
     public static string IOSProjectFile { get; private set; }
@@ -71,6 +73,8 @@ public static class Configurator
     public static bool IsValidForSonarQube => !string.IsNullOrEmpty(SonarQubeUrl) && 
                                               !string.IsNullOrEmpty(SonarQubeBranch) &&
                                               !string.IsNullOrEmpty(SonarQubeToken);
+
+    public static string TestConfiguration { get; private set; }
 
     /// AppCenter 
 
@@ -145,6 +149,8 @@ public static class Configurator
         _context.Information(string.Format("FullVersion: {0}", !string.IsNullOrEmpty(FullVersion) ? FullVersion : "NOT SET: buildversion"));
         _context.Information(string.Format("Version: {0}", !string.IsNullOrEmpty(Version) ? Version : "NOT SET: AppVersion"));
         _context.Information(string.Format("Cleaning: {0}", ShouldClean));
+        _context.Information($"BuildConfiguration : {BuildConfiguration}");
+
         _context.Information("");
         _context.Information("============ iOS ============");
         _context.Information(string.Format("iOS project: {0}", !string.IsNullOrEmpty(IOSProjectFile) ? IOSProjectFile : "NOT FOUND"));
@@ -174,6 +180,7 @@ public static class Configurator
             _context.Information(string.Format("Test directory: {0}", testProject.Directory));
         }
 
+        _context.Information($"TestConfiguration : {TestConfiguration}");
         _context.Information($"TestResult outputFolder : {TestResultOutputFolder}");
         _context.Information($"OpenCover outputFolder : {OpenCoverOutputFolder}");
 
@@ -208,6 +215,8 @@ public static class Configurator
 
         FullVersion = _context.EvaluateTfsBuildVariable("buildversion", _context.EnvironmentVariable("buildversion") ?? _context.Argument("buildversion", string.Empty));
         Version = _context.EvaluateTfsBuildVariable("AppVersion", _context.EnvironmentVariable("AppVersion") ?? _context.Argument("AppVersion", string.Empty));
+
+        BuildConfiguration = _context.EvaluateTfsBuildVariable("configuration", _context.EnvironmentVariable("configuration") ?? _context.Argument("configuration", string.Empty));
 
         ShouldClean = _context.Argument("clean", false);
 
@@ -301,6 +310,11 @@ public static class Configurator
                 }                
             }
         }    
+        TestConfiguration = _context.EvaluateTfsBuildVariable("testconfiguration", _context.EnvironmentVariable("testconfiguration") ?? _context.Argument("testconfiguration", string.Empty));
+
+        if(string.IsNullOrEmpty(TestConfiguration)){
+            TestConfiguration = BuildConfiguration;
+        }
 
         SonarQubeUrl = _context.EvaluateTfsBuildVariable("sonarqube_url", _context.EnvironmentVariable("sonarqube_url") ?? _context.Argument("sonarqube_url", string.Empty));    //"http://rhm-d-ranch01.boolhosting.tld:9000/""52ad219e8d1eec9bc631beb648e78fa0f6390425"
         SonarQubeBranch = _context.EvaluateTfsBuildVariable("sonarqube_branch", _context.EnvironmentVariable("sonarqube_branch") ?? _context.Argument("sonarqube_branch", string.Empty));
