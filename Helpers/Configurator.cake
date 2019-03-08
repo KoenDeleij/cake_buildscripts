@@ -201,7 +201,8 @@ public static class Configurator
         _context.Information(string.Format("App name iOS: {0}", !string.IsNullOrEmpty(AppCenteriOSAppName) ? AppCenteriOSAppName : "NOT SET: appcenter_ios_appname"));
         _context.Information(string.Format("App name Droid: {0}", !string.IsNullOrEmpty(AppCenterDroidAppName) ? AppCenterDroidAppName : "NOT SET: appcenter_droid_appname"));
         _context.Information(string.Format("Distribution group: {0}", !string.IsNullOrEmpty(AppCenterDistributionGroup) ? AppCenterDistributionGroup : "NOT SET: appcenter_distributiongroup"));
-        _context.Information(string.Format("Configuration complete for appcenter release: {0}", IsValidForAppCenterDistribution));
+        _context.Information(string.Format("Configuration complete for ios appcenter release: {0}", IsValidForiOSAppCenterDistribution));
+        _context.Information(string.Format("Configuration complete for android appcenter release: {0}", IsValidForDroidAppCenterDistribution));
 
         _context.Information("");
         _context.Information("============ Nuget ============");

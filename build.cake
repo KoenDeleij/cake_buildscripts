@@ -135,8 +135,6 @@ Task("SetDroidVersion")
             var manifestPath = foundManifestFiles.FirstOrDefault();
             var manifest = DeserializeAppManifest(manifestPath);
 
-            //Information("manifest -> {0}", manifest.Dump());
-
             //manifest.PackageName = "com.example.mycoolapp";
             manifest.VersionName = Configurator.FullVersion;
             manifest.VersionCode = int.Parse(Configurator.FullVersion.Replace(".",""));
