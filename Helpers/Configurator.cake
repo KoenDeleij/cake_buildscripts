@@ -37,7 +37,7 @@ public static class Configurator
     public static string IOSURLIdentifier { get; private set; }
 
     public static bool IsValidForBuildingIOS => !string.IsNullOrEmpty(IOSProjectFile) &&
-                                                !string.IsNullOrEmpty(AppPackageName)
+                                                !string.IsNullOrEmpty(AppPackageName);
 
     /// Android
 
@@ -57,7 +57,7 @@ public static class Configurator
                                                     !string.IsNullOrEmpty(AndroidKeystoreFile) &&
                                                     !string.IsNullOrEmpty(AndroidKeystoreAlias) &&
                                                     !string.IsNullOrEmpty(AndroidKeystorePassword) &&
-                                                    !string.IsNullOrEmpty(AppPackageName)
+                                                    !string.IsNullOrEmpty(AppPackageName);
 
     /// Tests
     
