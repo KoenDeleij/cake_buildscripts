@@ -82,14 +82,22 @@ public static class Configurator
 
     public static string AppCenterOwner { get; private set; }
 
-    public static string AppCenterAppName { get; private set; }
+    public static string AppCenterDroidAppName { get; private set; }
+
+    public static string AppCenteriOSAppName { get; private set; }
 
     public static string AppCenterDistributionGroup { get; private set; }
 
-    public static bool IsValidForAppCenterDistribution => 
+    public static bool IsValidForiOSAppCenterDistribution => 
         !string.IsNullOrEmpty(AppCenterToken) &&
         !string.IsNullOrEmpty(AppCenterOwner) &&
-        !string.IsNullOrEmpty(AppCenterAppName) &&
+        !string.IsNullOrEmpty(AppCenteriOSAppName) &&
+        !string.IsNullOrEmpty(AppCenterDistributionGroup);
+
+    public static bool IsValidForDroidAppCenterDistribution => 
+        !string.IsNullOrEmpty(AppCenterToken) &&
+        !string.IsNullOrEmpty(AppCenterOwner) &&
+        !string.IsNullOrEmpty(AppCenterDroidAppName) &&
         !string.IsNullOrEmpty(AppCenterDistributionGroup);
 
     /// Nuget
@@ -190,7 +198,8 @@ public static class Configurator
         _context.Information("============ AppCenter ============");
         _context.Information(string.Format("Token: {0}", !string.IsNullOrEmpty(AppCenterToken) ? AppCenterToken : "NOT SET: appcenter_token"));
         _context.Information(string.Format("Owner: {0}", !string.IsNullOrEmpty(AppCenterOwner) ? AppCenterOwner : "NOT SET: appcenter_owner"));
-        _context.Information(string.Format("App name: {0}", !string.IsNullOrEmpty(AppCenterAppName) ? AppCenterAppName : "NOT SET: appcenter_appname"));
+        _context.Information(string.Format("App name iOS: {0}", !string.IsNullOrEmpty(AppCenteriOSAppName) ? AppCenteriOSAppName : "NOT SET: appcenter_ios_appname"));
+        _context.Information(string.Format("App name Droid: {0}", !string.IsNullOrEmpty(AppCenterDroidAppName) ? AppCenterDroidAppName : "NOT SET: appcenter_droid_appname"));
         _context.Information(string.Format("Distribution group: {0}", !string.IsNullOrEmpty(AppCenterDistributionGroup) ? AppCenterDistributionGroup : "NOT SET: appcenter_distributiongroup"));
         _context.Information(string.Format("Configuration complete for appcenter release: {0}", IsValidForAppCenterDistribution));
 
@@ -325,7 +334,8 @@ public static class Configurator
     {
         AppCenterToken = _context.EvaluateTfsBuildVariable("appcenter_token", _context.EnvironmentVariable("appcenter_token") ?? _context.Argument("appcenter_token", string.Empty));
         AppCenterOwner = _context.EvaluateTfsBuildVariable("appcenter_owner", _context.EnvironmentVariable("appcenter_owner") ?? _context.Argument("appcenter_owner", string.Empty));
-        AppCenterAppName = _context.EvaluateTfsBuildVariable("appcenter_appname", _context.EnvironmentVariable("appcenter_appname") ?? _context.Argument("appcenter_appname", string.Empty));
+        AppCenteriOSAppName = _context.EvaluateTfsBuildVariable("appcenter_ios_appname", _context.EnvironmentVariable("appcenter_ios_appname") ?? _context.Argument("appcenter_ios_appname", string.Empty));
+        AppCenterDroidAppName = _context.EvaluateTfsBuildVariable("appcenter_droid_appname", _context.EnvironmentVariable("appcenter_droid_appname") ?? _context.Argument("appcenter_droid_appname", string.Empty));
         AppCenterDistributionGroup = _context.EvaluateTfsBuildVariable("appcenter_distributiongroup", _context.EnvironmentVariable("appcenter_distributiongroup") ?? _context.Argument("appcenter_distributiongroup", string.Empty));
     }
 

@@ -166,7 +166,7 @@ Task("SetDroidVersion")
 Task("AppCenterRelease-Droid")
     .IsDependentOn("Build-Droid")
     .IsDependentOn("AppCenterLogin")
-    .WithCriteria(() => Configurator.IsValidForAppCenterDistribution)
+    .WithCriteria(() => Configurator.IsValidForDroidAppCenterDistribution)
     .Does(() =>
     {
         //https://cakebuild.net/api/Cake.AppCenter/
@@ -184,7 +184,7 @@ Task("AppCenterRelease-Droid")
             AppCenterDistributeRelease(
                 new AppCenterDistributeReleaseSettings() 
                 { 
-                    App = Configurator.AppCenterOwner + "/" + Configurator.AppCenterAppName, 
+                    App = Configurator.AppCenterOwner + "/" + Configurator.AppCenterDroidAppName, 
                     File = foundApkFiles.FirstOrDefault().ToString(),
                     Group = Configurator.AppCenterDistributionGroup
                 });
@@ -282,7 +282,7 @@ Task("SetIOSParameters")
     });
 
 Task("AppCenterRelease-iOS")
-    .WithCriteria(() => Configurator.IsValidForAppCenterDistribution)
+    .WithCriteria(() => Configurator.IsValidForiOSAppCenterDistribution)
     .IsDependentOn("Build-iOS")
     .IsDependentOn("AppCenterLogin")
     .Does(() =>
@@ -295,7 +295,7 @@ Task("AppCenterRelease-iOS")
             AppCenterDistributeRelease(
                 new AppCenterDistributeReleaseSettings() 
                 { 
-                    App = Configurator.AppCenterOwner + "/" + Configurator.AppCenterAppName, 
+                    App = Configurator.AppCenterOwner + "/" + Configurator.AppCenteriOSAppName, 
                     File = foundIpaFiles.FirstOrDefault().ToString(),
                     Group = Configurator.AppCenterDistributionGroup
                 });
@@ -313,7 +313,7 @@ Task("AppCenterRelease-iOS")
             AppCenterCrashesUploadSymbols(
                 new AppCenterCrashesUploadSymbolsSettings() 
                 { 
-                    App = Configurator.AppCenterOwner + "/" + Configurator.AppCenterAppName, 
+                    App = Configurator.AppCenterOwner + "/" + Configurator.AppCenteriOSAppName, 
                     Symbol = symbolsDirectory.ToString()
                 });
         }
