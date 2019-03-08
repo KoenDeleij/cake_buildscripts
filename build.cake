@@ -258,19 +258,13 @@ Task("SetIOSParameters")
 
             if(!string.IsNullOrEmpty(Configurator.IOSURLSchema))
             {
-                Information(string.Format("Writing splash: {0}", Configurator.IOSURLSchema));
+                Information(string.Format("Writing url schema: {0}", Configurator.IOSURLSchema));
                 data["CFBundleURLTypes"][0]["CFBundleURLSchemes"][0] = Configurator.IOSURLSchema;
             }
 
             if(!string.IsNullOrEmpty(Configurator.IOSURLIdentifier))
             {
-                Information(string.Format("Writing splash: {0}", Configurator.IOSURLIdentifier));
-                data["CFBundleURLTypes"][0]["CFBundleURLName"] = Configurator.IOSURLIdentifier;
-            }
-
-            if(!string.IsNullOrEmpty(Configurator.IOSURLIdentifier))
-            {
-                Information(string.Format("Writing splash: {0}", Configurator.IOSURLIdentifier));
+                Information(string.Format("Writing url identifier: {0}", Configurator.IOSURLIdentifier));
                 data["CFBundleURLTypes"][0]["CFBundleURLName"] = Configurator.IOSURLIdentifier;
             }
 
