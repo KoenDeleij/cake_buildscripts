@@ -135,23 +135,20 @@ Task("SetDroidVersion")
             var manifestPath = foundManifestFiles.FirstOrDefault();
             var manifest = DeserializeAppManifest(manifestPath);
 
-            //manifest.PackageName = "com.example.mycoolapp";
+            //versioning
             manifest.VersionName = Configurator.FullVersion;
             manifest.VersionCode = int.Parse(Configurator.FullVersion.Replace(".",""));
 
+            //theming
             if(!string.IsNullOrEmpty(Configurator.AndroidStyle))
                 manifest.ApplicationTheme = Configurator.AndroidStyle;
 
-            // AndroidStyle
-            // manifest.ApplicationIcon = "@mipmap/ic_launcher";
-            // manifest.ApplicationLabel = "Android Application";
-            // manifest.Debuggable = false;
+            if(!string.IsNullOrEmpty(Configurator.AndroidIcon))
+                manifest.ApplicationIcon = Configurator.AndroidIcon;
 
-            // data["CFBundleShortVersionString"] = Configurator.Version;
-            // data["CFBundleVersion"] = Configurator.FullVersion;
-
-            // data["CFBundleShortVersionString"] = Configurator.Version;
-            // data["CFBundleVersion"] = Configurator.FullVersion;
+            //app name
+            manifest.PackageName = Configurator.AppPackageName;
+            manifest.ApplicationLabel = Configurator.AppDisplayName;
 
             SerializeAppManifest(manifestPath, manifest);
         }
@@ -234,10 +231,10 @@ Task("SetIOSParameters")
             data["CFBundleShortVersionString"] = Configurator.Version;
             data["CFBundleVersion"] = Configurator.FullVersion;
 
-            if(!string.IsNullOrEmpty(Configurator.IOSBundleIdentifier))
+            if(!string.IsNullOrEmpty(Configurator.AppPackageName))
             {
-                Information(string.Format("Writing bundle identifier: {0}", Configurator.IOSBundleIdentifier));
-                data["CFBundleIdentifier"] = Configurator.IOSBundleIdentifier;
+                Information(string.Format("Writing bundle identifier: {0}", Configurator.AppPackageName));
+                data["CFBundleIdentifier"] = Configurator.AppPackageName;
             }
 
             if(!string.IsNullOrEmpty(Configurator.AppDisplayName))
@@ -271,12 +268,42 @@ Task("SetIOSParameters")
                 data["CFBundleURLTypes"][0]["CFBundleURLName"] = Configurator.IOSURLIdentifier;
             }
 
+            if(!string.IsNullOrEmpty(Configurator.IOSURLIdentifier))
+            {
+                Information(string.Format("Writing splash: {0}", Configurator.IOSURLIdentifier));
+                data["CFBundleURLTypes"][0]["CFBundleURLName"] = Configurator.IOSURLIdentifier;
+            }
+
             SerializePlist(plistPath, data);
         }
         else
         {
             throw new Exception("Can't find Info.plist");
         }
+
+        //Entitlements
+        var plistPattern = "./**/Entitlements.plist";
+        var foundPListFiles = GetFiles(plistPattern);
+        if(foundPListFiles.Any())
+        {
+            var entitlementsPath = foundPListFiles.FirstOrDefault().ToString();
+
+            Information(string.Format("Entitlements file: {0}", plistPath.ToString()));
+
+            dynamic entitlementsData = DeserializePlist(entitlementsPath);
+            
+            if(!string.IsNullOrEmpty(Configurator.IOSAssociatedDomain))
+            {
+                Information(string.Format("Writing associated domain: {0}", Configurator.IOSAssociatedDomain));
+                entitlementsData["com.apple.developer.associated-domains"][0] = Configurator.IOSAssociatedDomain;
+            }
+
+            if(!string.IsNullOrEmpty(Configurator.IOSAppIdentifier))
+            {
+                Information(string.Format("Writing app identifier: {0}", Configurator.IOSAppIdentifier));
+                entitlementsData["application-identifier"] = Configurator.IOSAppIdentifier;
+            } 
+        } 
     });
 
 Task("AppCenterRelease-iOS")

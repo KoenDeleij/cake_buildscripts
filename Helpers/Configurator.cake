@@ -18,11 +18,11 @@ public static class Configurator
 
     public static string BuildConfiguration { get; private set; }
 
+    public static string AppPackageName { get; private set; }
+
     /// iOS
 
     public static string IOSProjectFile { get; private set; }
-
-    public static string IOSBundleIdentifier { get; private set; }
 
     public static string IOSSplashXib { get; private set; }
 
@@ -30,9 +30,14 @@ public static class Configurator
 
     public static string IOSURLSchema { get; private set; }
 
+    public static string IOSAssociatedDomain { get; private set; }
+
+    public static string IOSAppIdentifier { get; private set; }
+
     public static string IOSURLIdentifier { get; private set; }
 
-    public static bool IsValidForBuildingIOS => !string.IsNullOrEmpty(IOSProjectFile);
+    public static bool IsValidForBuildingIOS => !string.IsNullOrEmpty(IOSProjectFile) &&
+                                                !string.IsNullOrEmpty(AppPackageName)
 
     /// Android
 
@@ -46,10 +51,13 @@ public static class Configurator
 
     public static string AndroidStyle { get; private set; }
 
+    public static string AndroidIcon { get; private set; }
+
     public static bool IsValidForBuildingAndroid => !string.IsNullOrEmpty(AndroidProjectFile) && 
                                                     !string.IsNullOrEmpty(AndroidKeystoreFile) &&
                                                     !string.IsNullOrEmpty(AndroidKeystoreAlias) &&
-                                                    !string.IsNullOrEmpty(AndroidKeystorePassword);
+                                                    !string.IsNullOrEmpty(AndroidKeystorePassword) &&
+                                                    !string.IsNullOrEmpty(AppPackageName)
 
     /// Tests
     
@@ -156,13 +164,13 @@ public static class Configurator
         _context.Information(string.Format("AppDisplayName: {0}", !string.IsNullOrEmpty(AppDisplayName) ? AppDisplayName : "NOT SET: app_display_name"));        
         _context.Information(string.Format("FullVersion: {0}", !string.IsNullOrEmpty(FullVersion) ? FullVersion : "NOT SET: buildversion"));
         _context.Information(string.Format("Version: {0}", !string.IsNullOrEmpty(Version) ? Version : "NOT SET: AppVersion"));
+        _context.Information(string.Format("App bundle/package identifier: {0}", !string.IsNullOrEmpty(AppPackageName) ? AppPackageName : "NOT SET: app_packagename"));    
         _context.Information(string.Format("Cleaning: {0}", ShouldClean));
         _context.Information($"BuildConfiguration : {BuildConfiguration}");
 
         _context.Information("");
         _context.Information("============ iOS ============");
         _context.Information(string.Format("iOS project: {0}", !string.IsNullOrEmpty(IOSProjectFile) ? IOSProjectFile : "NOT FOUND"));
-        _context.Information(string.Format("iOS bundle identifier: {0}", !string.IsNullOrEmpty(IOSBundleIdentifier) ? IOSBundleIdentifier : "NOT SET: ios_bundle_identifier"));    
         _context.Information(string.Format("iOS Splash XIB: {0}", !string.IsNullOrEmpty(IOSSplashXib) ? IOSSplashXib : "NOT SET: ios_splash_xib"));    
         _context.Information(string.Format("iOS App Icons: {0}", !string.IsNullOrEmpty(IOSAppIconsSet) ? IOSAppIconsSet : "NOT SET: ios_appicons_set"));
         _context.Information(string.Format("iOS Bundle schemes: {0}", !string.IsNullOrEmpty(IOSURLSchema) ? IOSURLSchema : "NOT SET: ios_url_schema"));                
@@ -172,11 +180,13 @@ public static class Configurator
         _context.Information("");
         _context.Information("============ Droid ============");
         _context.Information(string.Format("Droid project: {0}", !string.IsNullOrEmpty(AndroidProjectFile) ? AndroidProjectFile : "NOT FOUND"));
+        _context.Information(string.Format("Droid packagename: {0}", !string.IsNullOrEmpty(AndroidPackageName) ? AndroidPackageName : "NOT FOUND"));
         _context.Information(string.Format("Droid keystore: {0}", !string.IsNullOrEmpty(AndroidKeystoreFile) ? AndroidKeystoreFile : "NOT SET: android_keystorefile"));
         _context.Information(string.Format("Droid keystore alias: {0}", !string.IsNullOrEmpty(AndroidKeystoreAlias) ? AndroidKeystoreAlias : "NOT SET: android_keystorealias"));
         _context.Information(string.Format("Droid keystore password: {0}", !string.IsNullOrEmpty(AndroidKeystorePassword) ? "SET" : "NOT SET: android_keystorepasswd"));
         _context.Information(string.Format("Droid style: {0}", !string.IsNullOrEmpty(AndroidStyle) ? AndroidStyle : "NOT SET: android_style"));
-        
+        _context.Information(string.Format("Droid icon: {0}", !string.IsNullOrEmpty(AndroidIcon) ? AndroidIcon : "NOT SET: android_icon"));
+
         _context.Information(string.Format("Configuration complete for building Android: {0}", IsValidForBuildingAndroid));
 
         _context.Information("");
@@ -243,6 +253,8 @@ public static class Configurator
                     ProjectName = solutionFiles.FirstOrDefault().GetFilenameWithoutExtension().ToString();
             }
         }
+
+        AppPackageName = _context.EvaluateTfsBuildVariable("app_packagename", _context.EnvironmentVariable("app_packagename") ?? _context.Argument("app_packagename", string.Empty));
     }
 
     private static void ReadIOSBuildSettings()
@@ -252,11 +264,12 @@ public static class Configurator
 
         if(iosFiles.Any())
             IOSProjectFile = iosFiles.FirstOrDefault().ToString();
-
-        IOSBundleIdentifier = _context.EvaluateTfsBuildVariable("ios_bundle_identifier",  _context.EnvironmentVariable("ios_bundle_identifier") ??  _context.Argument("ios_bundle_identifier", string.Empty));    
+  
         IOSSplashXib = _context.EvaluateTfsBuildVariable("ios_splash_xib",  _context.EnvironmentVariable("ios_splash_xib") ??  _context.Argument("ios_splash_xib", string.Empty));            
         IOSAppIconsSet = _context.EvaluateTfsBuildVariable("ios_appicons_set",  _context.EnvironmentVariable("ios_appicons_set") ??  _context.Argument("ios_appicons_set", string.Empty));                    
-        IOSURLSchema = _context.EvaluateTfsBuildVariable("ios_url_schema",  _context.EnvironmentVariable("ios_url_schema") ??  _context.Argument("ios_url_schema", string.Empty));  
+        IOSURLSchema = _context.EvaluateTfsBuildVariable("ios_url_schema",  _context.EnvironmentVariable("ios_url_schema") ??  _context.Argument("ios_url_schema", string.Empty)); 
+        IOSAssociatedDomain = _context.EvaluateTfsBuildVariable("ios_associateddomain",  _context.EnvironmentVariable("ios_associateddomain") ??  _context.Argument("ios_associateddomain", string.Empty)); 
+        IOSAppIdentifier = _context.EvaluateTfsBuildVariable("ios_appidentifier",  _context.EnvironmentVariable("ios_appidentifier") ??  _context.Argument("ios_appidentifier", string.Empty)); 
     }
 
     private static void ReadDroidBuildSettings()
@@ -292,6 +305,7 @@ public static class Configurator
         AndroidKeystorePassword =  _context.EvaluateTfsBuildVariable("android_keystorepasswd",  _context.EnvironmentVariable("android_keystorepasswd") ??  _context.Argument("android_keystorepasswd", string.Empty));            
 
         AndroidStyle = _context.EvaluateTfsBuildVariable("android_style", _context.EnvironmentVariable("android_style") ?? _context.Argument("android_style", string.Empty));
+        AndroidIcon = _context.EvaluateTfsBuildVariable("android_icon", _context.EnvironmentVariable("android_icon") ?? _context.Argument("android_icon", string.Empty));
     }
 
     private static void ReadTestBuildSettings()
