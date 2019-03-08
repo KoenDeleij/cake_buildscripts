@@ -276,13 +276,13 @@ Task("SetIOSParameters")
         }
 
         //Entitlements
-        var plistPattern = "./**/Entitlements.plist";
-        var foundPListFiles = GetFiles(plistPattern);
-        if(foundPListFiles.Any())
+        var entitlementsPattern = "./**/Entitlements.plist";
+        var foundEntitlementsFiles = GetFiles(entitlementsPattern);
+        if(foundEntitlementsFiles.Any())
         {
-            var entitlementsPath = foundPListFiles.FirstOrDefault().ToString();
+            var entitlementsPath = foundEntitlementsFiles.FirstOrDefault().ToString();
 
-            Information(string.Format("Entitlements file: {0}", plistPath.ToString()));
+            Information(string.Format("Entitlements file: {0}", entitlementsPath.ToString()));
 
             dynamic entitlementsData = DeserializePlist(entitlementsPath);
             
