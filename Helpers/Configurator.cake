@@ -99,7 +99,7 @@ public static class Configurator
     public static bool IsValidForiOSAppCenterDistribution => 
         !string.IsNullOrEmpty(AppCenterToken) &&
         !string.IsNullOrEmpty(AppCenterOwner) &&
-        !string.IsNullOrEmpty(AppCenteriOSAppName));// &&
+        !string.IsNullOrEmpty(AppCenteriOSAppName);// &&
         //!string.IsNullOrEmpty(AppCenterDistributionGroup);
 
     public static bool IsValidForDroidAppCenterDistribution => 
