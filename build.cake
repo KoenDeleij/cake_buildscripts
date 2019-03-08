@@ -93,8 +93,8 @@ Task("Build-Apps")
     .IsDependentOn("Build-iOS");
 
 Task("Build-Apps-Appcenter")
-    //.IsDependentOn("SonarQubeCoverage")
-    //.IsDependentOn("AppCenterRelease-Droid");
+    .IsDependentOn("SonarQubeCoverage")
+    .IsDependentOn("AppCenterRelease-Droid")
     .IsDependentOn("AppCenterRelease-iOS");
     
 //////////////////////////////////////////////////////////////////////
