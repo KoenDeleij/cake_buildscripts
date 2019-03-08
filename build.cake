@@ -94,8 +94,12 @@ Task("Build-Apps")
 
 Task("Build-Apps-Appcenter")
     .IsDependentOn("SonarQubeCoverage")
-    .IsDependentOn("AppCenterRelease-Droid")
-    .IsDependentOn("AppCenterRelease-iOS");
+    .IsDependentOn("AppCenterLogin")
+    .IsDependentOn("Build-Droid")
+    .IsDependentOn("AppCenterRelease-DroidUpload")
+    .IsDependentOn("Build-iOS")
+    .IsDependentOn("AppCenterRelease-iOSUpload");
+    .IsDependentOn("AppCenterLogout")
     
 //////////////////////////////////////////////////////////////////////
 // BUILDING ANDROID
@@ -158,9 +162,7 @@ Task("SetDroidVersion")
         }
     });
 
-Task("AppCenterRelease-Droid")
-    .IsDependentOn("Build-Droid")
-    .IsDependentOn("AppCenterLogin")
+Task("AppCenterRelease-DroidUpload")
     .WithCriteria(() => Configurator.IsValidForDroidAppCenterDistribution)
     .Does(() =>
     {
@@ -190,6 +192,13 @@ Task("AppCenterRelease-Droid")
         // TODO: move to settings
         AppCenterLogout(new AppCenterLogoutSettings { Token = Configurator.AppCenterToken });
     });
+
+Task("AppCenterRelease-Droid")
+    .IsDependentOn("Build-Droid")
+    .IsDependentOn("AppCenterLogin")
+    .IsDependentOn("AppCenterRelease-DroidUpload")
+    .IsDependentOn("AppCenterLogout")
+    .WithCriteria(() => Configurator.IsValidForDroidAppCenterDistribution);
 
 //////////////////////////////////////////////////////////////////////
 // BUILDING iOS
@@ -300,12 +309,9 @@ Task("SetIOSParameters")
         } 
     });
 
-Task("AppCenterRelease-iOS")
-    .WithCriteria(() => Configurator.IsValidForiOSAppCenterDistribution)
-    .IsDependentOn("Build-iOS")
-    .IsDependentOn("AppCenterLogin")
-    .Does(() =>
-    {
+Task("AppCenterRelease-iOSUpload")
+    .WithCriteria(()=> Configurator.IsValidForiOSAppCenterDistribution)
+    .Does(()=>{
         var ipaFilePattern = "./**/*iOS*.ipa";
         var foundIpaFiles = GetFiles(ipaFilePattern);
 
@@ -340,12 +346,14 @@ Task("AppCenterRelease-iOS")
         {
             Information("No symbols directory found!");
         }
-    })
-    .Finally(() =>
-    {  
-        // TODO: move to settings
-        AppCenterLogout(new AppCenterLogoutSettings { Token = Configurator.AppCenterToken });
     });
+
+Task("AppCenterRelease-iOS")
+    .IsDependentOn("Build-iOS")
+    .IsDependentOn("AppCenterLogin")
+    .IsDependentOn("AppCenterRelease-iOSUpload")
+    .IsDependentOn("AppCenterLogout")
+    .WithCriteria(() => Configurator.IsValidForDroidAppCenterDistribution);
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -358,6 +366,20 @@ Task("AppCenterLogin")
     {
         // TODO: move to settings
         AppCenterLogin(new AppCenterLoginSettings { Token = Configurator.AppCenterToken });
+    })
+    .OnError(exception =>
+    {
+        Information(exception);
+
+        Information("Make sure the appcenter cli tools are installed!");
+        Information("npm install -g appcenter-cli");
+    });
+
+Task("AppCenterLogout")
+    .Does(() => 
+    {
+        // TODO: move to settings
+        AppCenterLogout(new AppCenterLogoutSettings { Token = Configurator.AppCenterToken });
     })
     .OnError(exception =>
     {
