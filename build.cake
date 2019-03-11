@@ -98,8 +98,8 @@ Task("Build-Apps-Appcenter")
     .IsDependentOn("Build-Droid")
     .IsDependentOn("AppCenterRelease-DroidUpload")
     .IsDependentOn("Build-iOS")
-    .IsDependentOn("AppCenterRelease-iOSUpload");
-    .IsDependentOn("AppCenterLogout")
+    .IsDependentOn("AppCenterRelease-iOSUpload")
+    .IsDependentOn("AppCenterLogout");
     
 //////////////////////////////////////////////////////////////////////
 // BUILDING ANDROID
