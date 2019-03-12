@@ -119,6 +119,7 @@ Task("Build-Droid")
         // TODO: verify & validate
         var file = BuildAndroidApk(Configurator.AndroidProjectFile, true, Configurator.BuildConfiguration, settings =>
             settings.SetConfiguration(Configurator.BuildConfiguration) 
+                    .WithProperty("Verbosity","q")
                     .WithProperty("AndroidKeyStore", "true")
                     .WithProperty("AndroidSigningStorePass", Configurator.AndroidKeystorePassword)
                     .WithProperty("AndroidSigningKeyStore", Configurator.AndroidKeystoreFile.Quote())
@@ -221,6 +222,7 @@ Task("Build-iOS")
             .WithProperty("OutputPath", "bin/iPhone")
             .WithProperty("BuildIpa", "true")
             .WithProperty("TreatWarningsAsErrors", "false"));
+            .WithProperty("Verbosity","q")
 	});
 
 Task("SetIOSParameters")
@@ -529,7 +531,7 @@ Task("CoverletCoverage")
 
         var testSettings = new DotNetCoreTestSettings {
             Configuration = Configurator.TestConfiguration,
-            Verbosity =	DotNetCoreVerbosity.Detailed
+            Verbosity =	DotNetCoreVerbosity.Quiet
         };
 
         DotNetCoreTest(projectFile, testSettings, coverletSettings);
