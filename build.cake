@@ -95,10 +95,10 @@ Task("Build-Apps")
 Task("Build-Apps-Appcenter")
     .IsDependentOn("SonarQubeCoverage")
     .IsDependentOn("AppCenterLogin")
-    .IsDependentOn("Build-Droid")
-    .IsDependentOn("AppCenterRelease-DroidUpload")
     .IsDependentOn("Build-iOS")
     .IsDependentOn("AppCenterRelease-iOSUpload")
+    .IsDependentOn("Build-Droid")
+    .IsDependentOn("AppCenterRelease-DroidUpload")
     .IsDependentOn("AppCenterLogout");
     
 //////////////////////////////////////////////////////////////////////
