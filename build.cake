@@ -221,8 +221,8 @@ Task("Build-iOS")
             .WithProperty("Platform", "iPhone")
             .WithProperty("OutputPath", "bin/iPhone")
             .WithProperty("BuildIpa", "true")
-            .WithProperty("TreatWarningsAsErrors", "false"))
-            .WithProperty("Verbosity","q");
+            .WithProperty("TreatWarningsAsErrors", "false")
+            .WithProperty("Verbosity","q"));
 	});
 
 Task("SetIOSParameters")
