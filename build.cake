@@ -253,7 +253,7 @@ Task("SetIOSParameters")
                 var displayName = Configurator.AppDisplayName;
                 if(displayName != null)
                 {
-                    displayName = displayName.Replace("\"",""");
+                    displayName = displayName.Replace("\"","");
                 }
 
                 if(!string.IsNullOrEmpty(displayName))
