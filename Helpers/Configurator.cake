@@ -268,6 +268,7 @@ public static class Configurator
         IOSAppIconsSet = _context.EvaluateTfsBuildVariable("ios_appicons_set",  _context.EnvironmentVariable("ios_appicons_set") ??  _context.Argument("ios_appicons_set", string.Empty));                    
         IOSURLSchema = _context.EvaluateTfsBuildVariable("ios_url_schema",  _context.EnvironmentVariable("ios_url_schema") ??  _context.Argument("ios_url_schema", string.Empty)); 
         IOSAssociatedDomain = _context.EvaluateTfsBuildVariable("ios_associateddomain",  _context.EnvironmentVariable("ios_associateddomain") ??  _context.Argument("ios_associateddomain", string.Empty)); 
+        IOSURLIdentifier = _context.EvaluateTfsBuildVariable("ios_url_identifier",  _context.EnvironmentVariable("ios_url_identifier") ??  _context.Argument("ios_url_identifier", string.Empty)); 
         IOSAppIdentifier = _context.EvaluateTfsBuildVariable("ios_appidentifier",  _context.EnvironmentVariable("ios_appidentifier") ??  _context.Argument("ios_appidentifier", string.Empty)); 
     }
 
