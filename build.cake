@@ -250,18 +250,9 @@ Task("SetIOSParameters")
 
             if(!string.IsNullOrEmpty(Configurator.AppDisplayName))
             {
-                var displayName = Configurator.AppDisplayName;
-                if(displayName != null)
-                {
-                    displayName = displayName.Replace("\"","");
-                }
-
-                if(!string.IsNullOrEmpty(displayName))
-                {
-                    Information(string.Format("Writing app name: {0}", displayName));
-                    data["CFBundleName"] = displayName;
-                    data["CFBundleDisplayName"] = displayName;     
-                }           
+                    Information(string.Format("Writing app name: {0}", Configurator.AppDisplayName));
+                    data["CFBundleName"] = Configurator.AppDisplayName;
+                    data["CFBundleDisplayName"] = Configurator.AppDisplayName;              
             }     
 
             if(!string.IsNullOrEmpty(Configurator.IOSAppIconsSet))
