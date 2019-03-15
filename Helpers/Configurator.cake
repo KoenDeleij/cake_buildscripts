@@ -10,6 +10,8 @@ public static class Configurator
 
     public static string AppDisplayName { get; private set; }
 
+    public static string AndroidDisplayName { get; private set; }
+
     public static string Version { get; private set; }
 
     public static string FullVersion { get; private set; }
