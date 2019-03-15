@@ -161,7 +161,8 @@ public static class Configurator
         _context.Information("");
         _context.Information("============ Main ============");
         _context.Information(string.Format("Solution: {0}", !string.IsNullOrEmpty(SolutionFile) ? SolutionFile : "NOT FOUND"));
-        _context.Information(string.Format("AppDisplayName: {0}", !string.IsNullOrEmpty(AppDisplayName) ? AppDisplayName : "NOT SET: app_display_name"));        
+        _context.Information(string.Format("AppDisplayName: {0}", !string.IsNullOrEmpty(AppDisplayName) ? AppDisplayName : "NOT SET: app_display_name"));   
+        _context.Information(string.Format("DroidAppDisplayName: {0}", !string.IsNullOrEmpty(AndroidDisplayName) ? AndroidDisplayName : "NOT SET: android_display_name"));      
         _context.Information(string.Format("FullVersion: {0}", !string.IsNullOrEmpty(FullVersion) ? FullVersion : "NOT SET: buildversion"));
         _context.Information(string.Format("Version: {0}", !string.IsNullOrEmpty(Version) ? Version : "NOT SET: AppVersion"));
         _context.Information(string.Format("App bundle/package identifier: {0}", !string.IsNullOrEmpty(AppPackageName) ? AppPackageName : "NOT SET: app_packagename"));    
@@ -231,6 +232,12 @@ public static class Configurator
         SolutionFile = _context.EvaluateTfsBuildVariable("solution_file", _context.EnvironmentVariable("solution_file") ?? _context.Argument("solution_file", string.Empty));
         ProjectName = _context.EvaluateTfsBuildVariable("project_name", _context.EnvironmentVariable("project_name") ?? _context.Argument("project_name", string.Empty));
         AppDisplayName = _context.EvaluateTfsBuildVariable("app_display_name", _context.EnvironmentVariable("app_display_name") ?? _context.Argument("app_display_name", string.Empty));
+        AndroidDisplayName = _context.EvaluateTfsBuildVariable("android_display_name", _context.EnvironmentVariable("android_display_name") ?? _context.Argument("android_display_name", string.Empty));
+
+        if(string.IsNullOrEmpty(AndroidDisplayName))
+        {
+            AndroidDisplayName = AppDisplayName;
+        }
 
         FullVersion = _context.EvaluateTfsBuildVariable("buildversion", _context.EnvironmentVariable("buildversion") ?? _context.Argument("buildversion", string.Empty));
         Version = _context.EvaluateTfsBuildVariable("AppVersion", _context.EnvironmentVariable("AppVersion") ?? _context.Argument("AppVersion", string.Empty));

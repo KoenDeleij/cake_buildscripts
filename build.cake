@@ -153,7 +153,7 @@ Task("SetDroidVersion")
 
             //app name
             manifest.PackageName = Configurator.AppPackageName;
-            manifest.ApplicationLabel = Configurator.AppDisplayName;
+            manifest.ApplicationLabel = Configurator.AndroidDisplayName;
 
             SerializeAppManifest(manifestPath, manifest);
         }
