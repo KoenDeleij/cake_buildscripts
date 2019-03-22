@@ -225,6 +225,13 @@ public static class Configurator
         _context.Information(string.Format("Nuspec: {0}", NuspecFile));  
 
         _context.Information("");
+        _context.Information("============ SQ ============");
+        _context.Information(string.Format("Branch: {0}", SonarQubeBranch);
+        _context.Information(string.Format("Token: {0}", SonarQubeToken));     
+        _context.Information(string.Format("Url: {0}", SonarQubeUrl));          
+        _context.Information(string.Format("SQ Valid: {0}", IsValidForSonarQube)); 
+
+        _context.Information("");
         _context.Information("===============================");
         _context.Information("");
     }
