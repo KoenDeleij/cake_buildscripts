@@ -179,6 +179,7 @@ Task("AppCenterRelease-DroidUpload")
 
         if(foundApkFiles.Any())
         {
+            Information($"Appcenter upload droid owner {Configurator.AppCenterOwner}, appname {Configurator.AppCenterDroidAppName}, distribution {Configurator.AppCenterDistributionGroup}");
             AppCenterDistributeRelease(
                 new AppCenterDistributeReleaseSettings() 
                 { 
@@ -319,6 +320,8 @@ Task("AppCenterRelease-iOSUpload")
 
         if(foundIpaFiles.Any())
         {
+            Information($"Appcenter upload ios owner {Configurator.AppCenterOwner}, appname {Configurator.AppCenteriOSAppName}, distribution {Configurator.AppCenterDistributionGroup}");
+            
             AppCenterDistributeRelease(
                 new AppCenterDistributeReleaseSettings() 
                 { 
