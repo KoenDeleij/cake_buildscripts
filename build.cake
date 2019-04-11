@@ -445,8 +445,8 @@ Task("PushNugetPackage")
         var path = string.Format("./**/{0}*.nupkg", Configurator.ProjectName);
         PublishNugetFromFolder(GetFiles(path));
 
-        var path = string.Format("./*.nupkg", Configurator.ProjectName);
-        PublishNugetFromFolder(GetFiles(path));
+        var pathRoot = string.Format("./*.nupkg", Configurator.ProjectName);
+        PublishNugetFromFolder(GetFiles(pathRoot));
     });
 
 private void PublishNugetFromFolder(FilePathCollection files)
