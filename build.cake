@@ -449,7 +449,7 @@ Task("PushNugetPackage")
         PublishNugetFromFolder(GetFiles(path));
     });
 
-private void PublishNugetFromFolder(FilePathCollection files, string destination)
+private void PublishNugetFromFolder(FilePathCollection files)
 {
     if(files.Any())
     {
