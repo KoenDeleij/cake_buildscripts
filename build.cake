@@ -83,7 +83,7 @@ Task("Build")
     MSBuild (Configurator.SolutionFile, c => {
 		c.Configuration = Configurator.BuildConfiguration;        
 		c.MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
-        c.MaxCpuCount = 10;
+        c.MaxCpuCount = 0;
 	});
 });
 
@@ -443,20 +443,27 @@ Task("PushNugetPackage")
         Information("## PushNugetPackage");
 
         var path = string.Format("./**/{0}*.nupkg", Configurator.ProjectName);
-        var files = GetFiles(path);
-        if(files.Any())
-        {
-            foreach (var file in files)
-            {
-                Information("Pushing " + file.ToString());
-                NuGetPush(file, new NuGetPushSettings 
-                {
-                    Source = Configurator.NugetUrl,
-                    ApiKey = Configurator.NugetToken
-                });
-            }
-        }
+        PublishNugetFromFolder(GetFiles(path));
+
+        var path = string.Format("./*.nupkg", Configurator.ProjectName);
+        PublishNugetFromFolder(GetFiles(path));
     });
+
+private void PublishNugetFromFolder(FilePathCollection files, string destination)
+{
+    if(files.Any())
+    {
+        foreach (var file in files)
+        {
+            Information("Pushing " + file.ToString());
+            NuGetPush(file, new NuGetPushSettings 
+            {
+                Source = Configurator.NugetUrl,
+                ApiKey = Configurator.NugetToken
+            });
+        }
+    }
+}
     
 
 //////////////////////////////////////////////////////////////////////
@@ -534,8 +541,8 @@ Task("CoverletCoverage")
 
         var testSettings = new DotNetCoreTestSettings {
             Configuration = Configurator.TestConfiguration,
-            Verbosity =	DotNetCoreVerbosity.Quiet
-        };
+            
+        };//Verbosity =	DotNetCoreVerbosity.Quiet
 
         DotNetCoreTest(projectFile, testSettings, coverletSettings);
     }
