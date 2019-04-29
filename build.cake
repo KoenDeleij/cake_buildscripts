@@ -101,10 +101,13 @@ Task("Build-Apps-Appcenter")
     .IsDependentOn("AppCenterRelease-DroidUpload")
     .IsDependentOn("AppCenterLogout");
 
-Task("Apps-Release")
-    .IsDependentOn("SonarQubeCoverage")
-    .IsDependentOn("Build-iOS")
-    .IsDependentOn("Build-Droid");
+//Task("Apps-Release")
+//    .IsDependentOn("SonarQubeCoverage")
+//    .IsDependentOn("Release-iOS")
+//    .IsDependentOn("Release-Droid");
+
+
+
 //////////////////////////////////////////////////////////////////////
 // BUILDING ANDROID
 //////////////////////////////////////////////////////////////////////
@@ -146,7 +149,7 @@ Task("SetDroidVersion")
 
             //versioning
             manifest.VersionName = Configurator.FullVersion;
-            manifest.VersionCode = int.Parse(Configurator.FullVersion.Replace(".",""));
+            manifest.VersionCode = int.Parse(Configurator.DroidVersion.Replace(".",""));
 
             //theming
             if(!string.IsNullOrEmpty(Configurator.AndroidStyle))
@@ -206,6 +209,14 @@ Task("AppCenterRelease-Droid")
     .IsDependentOn("AppCenterLogout")
     .WithCriteria(() => Configurator.IsValidForDroidAppCenterDistribution);
 
+//Task("Release-Droid")
+//    .IsDependentOn("Build-Droid")
+//    .Does(() =>
+//    {
+//        Information($"## Release Droid");
+//        
+    });
+
 //////////////////////////////////////////////////////////////////////
 // BUILDING iOS
 //////////////////////////////////////////////////////////////////////
@@ -244,7 +255,7 @@ Task("SetIOSParameters")
 
             dynamic data = DeserializePlist(plistPath);
             
-            data["CFBundleShortVersionString"] = Configurator.Version;
+            data["CFBundleShortVersionString"] = Configurator.iOSVersion;
             data["CFBundleVersion"] = Configurator.FullVersion;
 
             if(!string.IsNullOrEmpty(Configurator.AppPackageName))
@@ -358,6 +369,35 @@ Task("AppCenterRelease-iOSUpload")
             Information("No symbols directory found!");
         }
     });
+
+//Task("Release-iOS")
+//    .IsDependentOn("Build-iOS")
+//    .Does(() =>
+//    {
+//        Information($"## Release iOS");
+//        
+//        var uploader = "/Applications/Xcode.app/Contents/Applications/Application\ Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Support/altool"
+//        
+//        var ipaFilePattern = "./**/*iOS*.ipa";
+//        var foundIpaFiles = GetFiles(ipaFilePattern);
+//
+//        if(foundIpaFiles.Any())
+//        {
+//            var ipaPath = foundIpaFiles.FirstOrDefault();
+//            StartProcess(uploader, new ProcessSettings {
+//                Arguments = new ProcessArgumentBuilder()
+//                    .Append(@"--upload-app")
+//                    .Append("-f")
+//                    .Append(ipaPath)
+//                    .Append("-u")
+//                    .Append((environVarOrFail "AppStoreUser"))
+//                    .Append("-p")
+//                    .Append((environVarOrFail "AppStorePassword"))
+//                }
+//            );
+//        }
+//    });
+
 
 Task("AppCenterRelease-iOS")
     .IsDependentOn("Build-iOS")
@@ -566,7 +606,7 @@ Task("SonarEnd")
 
 Task("SonarQubeCoverage")
     .IsDependentOn("SonarBegin")
-    .IsDependentOn("UnitTest")
+    //.IsDependentOn("UnitTest")
     .IsDependentOn("CoverletCoverage")
     .IsDependentOn("SonarEnd")
     .WithCriteria(() => Configurator.IsValidForSonarQube);

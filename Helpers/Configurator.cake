@@ -165,8 +165,7 @@ public static class Configurator
         _context.Information(string.Format("Solution: {0}", !string.IsNullOrEmpty(SolutionFile) ? SolutionFile : "NOT FOUND"));
         _context.Information(string.Format("AppDisplayName: {0}", !string.IsNullOrEmpty(AppDisplayName) ? AppDisplayName : "NOT SET: app_display_name"));   
         _context.Information(string.Format("DroidAppDisplayName: {0}", !string.IsNullOrEmpty(AndroidDisplayName) ? AndroidDisplayName : "NOT SET: android_display_name"));      
-        _context.Information(string.Format("FullVersion: {0}", !string.IsNullOrEmpty(FullVersion) ? FullVersion : "NOT SET: buildversion"));
-        _context.Information(string.Format("Version: {0}", !string.IsNullOrEmpty(Version) ? Version : "NOT SET: AppVersion"));
+        _context.Information(string.Format("FullVersion: {0}", !string.IsNullOrEmpty(FullVersion) ? FullVersion : "NOT SET: buildversion"));    
         _context.Information(string.Format("App bundle/package identifier: {0}", !string.IsNullOrEmpty(AppPackageName) ? AppPackageName : "NOT SET: app_packagename"));    
         _context.Information(string.Format("Cleaning: {0}", ShouldClean));
         _context.Information($"BuildConfiguration : {BuildConfiguration}");
@@ -253,7 +252,8 @@ public static class Configurator
         }
 
         FullVersion = _context.EvaluateTfsBuildVariable("buildversion", _context.EnvironmentVariable("buildversion") ?? _context.Argument("buildversion", string.Empty));
-        Version = _context.EvaluateTfsBuildVariable("AppVersion", _context.EnvironmentVariable("AppVersion") ?? _context.Argument("AppVersion", string.Empty));
+        iOSVersion = _context.EvaluateTfsBuildVariable("ios_buildversion", _context.EnvironmentVariable("ios_buildversion") ?? _context.Argument("ios_buildversion", string.Empty));
+        DroidVersion = _context.EvaluateTfsBuildVariable("droid_buildversion", _context.EnvironmentVariable("android_buildversion") ?? _context.Argument("android_buildversion", string.Empty));
 
         BuildConfiguration = _context.EvaluateTfsBuildVariable("configuration", _context.EnvironmentVariable("configuration") ?? _context.Argument("configuration", string.Empty));
 
