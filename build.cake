@@ -100,7 +100,11 @@ Task("Build-Apps-Appcenter")
     .IsDependentOn("Build-Droid")
     .IsDependentOn("AppCenterRelease-DroidUpload")
     .IsDependentOn("AppCenterLogout");
-    
+
+Task("Apps-Release")
+    .IsDependentOn("SonarQubeCoverage")
+    .IsDependentOn("Build-iOS")
+    .IsDependentOn("Build-Droid") 
 //////////////////////////////////////////////////////////////////////
 // BUILDING ANDROID
 //////////////////////////////////////////////////////////////////////
@@ -201,9 +205,6 @@ Task("AppCenterRelease-Droid")
     .IsDependentOn("AppCenterRelease-DroidUpload")
     .IsDependentOn("AppCenterLogout")
     .WithCriteria(() => Configurator.IsValidForDroidAppCenterDistribution);
-
-Task("Release-Droid")
-    .IsDependentOn("Build-Droid")
 
 //////////////////////////////////////////////////////////////////////
 // BUILDING iOS
@@ -363,8 +364,6 @@ Task("AppCenterRelease-iOS")
     .IsDependentOn("AppCenterLogout")
     .WithCriteria(() => Configurator.IsValidForDroidAppCenterDistribution);
 
-Task("Release-iOS")
-    .IsDependentOn("Build-iOS")
 //////////////////////////////////////////////////////////////////////
 //
 // AppCenter Tasks
