@@ -304,13 +304,13 @@ Task("SetIOSParameters")
             
             if(!string.IsNullOrEmpty(Configurator.IOSAssociatedDomain))
             {
-                Information(string.Format("Writing associated domain: {0}", Configurator.IOSAssociatedDomain));
+                Information(string.Format("Writing associated domain: {0} {1}", Configurator.IOSAssociatedDomain,entitlementsData["com.apple.developer.associated-domains"][0]));
                 entitlementsData["com.apple.developer.associated-domains"][0] = Configurator.IOSAssociatedDomain;
             }
 
             if(!string.IsNullOrEmpty(Configurator.IOSAppIdentifier))
             {
-                Information(string.Format("Writing app identifier: {0}", Configurator.IOSAppIdentifier));
+                Information(string.Format("Writing app identifier: {0} {1}", Configurator.IOSAppIdentifier,entitlementsData["application-identifier"]));
                 entitlementsData["application-identifier"] = Configurator.IOSAppIdentifier;
             } 
         } 
