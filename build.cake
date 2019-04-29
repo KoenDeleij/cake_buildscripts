@@ -202,6 +202,9 @@ Task("AppCenterRelease-Droid")
     .IsDependentOn("AppCenterLogout")
     .WithCriteria(() => Configurator.IsValidForDroidAppCenterDistribution);
 
+Task("Release-Droid")
+    .IsDependentOn("Build-Droid")
+
 //////////////////////////////////////////////////////////////////////
 // BUILDING iOS
 //////////////////////////////////////////////////////////////////////
@@ -360,6 +363,8 @@ Task("AppCenterRelease-iOS")
     .IsDependentOn("AppCenterLogout")
     .WithCriteria(() => Configurator.IsValidForDroidAppCenterDistribution);
 
+Task("Release-iOS")
+    .IsDependentOn("Build-iOS")
 //////////////////////////////////////////////////////////////////////
 //
 // AppCenter Tasks
@@ -477,7 +482,7 @@ Task("TestBuild")
     MSBuild (Configurator.SolutionFile, c => {
 		c.Configuration = Configurator.TestConfiguration;        
 		c.MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
-        c.MaxCpuCount = 10;
+        c.MaxCpuCount = 0;
 	});
 });
 
