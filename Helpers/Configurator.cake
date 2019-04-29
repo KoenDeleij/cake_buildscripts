@@ -178,7 +178,11 @@ public static class Configurator
         _context.Information(string.Format("iOS App Icons: {0}", !string.IsNullOrEmpty(IOSAppIconsSet) ? IOSAppIconsSet : "NOT SET: ios_appicons_set"));
         _context.Information(string.Format("iOS Bundle schemes: {0}", !string.IsNullOrEmpty(IOSURLSchema) ? IOSURLSchema : "NOT SET: ios_url_schema"));                
         _context.Information(string.Format("iOS Url identifier: {0}", !string.IsNullOrEmpty(IOSURLIdentifier) ? IOSURLIdentifier : "NOT SET: ios_url_identifier"));   
-        _context.Information(string.Format("Configuration complete for building iOS: {0}", IsValidForBuildingIOS));
+        _context.Information(string.Format("iOS associated domain: {0}", !string.IsNullOrEmpty(IOSAssociatedDomain) ? IOSAssociatedDomain : "NOT SET: ios_associateddomain"));   
+        _context.Information(string.Format("iOS app id identifier: {0}", !string.IsNullOrEmpty(IOSAppIdentifier) ? IOSAppIdentifier : "NOT SET: ios_appidentifier"));   
+        
+        
+        _context.Information(string.Format("Configuration complete for building iOS: {0}", IsValidForBuildingIOS));        
 
         _context.Information("");
         _context.Information("============ Droid ============");
