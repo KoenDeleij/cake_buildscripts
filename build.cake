@@ -313,6 +313,8 @@ Task("SetIOSParameters")
                 Information(string.Format("Writing app identifier: {0} {1}", Configurator.IOSAppIdentifier,entitlementsData["application-identifier"]));
                 entitlementsData["application-identifier"] = Configurator.IOSAppIdentifier;
             } 
+
+            SerializePlist(entitlementsPath, entitlementsData);
         } 
     });
 
