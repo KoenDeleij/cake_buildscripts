@@ -215,7 +215,7 @@ Task("AppCenterRelease-Droid")
 //    {
 //        Information($"## Release Droid");
 //        
-    });
+//    });
 
 //////////////////////////////////////////////////////////////////////
 // BUILDING iOS
