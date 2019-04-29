@@ -149,7 +149,7 @@ Task("SetDroidVersion")
 
             //versioning
             manifest.VersionName = Configurator.FullVersion;
-            manifest.VersionCode = int.Parse(Configurator.DroidVersion.Replace(".",""));
+            manifest.VersionCode = int.Parse(Configurator.AndroidVersion.Replace(".",""));
 
             //theming
             if(!string.IsNullOrEmpty(Configurator.AndroidStyle))

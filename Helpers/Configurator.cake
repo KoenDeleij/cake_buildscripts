@@ -12,7 +12,7 @@ public static class Configurator
 
     public static string AndroidDisplayName { get; private set; }
 
-    public static string DroidVersion { get; private set; }
+    public static string AndroidVersion { get; private set; }
 
     public static string iOSVersion { get; private set; }
 
@@ -181,6 +181,7 @@ public static class Configurator
         _context.Information(string.Format("iOS Url identifier: {0}", !string.IsNullOrEmpty(IOSURLIdentifier) ? IOSURLIdentifier : "NOT SET: ios_url_identifier"));   
         _context.Information(string.Format("iOS associated domain: {0}", !string.IsNullOrEmpty(IOSAssociatedDomain) ? IOSAssociatedDomain : "NOT SET: ios_associateddomain"));   
         _context.Information(string.Format("iOS app id identifier: {0}", !string.IsNullOrEmpty(IOSAppIdentifier) ? IOSAppIdentifier : "NOT SET: ios_appidentifier"));   
+        _context.Information(string.Format("iOS version: {0}", !string.IsNullOrEmpty(iOSVersion) ? iOSVersion : "NOT SET: ios_buildversion"));   
         
         
         _context.Information(string.Format("Configuration complete for building iOS: {0}", IsValidForBuildingIOS));        
@@ -193,6 +194,7 @@ public static class Configurator
         _context.Information(string.Format("Droid keystore password: {0}", !string.IsNullOrEmpty(AndroidKeystorePassword) ? "SET" : "NOT SET: android_keystorepasswd"));
         _context.Information(string.Format("Droid style: {0}", !string.IsNullOrEmpty(AndroidStyle) ? AndroidStyle : "NOT SET: android_style"));
         _context.Information(string.Format("Droid icon: {0}", !string.IsNullOrEmpty(AndroidIcon) ? AndroidIcon : "NOT SET: android_icon"));
+        _context.Information(string.Format("Droid version: {0}", !string.IsNullOrEmpty(AndroidVersion) ? AndroidVersion : "NOT SET: android_buildversion"));   
 
         _context.Information(string.Format("Configuration complete for building Android: {0}", IsValidForBuildingAndroid));
 
@@ -254,9 +256,6 @@ public static class Configurator
         }
 
         FullVersion = _context.EvaluateTfsBuildVariable("buildversion", _context.EnvironmentVariable("buildversion") ?? _context.Argument("buildversion", string.Empty));
-        iOSVersion = _context.EvaluateTfsBuildVariable("ios_buildversion", _context.EnvironmentVariable("ios_buildversion") ?? _context.Argument("ios_buildversion", string.Empty));
-        DroidVersion = _context.EvaluateTfsBuildVariable("droid_buildversion", _context.EnvironmentVariable("android_buildversion") ?? _context.Argument("android_buildversion", string.Empty));
-
         BuildConfiguration = _context.EvaluateTfsBuildVariable("configuration", _context.EnvironmentVariable("configuration") ?? _context.Argument("configuration", string.Empty));
 
         ShouldClean = _context.Argument("clean", false);
@@ -292,6 +291,7 @@ public static class Configurator
         IOSAssociatedDomain = _context.EvaluateTfsBuildVariable("ios_associateddomain",  _context.EnvironmentVariable("ios_associateddomain") ??  _context.Argument("ios_associateddomain", string.Empty)); 
         IOSURLIdentifier = _context.EvaluateTfsBuildVariable("ios_url_identifier",  _context.EnvironmentVariable("ios_url_identifier") ??  _context.Argument("ios_url_identifier", string.Empty)); 
         IOSAppIdentifier = _context.EvaluateTfsBuildVariable("ios_appidentifier",  _context.EnvironmentVariable("ios_appidentifier") ??  _context.Argument("ios_appidentifier", string.Empty)); 
+        iOSVersion = _context.EvaluateTfsBuildVariable("ios_buildversion", _context.EnvironmentVariable("ios_buildversion") ?? _context.Argument("ios_buildversion", string.Empty));
     }
 
     private static void ReadDroidBuildSettings()
@@ -328,6 +328,7 @@ public static class Configurator
 
         AndroidStyle = _context.EvaluateTfsBuildVariable("android_style", _context.EnvironmentVariable("android_style") ?? _context.Argument("android_style", string.Empty));
         AndroidIcon = _context.EvaluateTfsBuildVariable("android_icon", _context.EnvironmentVariable("android_icon") ?? _context.Argument("android_icon", string.Empty));
+        AndroidVersion = _context.EvaluateTfsBuildVariable("android_buildversion", _context.EnvironmentVariable("android_buildversion") ?? _context.Argument("android_buildversion", string.Empty));
     }
 
     private static void ReadTestBuildSettings()
