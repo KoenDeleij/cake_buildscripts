@@ -606,7 +606,7 @@ Task("SonarEnd")
 
 Task("SonarQubeCoverage")
     .IsDependentOn("SonarBegin")
-    //.IsDependentOn("UnitTest")
+    .IsDependentOn("UnitTest")
     .IsDependentOn("CoverletCoverage")
     .IsDependentOn("SonarEnd")
     .WithCriteria(() => Configurator.IsValidForSonarQube);
