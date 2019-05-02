@@ -489,13 +489,15 @@ Task("PushNugetPackage")
         Information("## PushNugetPackage");
 
         var path = string.Format("./**/{0}*.nupkg", Configurator.ProjectName);
-        PublishNugetFromFolder(GetFiles(path));
-
-        var pathRoot = string.Format("./*.nupkg", Configurator.ProjectName);
-        PublishNugetFromFolder(GetFiles(pathRoot));
+        PublishNugetFromFolder(GetFiles(path);
+        //if(!PublishNugetFromFolder(GetFiles(path)))
+        //{
+        //    var pathRoot = string.Format("./*.nupkg", Configurator.ProjectName);
+        //    PublishNugetFromFolder(GetFiles(pathRoot));
+        //}
     });
 
-private void PublishNugetFromFolder(FilePathCollection files)
+private bool PublishNugetFromFolder(FilePathCollection files)
 {
     if(files.Any())
     {
@@ -508,6 +510,11 @@ private void PublishNugetFromFolder(FilePathCollection files)
                 ApiKey = Configurator.NugetToken
             });
         }
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
     
