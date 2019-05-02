@@ -192,7 +192,8 @@ Task("AppCenterRelease-DroidUpload")
                 { 
                     App = Configurator.AppCenterOwner + "/" + Configurator.AppCenterDroidAppName, 
                     File = foundApkFiles.FirstOrDefault().ToString(),
-                    Group = Configurator.AppCenterDistributionGroup
+                    Group = Configurator.AppCenterDistributionGroup,
+                    Debug = true
                 });
         }
     })
@@ -344,7 +345,8 @@ Task("AppCenterRelease-iOSUpload")
                 { 
                     App = Configurator.AppCenterOwner + "/" + Configurator.AppCenteriOSAppName, 
                     File = foundIpaFiles.FirstOrDefault().ToString(),
-                    Group = Configurator.AppCenterDistributionGroup
+                    Group = Configurator.AppCenterDistributionGroup,
+                    Debug = true
                 });
         }
 
@@ -490,11 +492,6 @@ Task("PushNugetPackage")
 
         var path = string.Format("./**/{0}*.nupkg", Configurator.ProjectName);
         PublishNugetFromFolder(GetFiles(path));
-        //if(!PublishNugetFromFolder(GetFiles(path)))
-        //{
-        //    var pathRoot = string.Format("./*.nupkg", Configurator.ProjectName);
-        //    PublishNugetFromFolder(GetFiles(pathRoot));
-        //}
     });
 
 private bool PublishNugetFromFolder(FilePathCollection files)
