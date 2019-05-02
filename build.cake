@@ -489,7 +489,7 @@ Task("PushNugetPackage")
         Information("## PushNugetPackage");
 
         var path = string.Format("./**/{0}*.nupkg", Configurator.ProjectName);
-        PublishNugetFromFolder(GetFiles(path);
+        PublishNugetFromFolder(GetFiles(path));
         //if(!PublishNugetFromFolder(GetFiles(path)))
         //{
         //    var pathRoot = string.Format("./*.nupkg", Configurator.ProjectName);
