@@ -506,9 +506,9 @@ Task("UnitTest")
     {
         var outputFolder = $"--logger \"trx;LogFileName={Configurator.TestResultOutputFolder}/{testProject.File}.xml\"";
 
-        Information($"OUTPUT UNITTEST : {outputFolder} for {testProject.File}/{testProject.Directory}");
+        Information($"OUTPUT UNITTEST : {outputFolder} for {testProject.Directory}/{testProject.File}");
         DotNetCoreTest(
-                $"{testProject.File}/{testProject.Directory}" ,
+                $"{testProject.Directory}/{testProject.File}" ,
                 new DotNetCoreTestSettings()
                 {
                     Configuration = Configurator.TestConfiguration,
