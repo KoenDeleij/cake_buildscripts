@@ -60,9 +60,9 @@ Task("Clean")
 Task("NuGetRestore")
     .Does(()=>
     {
-        Information("## Restoring " + Configuration.SolutionFile);
+        Information("## Restoring " + Configurator.SolutionFile);
     //    NuGetRestore(file);
-        DotNetCoreRestore(Configuration.SolutionFile);
+        DotNetCoreRestore(Configurator.SolutionFile);
     })
     //.DoesForEach(GetFiles("**/*.csproj"), (file) => 
     //{
