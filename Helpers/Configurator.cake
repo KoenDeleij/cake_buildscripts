@@ -65,7 +65,7 @@ public static class Configurator
 
     /// Tests
     
-    public static bool IsValidForRunningTests => !string.IsNullOrEmpty(Solution);
+    public static bool IsValidForRunningTests => !string.IsNullOrEmpty(SolutionFile);
 
     public static string TestResultOutputFolder => FilePath.FromString("TestResults").MakeAbsolute(_context.Environment).ToString();
 
