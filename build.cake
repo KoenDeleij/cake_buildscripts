@@ -502,6 +502,16 @@ Task("UnitTest")
     .WithCriteria(() => Configurator.IsValidForRunningTests)
     .Does(() =>
 {
+    Information($"OUTPUT UNITTEST : {outputFolder} for {testProject.File}");
+    DotNetCoreTest(
+            Configurator.SolutionFile ,
+            new DotNetCoreTestSettings()
+            {
+                Configuration = Configurator.TestConfiguration,
+                ArgumentCustomization = args => args.Append(outputFolder),
+                NoBuild = true
+            });
+    /* 
     foreach(var testProject in Configurator.UnitTestProjects)
     {
         var outputFolder = $"--logger \"trx;LogFileName={Configurator.TestResultOutputFolder}/TestReport.xml\"";
@@ -515,7 +525,7 @@ Task("UnitTest")
                     ArgumentCustomization = args => args.Append(outputFolder),
                     NoBuild = true
                 });
-    }
+    }*/
 });
 
 Task("SonarBegin")
