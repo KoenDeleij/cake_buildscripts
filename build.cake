@@ -63,8 +63,7 @@ Task("NuGetRestore")
         Information("## Restoring " + Configuration.SolutionFile);
     //    NuGetRestore(file);
         DotNetCoreRestore(Configuration.SolutionFile);
-
-    });
+    })
     //.DoesForEach(GetFiles("**/*.csproj"), (file) => 
     //{
     //    Information("## Restoring " + file.ToString());
