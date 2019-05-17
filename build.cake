@@ -437,6 +437,10 @@ Task("CreateNugetBySpec")
         }
     });
 
+Task("PushNugetPackageWithSQ")   
+    .IsDependentOn("SonarQubeCoverage")
+    .IsDependentOn("PushNugetPackage");
+
 Task("PushNugetPackage")   
     .IsDependentOn("UpdateNugetPackageVersion")
     .IsDependentOn("Build")
@@ -537,7 +541,7 @@ Task("CoverletCoverage")
              CollectCoverage = true,
              CoverletOutputFormat = CoverletOutputFormat.opencover,
              CoverletOutputDirectory = Directory($"{Configurator.TestResultOutputFolder}"),
-             CoverletOutputName = $"report",
+             CoverletOutputName = $"report_{testProject.File}",
              Exclude = new List<string>(){"[xunit.*]*"}
         };
 
