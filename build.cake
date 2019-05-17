@@ -61,20 +61,9 @@ Task("NuGetRestore")
     .Does(()=>
     {
         Information("## Restoring " + Configurator.SolutionFile);
-    //    NuGetRestore(file);
         DotNetCoreRestore(Configurator.SolutionFile);
     })
-    //.DoesForEach(GetFiles("**/*.csproj"), (file) => 
-    //{
-    //    Information("## Restoring " + file.ToString());
-    //    NuGetRestore(file);
-    //    DotNetCoreRestore(file.ToString());
-    //})
-    //.OnError(exception =>
-    //{
-    //    Information("Possible errors while restoring packages, continuing seems to work.");
-    //    Information(exception);
-    //})
+
     .DeferOnError();
 
 //////////////////////////////////////////////////////////////////////
@@ -554,7 +543,7 @@ Task("CoverletCoverage")
     };//Verbosity =	DotNetCoreVerbosity.Quiet
 
     DotNetCoreTest(Configurator.SolutionFile, testSettings, coverletSettings);
-
+    //Coverlet(FilePath.FromString(Configurator.SolutionFile), coverletSettings);
     Information($"COVERLET OUTPUT  {Configurator.TestResultOutputFolder}/report");
 });
 
@@ -570,7 +559,7 @@ Task("SonarEnd")
 
 Task("SonarQubeCoverage")
     .IsDependentOn("SonarBegin")
-    //.IsDependentOn("UnitTest")
+    .IsDependentOn("UnitTest")
     .IsDependentOn("CoverletCoverage")
     .IsDependentOn("SonarEnd")
     .WithCriteria(() => Configurator.IsValidForSonarQube);
