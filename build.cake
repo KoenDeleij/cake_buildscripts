@@ -58,17 +58,24 @@ Task("Clean")
 });
 
 Task("NuGetRestore")
-    .DoesForEach(GetFiles("**/*.csproj"), (file) => 
+    .Does(()=>
     {
-        Information("## Restoring " + file.ToString());
-        NuGetRestore(file);
-        DotNetCoreRestore(file.ToString());
-    })
-    .OnError(exception =>
-    {
-        Information("Possible errors while restoring packages, continuing seems to work.");
-        Information(exception);
-    })
+        Information("## Restoring " + Configuration.SolutionFile);
+    //    NuGetRestore(file);
+        DotNetCoreRestore(Configuration.SolutionFile);
+
+    });
+    //.DoesForEach(GetFiles("**/*.csproj"), (file) => 
+    //{
+    //    Information("## Restoring " + file.ToString());
+    //    NuGetRestore(file);
+    //    DotNetCoreRestore(file.ToString());
+    //})
+    //.OnError(exception =>
+    //{
+    //    Information("Possible errors while restoring packages, continuing seems to work.");
+    //    Information(exception);
+    //})
     .DeferOnError();
 
 //////////////////////////////////////////////////////////////////////
