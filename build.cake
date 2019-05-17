@@ -93,20 +93,13 @@ Task("Build-Apps")
     .IsDependentOn("Build-iOS");
 
 Task("Build-Apps-Appcenter")
-    .IsDependentOn("SonarQubeCoverage")
+    .IsDependentOn("UnitTest")
     .IsDependentOn("AppCenterLogin")
     .IsDependentOn("Build-iOS")
     .IsDependentOn("AppCenterRelease-iOSUpload")
     .IsDependentOn("Build-Droid")
     .IsDependentOn("AppCenterRelease-DroidUpload")
     .IsDependentOn("AppCenterLogout");
-
-//Task("Apps-Release")
-//    .IsDependentOn("SonarQubeCoverage")
-//    .IsDependentOn("Release-iOS")
-//    .IsDependentOn("Release-Droid");
-
-
 
 //////////////////////////////////////////////////////////////////////
 // BUILDING ANDROID
@@ -209,14 +202,6 @@ Task("AppCenterRelease-Droid")
     .IsDependentOn("AppCenterRelease-DroidUpload")
     .IsDependentOn("AppCenterLogout")
     .WithCriteria(() => Configurator.IsValidForDroidAppCenterDistribution);
-
-//Task("Release-Droid")
-//    .IsDependentOn("Build-Droid")
-//    .Does(() =>
-//    {
-//        Information($"## Release Droid");
-//        
-//    });
 
 //////////////////////////////////////////////////////////////////////
 // BUILDING iOS
@@ -371,35 +356,6 @@ Task("AppCenterRelease-iOSUpload")
             Information("No symbols directory found!");
         }
     });
-
-//Task("Release-iOS")
-//    .IsDependentOn("Build-iOS")
-//    .Does(() =>
-//    {
-//        Information($"## Release iOS");
-//        
-//        var uploader = "/Applications/Xcode.app/Contents/Applications/Application\ Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Support/altool"
-//        
-//        var ipaFilePattern = "./**/*iOS*.ipa";
-//        var foundIpaFiles = GetFiles(ipaFilePattern);
-//
-//        if(foundIpaFiles.Any())
-//        {
-//            var ipaPath = foundIpaFiles.FirstOrDefault();
-//            StartProcess(uploader, new ProcessSettings {
-//                Arguments = new ProcessArgumentBuilder()
-//                    .Append(@"--upload-app")
-//                    .Append("-f")
-//                    .Append(ipaPath)
-//                    .Append("-u")
-//                    .Append((environVarOrFail "AppStoreUser"))
-//                    .Append("-p")
-//                    .Append((environVarOrFail "AppStorePassword"))
-//                }
-//            );
-//        }
-//    });
-
 
 Task("AppCenterRelease-iOS")
     .IsDependentOn("Build-iOS")
