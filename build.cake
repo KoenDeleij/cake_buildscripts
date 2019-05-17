@@ -513,21 +513,6 @@ Task("UnitTest")
                 ArgumentCustomization = args => args.Append(outputFolder),
                 NoBuild = true
             });
-    /* 
-    foreach(var testProject in Configurator.UnitTestProjects)
-    {
-        var outputFolder = $"--logger \"trx;LogFileName={Configurator.TestResultOutputFolder}/TestReport.xml\"";
-
-        Information($"OUTPUT UNITTEST : {outputFolder} for {testProject.File}");
-        DotNetCoreTest(
-                testProject.File ,
-                new DotNetCoreTestSettings()
-                {
-                    Configuration = Configurator.TestConfiguration,
-                    ArgumentCustomization = args => args.Append(outputFolder),
-                    NoBuild = true
-                });
-    }*/
 });
 
 Task("SonarBegin")
@@ -552,28 +537,25 @@ Task("CoverletCoverage")
 {
     Func<IFileSystemInfo, bool> exclude_ui_tests = fileSystemInfo => !fileSystemInfo.Path.FullPath.Contains("UI");
 
-    foreach(var testProject in Configurator.UnitTestProjects)
-    {
-        Information($"TESTING {testProject.File}");
-        var coverletSettings = new CoverletSettings {
-             CollectCoverage = true,
-             CoverletOutputFormat = CoverletOutputFormat.opencover,
-             CoverletOutputDirectory = Directory($"{Configurator.TestResultOutputFolder}"),
-             CoverletOutputName = $"report",//_{testProject.File}
-             Exclude = new List<string>(){"[xunit.*]*"}
-        };
+    Information($"TESTING {Configurator.SolutionFile}");
+    var coverletSettings = new CoverletSettings {
+        CollectCoverage = true,
+        CoverletOutputFormat = CoverletOutputFormat.opencover,
+        CoverletOutputDirectory = Directory($"{Configurator.TestResultOutputFolder}"),
+        CoverletOutputName = $"report",//_{testProject.File}
+        Exclude = new List<string>(){"[xunit.*]*"}
+    };
 
-        var projectFile = FilePath.FromString(testProject.File);
+    var projectFile = FilePath.FromString(testProject.File);
         
-        Information($"COVERLET  {projectFile} {Configurator.TestConfiguration}");
+    Information($"COVERLET  {Configurator.SolutionFile} {Configurator.TestConfiguration}");
 
-        var testSettings = new DotNetCoreTestSettings {
-            Configuration = Configurator.TestConfiguration,
+    var testSettings = new DotNetCoreTestSettings {
+        Configuration = Configurator.TestConfiguration,
             
-        };//Verbosity =	DotNetCoreVerbosity.Quiet
+    };//Verbosity =	DotNetCoreVerbosity.Quiet
 
-        DotNetCoreTest(projectFile, testSettings, coverletSettings);
-    }
+    DotNetCoreTest(Configurator.SolutionFile, testSettings, coverletSettings);
 });
 
 Task("SonarEnd")
@@ -588,7 +570,7 @@ Task("SonarEnd")
 
 Task("SonarQubeCoverage")
     .IsDependentOn("SonarBegin")
-    .IsDependentOn("UnitTest")
+    //.IsDependentOn("UnitTest")
     .IsDependentOn("CoverletCoverage")
     .IsDependentOn("SonarEnd")
     .WithCriteria(() => Configurator.IsValidForSonarQube);
