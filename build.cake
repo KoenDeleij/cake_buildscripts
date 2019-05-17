@@ -535,7 +535,7 @@ Task("SonarBegin")
 Task("CoverletCoverage")
     .Does(() => 
 {
-    Func<IFileSystemInfo, bool> exclude_ui_tests = fileSystemInfo => !fileSystemInfo.Path.FullPath.Contains("UI");
+    //Func<IFileSystemInfo, bool> exclude_ui_tests = fileSystemInfo => !fileSystemInfo.Path.FullPath.Contains("UI");
 
     Information($"TESTING {Configurator.SolutionFile}");
     var coverletSettings = new CoverletSettings {
@@ -554,6 +554,8 @@ Task("CoverletCoverage")
     };//Verbosity =	DotNetCoreVerbosity.Quiet
 
     DotNetCoreTest(Configurator.SolutionFile, testSettings, coverletSettings);
+
+    Information($"COVERLET OUTPUT  {Configurator.TestResultOutputFolder}/report");
 });
 
 Task("SonarEnd")
