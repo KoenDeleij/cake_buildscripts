@@ -61,6 +61,7 @@ Task("NuGetRestore")
     .Does(()=>
     {
         Information("## Restoring " + Configurator.SolutionFile);
+        NuGetRestore(Configurator.SolutionFile);
         DotNetCoreRestore(Configurator.SolutionFile);
     })
 
