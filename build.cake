@@ -504,11 +504,11 @@ Task("UnitTest")
 {
     foreach(var testProject in Configurator.UnitTestProjects)
     {
-        var outputFolder = $"--logger \"trx;LogFileName={Configurator.TestResultOutputFolder}/{testProject.File}.xml\"";
+        var outputFolder = $"--logger \"trx;LogFileName={Configurator.TestResultOutputFolder}/TestReport.xml\"";
 
-        Information($"OUTPUT UNITTEST : {outputFolder} for {testProject.Directory}/{testProject.File}");
+        Information($"OUTPUT UNITTEST : {outputFolder} for {testProject.File}");
         DotNetCoreTest(
-                $"{testProject.Directory}/{testProject.File}" ,
+                testProject.File ,
                 new DotNetCoreTestSettings()
                 {
                     Configuration = Configurator.TestConfiguration,
@@ -547,7 +547,7 @@ Task("CoverletCoverage")
              CollectCoverage = true,
              CoverletOutputFormat = CoverletOutputFormat.opencover,
              CoverletOutputDirectory = Directory($"{Configurator.TestResultOutputFolder}"),
-             CoverletOutputName = $"report_{testProject.File}",
+             CoverletOutputName = $"report",//_{testProject.File}
              Exclude = new List<string>(){"[xunit.*]*"}
         };
 
