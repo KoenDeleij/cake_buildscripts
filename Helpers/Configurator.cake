@@ -65,10 +65,7 @@ public static class Configurator
 
     /// Tests
     
-    public static List<UnitTestProject> UnitTestProjects { get; private set;}
-
-    public static bool IsValidForRunningTests => UnitTestProjects != null &&
-                                                    UnitTestProjects.Any();
+    public static bool IsValidForRunningTests => !string.IsNullOrEmpty(Solution);
 
     public static string TestResultOutputFolder => FilePath.FromString("TestResults").MakeAbsolute(_context.Environment).ToString();
 
@@ -84,7 +81,8 @@ public static class Configurator
 
     public static bool IsValidForSonarQube => !string.IsNullOrEmpty(SonarQubeUrl) && 
                                               !string.IsNullOrEmpty(SonarQubeBranch) &&
-                                              !string.IsNullOrEmpty(SonarQubeToken);
+                                              !string.IsNullOrEmpty(SonarQubeToken) &&
+                                              !string.IsNullOrEmpty(ProjectName);
 
     public static string TestConfiguration { get; private set; }
 
@@ -200,12 +198,6 @@ public static class Configurator
 
         _context.Information("");
         _context.Information("============ Test ============");
-        foreach(var testProject in UnitTestProjects)
-        {
-            _context.Information(string.Format("Test project: {0}", testProject.File));
-            _context.Information(string.Format("Test project name: {0}", testProject.Name));            
-            _context.Information(string.Format("Test directory: {0}", testProject.Directory));
-        }
 
         _context.Information($"TestConfiguration : {TestConfiguration}");
         _context.Information($"TestResult outputFolder : {TestResultOutputFolder}");
@@ -332,31 +324,7 @@ public static class Configurator
     }
 
     private static void ReadTestBuildSettings()
-    {
-        UnitTestProjects = new List<UnitTestProject>();
-
-        var testProjectFile = _context.EvaluateTfsBuildVariable("test_solution_file", _context.EnvironmentVariable("test_solution_file") ?? _context.Argument("test_solution_file", string.Empty));
-        var testProjectDirectory = _context.EvaluateTfsBuildVariable("test_solution_directory", _context.EnvironmentVariable("test_solution_directory") ?? _context.Argument("test_solution_directory", string.Empty));
-
-        if(!string.IsNullOrEmpty(testProjectFile) && !string.IsNullOrEmpty(testProjectDirectory))
-        {
-            UnitTestProjects.Add(new UnitTestProject(testProjectFile, testProjectFile.Replace(".csproj", ""), testProjectDirectory));
-        }
-        else
-        {
-            Func<IFileSystemInfo, bool> exclude_ui_tests = fileSystemInfo => !fileSystemInfo.Path.FullPath.Contains("UI");
-
-            var testPath = "./**/*Tests.csproj";
-            var testFiles = GlobbingAliases.GetFiles(_context, testPath, exclude_ui_tests);
-
-            if(testFiles.Any())
-            {
-                foreach(var testFile in testFiles)
-                {
-                    UnitTestProjects.Add(new UnitTestProject(testFile.ToString(), testFile.GetFilenameWithoutExtension().ToString(), testFile.GetDirectory().ToString()));
-                }                
-            }
-        }    
+    {   
         TestConfiguration = _context.EvaluateTfsBuildVariable("testconfiguration", _context.EnvironmentVariable("testconfiguration") ?? _context.Argument("testconfiguration", string.Empty));
 
         if(string.IsNullOrEmpty(TestConfiguration)){
