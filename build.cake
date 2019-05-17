@@ -546,7 +546,7 @@ Task("CoverletCoverage")
         Exclude = new List<string>(){"[xunit.*]*"}
     };
 
-    var projectFile = FilePath.FromString(testProject.File);
+    //var projectFile = FilePath.FromString(testProject.File);
         
     Information($"COVERLET  {Configurator.SolutionFile} {Configurator.TestConfiguration}");
 
