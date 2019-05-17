@@ -502,7 +502,9 @@ Task("UnitTest")
     .WithCriteria(() => Configurator.IsValidForRunningTests)
     .Does(() =>
 {
-    Information($"OUTPUT UNITTEST : {outputFolder} for {testProject.File}");
+    var outputFolder = $"--logger \"trx;LogFileName={Configurator.TestResultOutputFolder}/TestReport.xml\"";
+
+    Information($"OUTPUT UNITTEST : {outputFolder} for {Configurator.SolutionFile}");
     DotNetCoreTest(
             Configurator.SolutionFile ,
             new DotNetCoreTestSettings()
