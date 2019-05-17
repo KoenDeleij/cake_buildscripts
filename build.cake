@@ -466,14 +466,12 @@ private bool PublishNugetFromFolder(FilePathCollection files)
     {
         foreach (var file in files)
         {
-            Information($"## Pushing file {file.ToString()}");
-            /* 
             Information("Pushing " + file.ToString());
             NuGetPush(file, new NuGetPushSettings 
             {
                 Source = Configurator.NugetUrl,
                 ApiKey = Configurator.NugetToken
-            });*/
+            });
         }
         return true;
     }
@@ -548,8 +546,6 @@ Task("CoverletCoverage")
         Exclude = new List<string>(){"[xunit.*]*"}
     };
 
-    //var projectFile = FilePath.FromString(testProject.File);
-        
     Information($"COVERLET  {Configurator.SolutionFile} {Configurator.TestConfiguration}");
 
     var testSettings = new DotNetCoreTestSettings {
