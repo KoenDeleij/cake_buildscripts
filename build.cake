@@ -97,9 +97,9 @@ Task("Build")
 });
 
 Task("Build-Apps")
-    //.IsDependentOn("SonarQubeCoverage")
+    .IsDependentOn("SonarQubeCoverage")
     .IsDependentOn("Build-Droid")
-    //.IsDependentOn("Build-iOS");
+    .IsDependentOn("Build-iOS");
 
 Task("Build-Apps-Appcenter")
     .IsDependentOn("UnitTest")
