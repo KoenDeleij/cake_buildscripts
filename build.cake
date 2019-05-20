@@ -61,7 +61,7 @@ Task("NuGetRestore")
     .DoesForEach(GetFiles("**/*.csproj"), (file) => 
     {
         Information("## Restoring " + file.ToString());
-        //NuGetRestore(file);
+        NuGetRestore(file);
         DotNetCoreRestore(file.ToString());
     })
     .OnError(exception =>
