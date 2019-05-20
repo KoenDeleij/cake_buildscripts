@@ -56,31 +56,29 @@ Task("Clean")
         CleanDirectories("./**/obj");
     }
 });
-//TODO replace THISSSSS want gaat ook projecten restoren die niet in de folder zitten
-Task("NuGetRestore")
-    .DoesForEach(GetFiles("**/*.csproj"), (file) => 
-    {
-        Information("## Restoring " + file.ToString());
-        NuGetRestore(file);
-        DotNetCoreRestore(file.ToString());
-    })
-    .OnError(exception =>
-    {
-        Information("Possible errors while restoring packages, continuing seems to work.");
-        Information(exception);
-    })
-    .DeferOnError();
-/* 
+
 Task("NuGetRestore")
     .Does(()=>
     {
         Information("## Restoring " + Configurator.SolutionFile);
-        NuGetRestore(Configurator.SolutionFile);
         DotNetCoreRestore(Configurator.SolutionFile);
+
+        var files = GetFiles("**/*.csproj");
+
+        foreach (var file in files)
+        {
+            Information("## Restoring Oldscool" + file.ToString());
+            //droid or iOS projects are typically not dotnet standard. they need a different restore.
+            if(file.ToString().ToLower().Contains("droid") || file.ToString().ToLower().Contains("ios") || file.ToString().ToLower().Contains("touch"))
+            {
+                Information("## Restoring Oldscool" + file.ToString());
+                NuGetRestore(file);
+            }
+        }
     })
 
     .DeferOnError();
-*/
+
 
 //////////////////////////////////////////////////////////////////////
 // BUILDING
@@ -99,9 +97,9 @@ Task("Build")
 });
 
 Task("Build-Apps")
-    .IsDependentOn("SonarQubeCoverage")
+    //.IsDependentOn("SonarQubeCoverage")
     .IsDependentOn("Build-Droid")
-    .IsDependentOn("Build-iOS");
+    //.IsDependentOn("Build-iOS");
 
 Task("Build-Apps-Appcenter")
     .IsDependentOn("UnitTest")
