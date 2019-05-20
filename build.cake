@@ -56,7 +56,7 @@ Task("Clean")
         CleanDirectories("./**/obj");
     }
 });
-
+//TODO replace THISSSSS want gaat ook projecten restoren die niet in de folder zitten
 Task("NuGetRestore")
     .DoesForEach(GetFiles("**/*.csproj"), (file) => 
     {
@@ -507,7 +507,7 @@ Task("UnitTest")
     .WithCriteria(() => Configurator.IsValidForRunningTests)
     .Does(() =>
 {
-    var outputFolder = $"--logger \"trx;LogFileName={Configurator.TestResultOutputFolder}/TestReport.xml\"";
+    var outputFolder = $"--logger \"trx;LogFileName={Configurator.TestResultOutputFolder}/TestResults.xml\"";
 
     Information($"OUTPUT UNITTEST : {outputFolder} for {Configurator.SolutionFile}");
     DotNetCoreTest(
