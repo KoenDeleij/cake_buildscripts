@@ -95,7 +95,12 @@ Task("Build")
 	});
 });
 
+Task("Test-Apps")
+    .IsDependentOn("UnitTest")
+    .IsDependentOn("SonarQubeCoverage");
+    
 Task("Build-Apps")
+    .IsDependentOn("UnitTest")
     .IsDependentOn("SonarQubeCoverage")
     .IsDependentOn("Build-Droid")
     .IsDependentOn("Build-iOS");
@@ -449,7 +454,8 @@ Task("PushNugetPackageWithSQ")
     .IsDependentOn("SonarQubeCoverage")
     .IsDependentOn("PushNugetPackage");
 
-Task("PushNugetPackage")   
+Task("PushNugetPackage")
+    .IsDependentOn("UnitTest")
     .IsDependentOn("UpdateNugetPackageVersion")
     .IsDependentOn("Build")
     .IsDependentOn("CreateNugetBySpec")
@@ -537,27 +543,44 @@ Task("SonarBegin")
 Task("CoverletCoverage")
     .Does(() => 
 {
-    //Func<IFileSystemInfo, bool> exclude_ui_tests = fileSystemInfo => !fileSystemInfo.Path.FullPath.Contains("UI");
+    var testProjects = GetFiles("**/*Tests.csproj");
 
-    Information($"TESTING {Configurator.SolutionFile}");
-    var coverletSettings = new CoverletSettings {
-        CollectCoverage = true,
-        CoverletOutputFormat = CoverletOutputFormat.opencover,
-        CoverletOutputDirectory = Directory($"{Configurator.TestResultOutputFolder}"),
-        CoverletOutputName = $"report",//_{testProject.File}
-        Exclude = new List<string>(){"[xunit.*]*"}
-    };
+    foreach (var testProject in testProjects)
+    {
+        var fileName = testProject.ToString();
 
-    Information($"COVERLET  {Configurator.SolutionFile} {Configurator.TestConfiguration}");
+        var fileNameNoExtension = testProject.GetFilenameWithoutExtension().ToString().Replace(".Tests","");
+        
+        //var fileList = new List<string>();
 
-    var testSettings = new DotNetCoreTestSettings {
-        Configuration = Configurator.TestConfiguration,
-            
-    };//Verbosity =	DotNetCoreVerbosity.Quiet
+        //var filesWithinNamespace = GetFiles($"{fileNameNoExtension}/**/*.cs");
+        //foreach (var fileWithinNamespace in filesWithinNamespace)
+        //{
+        //    fileList.Add(fileWithinNamespace.ToString());
+        //    Information($"INCLUDE  {fileWithinNamespace.ToString()}");// 
+        //}
+        
 
-    DotNetCoreTest(Configurator.SolutionFile, testSettings, coverletSettings);
-    //Coverlet(FilePath.FromString(Configurator.SolutionFile), coverletSettings);
-    Information($"COVERLET OUTPUT  {Configurator.TestResultOutputFolder}/report");
+        var coverletSettings = new CoverletSettings {
+            CollectCoverage = true,
+            CoverletOutputFormat = CoverletOutputFormat.opencover,
+            CoverletOutputDirectory = Directory($"{Configurator.TestResultOutputFolder}"),
+            CoverletOutputName = $"report",//_{fileNameNoExtension}
+            Exclude = new List<string>(){"[xunit.*]*"},
+            MergeWithFile = $"report"
+            //Include = fileList
+        };
+
+        Information($"COVERLET  {fileNameNoExtension} {Configurator.TestConfiguration}");// 
+
+        var testSettings = new DotNetCoreTestSettings {
+            Configuration = Configurator.TestConfiguration,
+        };//Verbosity =	DotNetCoreVerbosity.Quiet
+
+        DotNetCoreTest(fileName, testSettings, coverletSettings);
+        //Coverlet(FilePath.FromString(Configurator.SolutionFile), coverletSettings);
+        Information($"COVERLET OUTPUT  {Configurator.TestResultOutputFolder}/report_{fileNameNoExtension}");
+    }
 });
 
 Task("SonarEnd")
@@ -572,7 +595,6 @@ Task("SonarEnd")
 
 Task("SonarQubeCoverage")
     .IsDependentOn("SonarBegin")
-    .IsDependentOn("UnitTest")
     .IsDependentOn("CoverletCoverage")
     .IsDependentOn("SonarEnd")
     .WithCriteria(() => Configurator.IsValidForSonarQube);
