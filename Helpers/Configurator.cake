@@ -81,7 +81,8 @@ public static class Configurator
 
     public static bool IsValidForSonarQube => !string.IsNullOrEmpty(SonarQubeUrl) && 
                                               !string.IsNullOrEmpty(SonarQubeBranch) &&
-                                              !string.IsNullOrEmpty(SonarQubeToken);
+                                              !string.IsNullOrEmpty(SonarQubeToken) &&
+                                              !string.IsNullOrEmpty(ProjectName);
 
     public static string TestConfiguration { get; private set; }
 
