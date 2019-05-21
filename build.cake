@@ -3,8 +3,7 @@
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
 #tool "nuget:?package=xunit.runner.console"
 #tool "nuget:?package=MSBuild.SonarQube.Runner.Tool"
-
-//#tool "nuget:?package=ReportGenerator"
+#tool "nuget:?package=ReportGenerator"
 
 #addin "nuget:?package=Cake.CoreCLR"
 #addin "nuget:?package=Cake.Figlet"
@@ -496,45 +495,86 @@ private bool PublishNugetFromFolder(FilePathCollection files)
 //////////////////////////////////////////////////////////////////////
 // TESTING
 //////////////////////////////////////////////////////////////////////
-Task("TestBuild")
-    .IsDependentOn("Clean")
-    .IsDependentOn("NuGetRestoreTests")
-    .Does(() =>
-{
-    MSBuild (Configurator.SolutionFile, c => {
-		c.Configuration = Configurator.TestConfiguration;        
-		c.MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
-        c.MaxCpuCount = 0;
-	});
-});
+//Task("TestBuild")
+//    .IsDependentOn("Clean")
+//    .IsDependentOn("NuGetRestoreTests")
+//    .Does(() =>
+//{
+//    MSBuild (Configurator.SolutionFile, c => {
+//		c.Configuration = Configurator.TestConfiguration;        
+//		c.MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
+//        c.MaxCpuCount = 0;
+//	});
+//});
 
 Task("UnitTest")
-    .IsDependentOn("TestBuild")
+    .IsDependentOn("Clean")
+    .IsDependentOn("NuGetRestoreTests")
     .WithCriteria(() => Configurator.IsValidForRunningTests)
     .Does(() =>
 {
-    var outputFolder = $"--logger \"trx;LogFileName={Configurator.TestResultOutputFolder}/TestResults.xml\"";
+    Information($"OUTPUT UNITTEST : {Configurator.SolutionFile}");
 
-    Information($"OUTPUT UNITTEST : {outputFolder} for {Configurator.SolutionFile}");
+    //var coverletSettings = new CoverletSettings {
+    //    CollectCoverage = true,
+    //    CoverletOutputFormat = CoverletOutputFormat.teamcity,
+    //    Exclude = new List<string>(){"[xunit.*]*","[*]*Should"}
+    //};
+
+    //Information($"COVERLET Teamcity {Configurator.SolutionFile} {Configurator.TestConfiguration}");
+
+    //var testSettings = new DotNetCoreTestSettings {
+    //    Configuration = Configurator.TestConfiguration,
+    //};//Verbosity = DotNetCoreVerbosity.Quiet
+
+    //DotNetCoreTest(Configurator.SolutionFile, testSettings, coverletSettings);
+
+    //var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
+
+    //foreach(var project in solutionResult.Projects){
+    //    if(project.Path.ToString().Contains("Tests.csproj"))
+    //        {
+    //        Information($"## Testing {project.Path}");
+    //        DotNetCoreTest(
+    //            project.Path.ToString() ,
+    //            new DotNetCoreTestSettings()
+    //            {
+    //                Configuration = Configurator.TestConfiguration,
+    //                Logger = $"trx;LogFileName={Configurator.TestResultOutputFolder}/{project.Name}_TestResults.xml",
+    //                ResultsDirectory = new DirectoryPath(Configurator.TestResultOutputFolder),
+    //                NoBuild = false,
+    //                NoRestore = false
+    //            });
+    //    }
+    //});
+
+    //ReportGenerator(Configurator.TestResultOutputFolder,new ReportGeneratorSettings(){
+    //    ArgumentCustomization = args => args.Append("-reporttypes:Xml")
+    //});
+
     DotNetCoreTest(
         Configurator.SolutionFile ,
         new DotNetCoreTestSettings()
         {
             Configuration = Configurator.TestConfiguration,
-            ArgumentCustomization = args => args.Append(outputFolder),
-            NoBuild = true
+            Logger = $"trx;LogFileName={Configurator.TestResultOutputFolder}/TestResults.xml",
+            ResultsDirectory = new DirectoryPath(Configurator.TestResultOutputFolder),
+            NoBuild = false,
+            //MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
+            NoRestore = true
         });
 });
 
 Task("NuGetRestoreTests")
     .Does(()=>
     {
-       var files = GetFiles("**/*Tests.csproj");
-
-        foreach (var file in files)
-        {
-            Information("## Restoring Tests" + file.ToString());
-            DotNetCoreRestore(file.ToString());
+        Information($"## Restoring Tests {Configurator.SolutionFile}");
+        var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
+        foreach(var project in solutionResult.Projects){
+            if(project.Path.ToString().Contains("Tests.csproj")){
+                Information($"## Restoring Tests {project.Path}");
+                DotNetCoreRestore(project.Path.ToString());
+            }
         }
     })
 
