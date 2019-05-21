@@ -3,6 +3,7 @@
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
 #tool "nuget:?package=xunit.runner.console"
 #tool "nuget:?package=MSBuild.SonarQube.Runner.Tool"
+//#tool "nuget:?package=ReportGenerator"
 
 #addin "nuget:?package=Cake.CoreCLR"
 #addin "nuget:?package=Cake.Figlet"
@@ -442,10 +443,10 @@ Task("CreateNugetBySpec")
             Information($"## Create Nupkg {Configurator.NuspecFile}");
 
             var nuGetPackSettings = new NuGetPackSettings
-	        {
-		        IncludeReferencedProjects = true,
+            {
+                IncludeReferencedProjects = true,
                 Version = Configurator.NugetFullPackageVersion
-	        };
+            };
             NuGetPack(Configurator.NuspecFile, nuGetPackSettings);
         }
     });
@@ -536,59 +537,33 @@ Task("SonarBegin")
             Login = Configurator.SonarQubeToken,
             Verbose = true,
             CoverageExclusions = Configurator.SonarQubeExclusions,
-            OpenCoverReportsPath= Configurator.OpenCoverOutputFolder
+            ArgumentCustomization = args => args
+                .Append("/d:sonar.cs.opencover.reportsPaths=\"**/coverage.opencover.xml\"")
         });
 });
 
 Task("CoverletCoverage")
     .Does(() => 
 {
-    var testProjects = GetFiles("**/*Tests.csproj");
-
-    foreach (var testProject in testProjects)
-    {
-        var fileName = testProject.ToString();
-
-        var fileNameNoExtension = testProject.GetFilenameWithoutExtension().ToString().Replace(".Tests","");
-        
-        //var fileList = new List<string>();
-
-        //var filesWithinNamespace = GetFiles($"{fileNameNoExtension}/**/*.cs");
-        //foreach (var fileWithinNamespace in filesWithinNamespace)
-        //{
-        //    fileList.Add(fileWithinNamespace.ToString());
-        //    Information($"INCLUDE  {fileWithinNamespace.ToString()}");// 
-        //}
-        
-
         var coverletSettings = new CoverletSettings {
             CollectCoverage = true,
             CoverletOutputFormat = CoverletOutputFormat.opencover,
-            CoverletOutputDirectory = Directory($"{Configurator.TestResultOutputFolder}"),
-            CoverletOutputName = $"report",//_{fileNameNoExtension}
-            Exclude = new List<string>(){"[xunit.*]*"},
-            MergeWithFile = $"report"
-            //Include = fileList
+            Exclude = new List<string>(){"[xunit.*]*","[*]*Should"}
         };
 
-        Information($"COVERLET  {fileNameNoExtension} {Configurator.TestConfiguration}");// 
+        Information($"COVERLET  {Configurator.SolutionFile} {Configurator.TestConfiguration}");
 
         var testSettings = new DotNetCoreTestSettings {
             Configuration = Configurator.TestConfiguration,
-        };//Verbosity =	DotNetCoreVerbosity.Quiet
+        };//Verbosity = DotNetCoreVerbosity.Quiet
 
-        DotNetCoreTest(fileName, testSettings, coverletSettings);
-        //Coverlet(FilePath.FromString(Configurator.SolutionFile), coverletSettings);
-        Information($"COVERLET OUTPUT  {Configurator.TestResultOutputFolder}/report_{fileNameNoExtension}");
-    }
+        DotNetCoreTest(Configurator.SolutionFile, testSettings, coverletSettings);
 });
 
 Task("SonarEnd")
     .WithCriteria(() => Configurator.IsValidForSonarQube)
     .Does(() => 
 {    
-    //ReportGenerator(FilePath.FromString(@".\coverage-results\report.opencover.xml"), DirectoryPath.FromString(@".\coverage-results\"));
-
     Information($"SQ END");
     SonarEnd(new SonarEndSettings(){ Login = Configurator.SonarQubeToken});
 });

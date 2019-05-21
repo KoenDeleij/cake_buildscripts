@@ -69,7 +69,7 @@ public static class Configurator
 
     public static string TestResultOutputFolder => FilePath.FromString("TestResults").MakeAbsolute(_context.Environment).ToString();
 
-    public static string OpenCoverOutputFolder => $"{Configurator.TestResultOutputFolder}/report.opencover.xml";
+    public static string OpenCoverOutputFolder => $"./**/opencover.xml";
 
     public static string SonarQubeUrl { get; private set; }   
     
@@ -82,8 +82,7 @@ public static class Configurator
     public static bool IsValidForSonarQube => !string.IsNullOrEmpty(SonarQubeUrl) && 
                                               !string.IsNullOrEmpty(SonarQubeBranch) &&
                                               !string.IsNullOrEmpty(SonarQubeToken) &&
-                                              !string.IsNullOrEmpty(ProjectName) &&
-                                              !string.IsNullOrEmpty(SolutionFile)
+                                              !string.IsNullOrEmpty(ProjectName);
 
     public static string TestConfiguration { get; private set; }
 
