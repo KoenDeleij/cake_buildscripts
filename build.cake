@@ -3,7 +3,7 @@
 #tool "nuget:?package=NUnit.Extension.TeamCityEventListener"
 #tool "nuget:?package=xunit.runner.console"
 #tool "nuget:?package=MSBuild.SonarQube.Runner.Tool"
-#tool "nuget:?package=Cake.Common.Tools.NuGet"
+
 //#tool "nuget:?package=ReportGenerator"
 
 #addin "nuget:?package=Cake.CoreCLR"
@@ -529,18 +529,12 @@ Task("UnitTest")
 Task("NuGetRestoreTests")
     .Does(()=>
     {
-        //Information("## Restoring Tests" + Configurator.SolutionFile);
-        //NuGetRestore(new NuGetRestoreSettings(){
-        //    ArgumentCustomization = args=>args.Append(Configurator.SolutionFile)
-        //});
-        //DotNetCoreRestore(Configurator.SolutionFile);
-
        var files = GetFiles("**/*Tests.csproj");
 
         foreach (var file in files)
         {
             Information("## Restoring Tests" + file.ToString());
-            DotNetCoreRestore(file);
+            DotNetCoreRestore(file.ToString());
         }
     })
 
