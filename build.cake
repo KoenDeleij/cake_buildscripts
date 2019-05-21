@@ -509,7 +509,7 @@ private bool PublishNugetFromFolder(FilePathCollection files)
 
 Task("UnitTest")
     .IsDependentOn("Clean")
-    .IsDependentOn("NuGetRestoreTests")
+    //.IsDependentOn("NuGetRestoreTests")
     .WithCriteria(() => Configurator.IsValidForRunningTests)
     .Does(() =>
 {
@@ -529,41 +529,42 @@ Task("UnitTest")
 
     //DotNetCoreTest(Configurator.SolutionFile, testSettings, coverletSettings);
 
-    //var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
+    var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
 
-    //foreach(var project in solutionResult.Projects){
-    //    if(project.Path.ToString().Contains("Tests.csproj"))
-    //        {
-    //        Information($"## Testing {project.Path}");
-    //        DotNetCoreTest(
-    //            project.Path.ToString() ,
-    //            new DotNetCoreTestSettings()
-    //            {
-    //                Configuration = Configurator.TestConfiguration,
-    //                Logger = $"trx;LogFileName={Configurator.TestResultOutputFolder}/{project.Name}_TestResults.xml",
-    //                ResultsDirectory = new DirectoryPath(Configurator.TestResultOutputFolder),
-    //                NoBuild = false,
-    //                NoRestore = false
-    //            });
-    //    }
-    //});
+    foreach(var project in solutionResult.Projects){
+        if(project.Path.ToString().Contains("Tests.csproj"))
+            {
+            Information($"## Testing {project.Path}");
+            DotNetCoreTest(
+                project.Path.ToString() ,
+                new DotNetCoreTestSettings()
+                {
+                    Configuration = Configurator.TestConfiguration,
+                    Logger = $"trx;LogFileName={Configurator.TestResultOutputFolder}/{project.Name}_TestResults.xml",
+                    ResultsDirectory = new DirectoryPath(Configurator.TestResultOutputFolder),
+                    NoBuild = false,
+                    NoRestore = false
+                });
+        }
+    }
+});
 
     //ReportGenerator(Configurator.TestResultOutputFolder,new ReportGeneratorSettings(){
     //    ArgumentCustomization = args => args.Append("-reporttypes:Xml")
     //});
 
-    DotNetCoreTest(
-        Configurator.SolutionFile ,
-        new DotNetCoreTestSettings()
-        {
-            Configuration = Configurator.TestConfiguration,
-            Logger = $"trx;LogFileName={Configurator.TestResultOutputFolder}/TestResults.xml",
-            ResultsDirectory = new DirectoryPath(Configurator.TestResultOutputFolder),
-            NoBuild = false,
-            //MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
-            NoRestore = true
-        });
-});
+    //DotNetCoreTest(
+    //    Configurator.SolutionFile ,
+    //    new DotNetCoreTestSettings()
+    //    {
+    //        Configuration = Configurator.TestConfiguration,
+    //        Logger = $"trx;LogFileName={Configurator.TestResultOutputFolder}/TestResults.xml",
+    //        ResultsDirectory = new DirectoryPath(Configurator.TestResultOutputFolder),
+    //        NoBuild = false,
+    //        //MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
+    //        NoRestore = true
+    //    });
+//});
 
 Task("NuGetRestoreTests")
     .Does(()=>
