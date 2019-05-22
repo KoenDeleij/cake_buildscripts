@@ -454,10 +454,13 @@ Task("CreateNugetBySpec")
 Task("PushNugetPackageWithSQ")   
     .IsDependentOn("UnitTest")
     .IsDependentOn("SonarQubeCoverage")
-    .IsDependentOn("PushNugetPackage");
+    .IsDependentOn("BuildAndPushNugetPackage");
 
 Task("PushNugetPackage")
     .IsDependentOn("UnitTest")
+    .IsDependentOn("BuildAndPushNugetPackage");
+
+Task("BuildAndPushNugetPackage")
     .IsDependentOn("UpdateNugetPackageVersion")
     .IsDependentOn("Build")
     .IsDependentOn("CreateNugetBySpec")
@@ -602,10 +605,11 @@ Task("SonarBegin")
 Task("CoverletCoverage")
     .Does(() => 
 {
+    var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
         var coverletSettings = new CoverletSettings {
             CollectCoverage = true,
             CoverletOutputFormat = CoverletOutputFormat.opencover,
-            Exclude = new List<string>(){"[xunit.*]*","[*]*Should"}
+            Exclude = new List<string>(){"[xunit.*]*","[*]*Should","[*]*Test"}
         };
 
         Information($"COVERLET  {Configurator.SolutionFile} {Configurator.TestConfiguration}");
