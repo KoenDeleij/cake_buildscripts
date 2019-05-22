@@ -80,7 +80,7 @@ public static class Configurator
     public static string SonarQubeExtraExclusions { get; private set; }
 
     private static string _sonarQubeDefaultExcludes = "**/*Should.cs,**/*Test.cs,**/*Tests.cs";
-    public static string SonarQubeExclusions => !string.IsNullOrEmpty(SonarQubeExtraExclusions) ? $"{SonarQubeExtraExclusions},{_sonarQubeDefaultExcludes}" :_sonarQubeDefaultExcludes;
+    public static string SonarQubeExclusions => !string.IsNullOrWhiteSpace(SonarQubeExtraExclusions) ? $"{SonarQubeExtraExclusions},{_sonarQubeDefaultExcludes}" :_sonarQubeDefaultExcludes;
 
     public static bool IsValidForSonarQube => !string.IsNullOrEmpty(SonarQubeUrl) && 
                                               !string.IsNullOrEmpty(SonarQubeBranch) &&
