@@ -63,8 +63,6 @@ Task("Clean")
     {
         DeleteFile(file.ToString());
     }
-
-     CleanDirectory("./packages");
 });
 
 Task("NuGetRestore")
@@ -478,6 +476,8 @@ Task("BuildAndPushNugetPackage")
     {
         Information("## PushNugetPackage");
 
+        CleanDirectory("./packages");
+        
         var path = string.Format("./**/{0}*.nupkg", Configurator.ProjectName);
         PublishNugetFromFolder(GetFiles(path));
     });
