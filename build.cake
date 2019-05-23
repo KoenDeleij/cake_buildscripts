@@ -56,6 +56,15 @@ Task("Clean")
         CleanDirectories("./**/bin");
         CleanDirectories("./**/obj");
     }
+
+    var files = GetFiles("**/*.opencover.xml");
+
+    foreach (var file in files)
+    {
+        DeleteFile(file.ToString());
+    }
+
+     CleanDirectory("./packages");
 });
 
 Task("NuGetRestore")
