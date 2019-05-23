@@ -521,7 +521,7 @@ private bool PublishNugetFromFolder(FilePathCollection files)
 
 Task("UnitTest")
     .IsDependentOn("Clean")
-    //.IsDependentOn("NuGetRestoreTests")
+    .IsDependentOn("NuGetRestoreTests")
     .WithCriteria(() => Configurator.IsValidForRunningTests)
     .Does(() =>
 {
