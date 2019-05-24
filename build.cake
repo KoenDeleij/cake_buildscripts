@@ -487,6 +487,8 @@ Task("BuildAndPushNugetPackage")
 
 private bool PublishNugetFromFolder(FilePathCollection files)
 {
+     CleanDirectory("./packages");
+     
     if(files.Any())
     {
         foreach (var file in files)
