@@ -108,6 +108,7 @@ Task("Build")
 
 Task("Test-Apps")
     .IsDependentOn("UnitTest")
+    .IsDependentOn("MutationTest")
     .IsDependentOn("SonarQubeCoverage");
     
 Task("Build-Apps")
@@ -513,6 +514,7 @@ private bool PublishNugetFromFolder(FilePathCollection files)
 bool IsTestProjectPath(SolutionProject solutionProject) => solutionProject.Path.ToString().Contains("Tests.csproj");
 
 Task("MutationTest")
+    .IsDependentOn("NuGetRestoreTests")
     .Does(()=>{
         StartProcess(new FilePath("dotnet"),new ProcessSettings(){
             Arguments = new ProcessArgumentBuilder()
