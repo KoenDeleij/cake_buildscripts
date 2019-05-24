@@ -20,6 +20,7 @@
 #load "./helpers/Configurator.cake"
 
 using Newtonsoft.Json;
+using System.Xml;
 
 var target = Argument("target", "Help");
 var configuration = Argument("configuration", "Release");
@@ -63,6 +64,8 @@ Task("Clean")
     {
         DeleteFile(file.ToString());
     }
+
+     CleanDirectory("./packages");
 });
 
 Task("NuGetRestore")
@@ -460,6 +463,7 @@ Task("CreateNugetBySpec")
 
 Task("PushNugetPackageWithSQ")   
     .IsDependentOn("UnitTest")
+    .IsDependentOn("MutationTest")
     .IsDependentOn("SonarQubeCoverage")
     .IsDependentOn("BuildAndPushNugetPackage");
 
@@ -476,8 +480,6 @@ Task("BuildAndPushNugetPackage")
     {
         Information("## PushNugetPackage");
 
-        CleanDirectory("./packages");
-        
         var path = string.Format("./**/{0}*.nupkg", Configurator.ProjectName);
         PublishNugetFromFolder(GetFiles(path));
     });
@@ -507,17 +509,68 @@ private bool PublishNugetFromFolder(FilePathCollection files)
 //////////////////////////////////////////////////////////////////////
 // TESTING
 //////////////////////////////////////////////////////////////////////
-//Task("TestBuild")
-//    .IsDependentOn("Clean")
-//    .IsDependentOn("NuGetRestoreTests")
-//    .Does(() =>
-//{
-//    MSBuild (Configurator.SolutionFile, c => {
-//		c.Configuration = Configurator.TestConfiguration;        
-//		c.MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
-//        c.MaxCpuCount = 0;
-//	});
-//});
+
+bool IsTestProjectPath(SolutionProject solutionProject) => solutionProject.Path.ToString().Contains("Tests.csproj");
+
+Task("MutationTest")
+    .Does(()=>{
+        StartProcess(new FilePath("dotnet"),new ProcessSettings(){
+            Arguments = new ProcessArgumentBuilder()
+                .Append("tool install -g dotnet-stryker")
+        });
+
+        Information($"STRYKER Solution: {Configurator.SolutionFile}");
+        var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
+
+        foreach(var project in solutionResult.Projects)
+        {
+            if(IsTestProjectPath(project))
+            {
+                Information($"STRYKER : {project.Path.ToString()}");
+
+                Configurator.CakeEnvironment.WorkingDirectory = project.Path.GetDirectory();
+
+                var strykerPath = $"{project.Path.GetDirectory()}/StrykerOutput";
+                var outputPath =  $"{project.Path.GetDirectory()}/Output";
+                CleanDirectory(strykerPath);
+                CleanDirectory(outputPath);
+
+                XmlDocument doc = new XmlDocument();
+                doc.Load(project.Path.ToString());
+                var nodes = doc.SelectNodes("/Project/ItemGroup/ProjectReference/@Include");
+                foreach (System.Xml.XmlAttribute node in nodes)
+                {
+                    var projReference = node.Value.ToString();
+                    if(projReference.Contains(project.Name.Replace(".Tests","")))
+                    {
+                        var projectPath = new FilePath(projReference);
+                        var projectName = projectPath.GetFilenameWithoutExtension().ToString();
+
+                        Information($"STRYKER Project: {projectName}");
+                        
+                        StartProcess(new FilePath("dotnet"),new ProcessSettings(){
+                        Arguments = new ProcessArgumentBuilder()
+                            .Append("stryker")
+                            .Append("-r")
+                            .Append("\"['html']\"")
+                            .Append("-p")
+                            .Append(projectName)
+                        });
+
+                        var htmlReport = GetFiles($"{strykerPath}/**/*.html").FirstOrDefault();
+                        var reportOutputLocation = $"{outputPath}/{projectName}.html";
+                        Information($"STRYKER Copy: {htmlReport.ToString()} to {reportOutputLocation}");
+
+                        EnsureDirectoryExists(new DirectoryPath(outputPath));
+
+                        MoveFile(htmlReport,new FilePath(reportOutputLocation));
+                    }
+                }
+            }
+        }
+        
+    });
+    
 
 Task("UnitTest")
     .IsDependentOn("Clean")
@@ -527,25 +580,12 @@ Task("UnitTest")
 {
     Information($"OUTPUT UNITTEST : {Configurator.SolutionFile}");
 
-    //var coverletSettings = new CoverletSettings {
-    //    CollectCoverage = true,
-    //    CoverletOutputFormat = CoverletOutputFormat.teamcity,
-    //    Exclude = new List<string>(){"[xunit.*]*","[*]*Should"}
-    //};
-
-    //Information($"COVERLET Teamcity {Configurator.SolutionFile} {Configurator.TestConfiguration}");
-
-    //var testSettings = new DotNetCoreTestSettings {
-    //    Configuration = Configurator.TestConfiguration,
-    //};//Verbosity = DotNetCoreVerbosity.Quiet
-
-    //DotNetCoreTest(Configurator.SolutionFile, testSettings, coverletSettings);
-
     var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
 
-    foreach(var project in solutionResult.Projects){
-        if(project.Path.ToString().Contains("Tests.csproj"))
-            {
+    foreach(var project in solutionResult.Projects)
+    {
+        if(IsTestProjectPath(project))
+        {
             Information($"## Testing {project.Path}");
             DotNetCoreTest(
                 project.Path.ToString() ,
@@ -560,23 +600,6 @@ Task("UnitTest")
         }
     }
 });
-
-    //ReportGenerator(Configurator.TestResultOutputFolder,new ReportGeneratorSettings(){
-    //    ArgumentCustomization = args => args.Append("-reporttypes:Xml")
-    //});
-
-    //DotNetCoreTest(
-    //    Configurator.SolutionFile ,
-    //    new DotNetCoreTestSettings()
-    //    {
-    //        Configuration = Configurator.TestConfiguration,
-    //        Logger = $"trx;LogFileName={Configurator.TestResultOutputFolder}/TestResults.xml",
-    //        ResultsDirectory = new DirectoryPath(Configurator.TestResultOutputFolder),
-    //        NoBuild = false,
-    //        //MSBuildPlatform = Cake.Common.Tools.MSBuild.MSBuildPlatform.x86;
-    //        NoRestore = true
-    //    });
-//});
 
 Task("NuGetRestoreTests")
     .Does(()=>
