@@ -524,6 +524,8 @@ Task("MutationTest")
         Information($"STRYKER Solution: {Configurator.SolutionFile}");
         var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
 
+        string oldWorkingDirectory = Configurator.CakeEnvironment.WorkingDirectory.ToString();
+
         foreach(var project in solutionResult.Projects)
         {
             if(IsTestProjectPath(project))
@@ -570,9 +572,8 @@ Task("MutationTest")
                 }
             }
         }
-        
-        Configurator.CakeEnvironment.WorkingDirectory = new FilePath(Configurator.SolutionFile).GetDirectory();
-        
+        Information($"STRYKER set working directory back to {oldWorkingDirectory}");
+        Configurator.CakeEnvironment.WorkingDirectory = new DirectoryPath(oldWorkingDirectory);
     });
     
 
