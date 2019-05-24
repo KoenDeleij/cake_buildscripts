@@ -139,6 +139,8 @@ public static class Configurator
 
     private static ICakeContext _context;
 
+    public static ICakeEnvironment CakeEnvironment => _context.Environment;
+
     public static void Initialize(ICakeContext context)
     {
         _context = context;
