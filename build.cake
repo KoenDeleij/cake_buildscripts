@@ -571,6 +571,8 @@ Task("MutationTest")
             }
         }
         
+        Configurator.CakeEnvironment.WorkingDirectory = Configurator.SolutionFile.GetDirectory();
+        
     });
     
 
