@@ -514,7 +514,7 @@ private bool PublishNugetFromFolder(FilePathCollection files)
 bool IsTestProjectPath(SolutionProject solutionProject) => solutionProject.Path.ToString().Contains("Tests.csproj");
 
 Task("MutationTest")
-    .IsDependentOn("NuGetRestoreTests")
+    .IsDependentOn("NugetRestore")
     .Does(()=>{
         StartProcess(new FilePath("dotnet"),new ProcessSettings(){
             Arguments = new ProcessArgumentBuilder()
