@@ -481,14 +481,14 @@ Task("BuildAndPushNugetPackage")
     {
         Information("## PushNugetPackage");
 
+        CleanDirectory("./packages");
+        
         var path = string.Format("./**/{0}*.nupkg", Configurator.ProjectName);
         PublishNugetFromFolder(GetFiles(path));
     });
 
 private bool PublishNugetFromFolder(FilePathCollection files)
-{
-     CleanDirectory("./packages");
-     
+{     
     if(files.Any())
     {
         foreach (var file in files)
