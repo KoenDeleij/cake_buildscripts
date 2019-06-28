@@ -678,6 +678,8 @@ Task("SonarQubeCoverage")
 
 Task("UITest-Build")
     .Does(()=>{
+        NuGetRestore(Configurator.UITestProject);
+
         MSBuild (Configurator.UITestProject, c => {
             c.Configuration = Configurator.BuildConfiguration;        
             c.MaxCpuCount = 0;
@@ -688,6 +690,7 @@ Task("UITest-Droid")
     .IsDependentOn("UITest-Build")
     .IsDependentOn("AppCenterLogin")
 	.Does(() =>{
+         
         var apkFile = GetFiles("./**/*.apk").FirstOrDefault();
 
         Information($"Uploading for UITest {apkFile.ToString()}");
