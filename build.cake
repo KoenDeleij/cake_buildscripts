@@ -710,7 +710,7 @@ Task("UITest-Droid-Upload")
 Task("UITest-Droid")
 	.IsDependentOn("Build-Droid")
     .IsDependentOn("UITest-Build")
-    .IsDependentOn("UITest-Upload");
+    .IsDependentOn("UITest-Droid-Upload");
 
 //////////////////////////////////////////////////////////////////////
 // Help
