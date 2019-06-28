@@ -113,5 +113,9 @@ if [ ! -f "$CAKE_EXE" ]; then
     exit 1
 fi
 
+#npm install -g appcenter-cli
+#gem install xamarin-test-cloud
+#sudo gem install xamarin-test-cloud
+
 # Start Cake
 exec mono "$CAKE_EXE" $SCRIPT "${CAKE_ARGUMENTS[@]}"

@@ -4,6 +4,7 @@
 #tool "nuget:?package=xunit.runner.console"
 #tool "nuget:?package=MSBuild.SonarQube.Runner.Tool"
 #tool "nuget:?package=ReportGenerator"
+#tool "nuget:?package=Xamarin.UITest"
 
 #addin "nuget:?package=Cake.CoreCLR"
 #addin "nuget:?package=Cake.Figlet"
@@ -674,6 +675,27 @@ Task("SonarQubeCoverage")
     .IsDependentOn("SonarEnd")
     .WithCriteria(() => Configurator.IsValidForSonarQube);
 
+Task("UITest-Droid")
+	.IsDependentOn("Build-Droid")
+    .IsDependentOn("AppCenterLogin")
+	.Does(() =>{
+        var apkFile = GetFiles("./**/*.apk").FirstOrDefault();
+
+        Information($"Uploading for UITest {apkFile.ToString()}");
+
+        AppCenterTestRunUitest(
+            new AppCenterTestRunUitestSettings() 
+            { 
+                App = Configurator.AppCenterOwner + "/" + Configurator.AppCenterDroidAppName, 
+                AppPath = apkFile.ToString(),
+                Devices = Configurator.AppCenterUITestDeviceSet,
+                TestSeries = Configurator.AppCenterUITestTestSeries,
+                Locale = Configurator.AppCenterUITestLocale,
+                BuildDir = Configurator.AppCenterUITestOutputPath,
+                UitestToolsDir = "./tools/Xamarin.UITest.3.0.0/tools"
+
+            });
+    });
 
 //////////////////////////////////////////////////////////////////////
 // Help

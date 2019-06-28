@@ -136,6 +136,10 @@ public static class Configurator
 
     public static string NugetFullPackageVersion => !string.IsNullOrEmpty(Configurator.NugetPreReleaseFlag)?$"{Configurator.NugetPackageVersion}-{Configurator.NugetPreReleaseFlag}":$"{Configurator.NugetPackageVersion}";
 
+    public static string AppCenterUITestOutputPath { get; private set; }
+    public static string AppCenterUITestDeviceSet { get; private set; }
+    public static string AppCenterUITestTestSeries { get; private set; }
+    public static string AppCenterUITestLocale { get; private set; }
 
     private static ICakeContext _context;
 
@@ -219,6 +223,11 @@ public static class Configurator
         _context.Information(string.Format("Distribution group: {0}", !string.IsNullOrEmpty(AppCenterDistributionGroup) ? AppCenterDistributionGroup : "NOT SET: appcenter_distributiongroup"));
         _context.Information(string.Format("Configuration complete for ios appcenter release: {0}", IsValidForiOSAppCenterDistribution));
         _context.Information(string.Format("Configuration complete for android appcenter release: {0}", IsValidForDroidAppCenterDistribution));
+
+        _context.Information($"Appcenter output path: {AppCenterUITestOutputPath}");
+        _context.Information($"Appcenter deviceset: {AppCenterUITestDeviceSet}");
+        _context.Information($"Appcenter testseries: {AppCenterUITestTestSeries}");
+        _context.Information($"Appcenter locale: {AppCenterUITestLocale}");
 
         _context.Information("");
         _context.Information("============ Nuget ============");
@@ -350,6 +359,11 @@ public static class Configurator
         AppCenteriOSAppName = _context.EvaluateTfsBuildVariable("appcenter_ios_appname", _context.EnvironmentVariable("appcenter_ios_appname") ?? _context.Argument("appcenter_ios_appname", string.Empty));
         AppCenterDroidAppName = _context.EvaluateTfsBuildVariable("appcenter_droid_appname", _context.EnvironmentVariable("appcenter_droid_appname") ?? _context.Argument("appcenter_droid_appname", string.Empty));
         AppCenterDistributionGroup = _context.EvaluateTfsBuildVariable("appcenter_distributiongroup", _context.EnvironmentVariable("appcenter_distributiongroup") ?? _context.Argument("appcenter_distributiongroup", string.Empty));
+
+        AppCenterUITestOutputPath = _context.EvaluateTfsBuildVariable("appcenter_uitest_outputpath", _context.EnvironmentVariable("appcenter_uitest_outputpath") ?? _context.Argument("appcenter_uitest_outputpath", string.Empty));
+        AppCenterUITestDeviceSet = _context.EvaluateTfsBuildVariable("appcenter_uitest_deviceset", _context.EnvironmentVariable("appcenter_uitest_deviceset") ?? _context.Argument("appcenter_uitest_deviceset", string.Empty));
+        AppCenterUITestTestSeries = _context.EvaluateTfsBuildVariable("appcenter_uitest_testseries", _context.EnvironmentVariable("appcenter_uitest_testseries") ?? _context.Argument("appcenter_uitest_testseries", "master"));
+        AppCenterUITestLocale = _context.EvaluateTfsBuildVariable("appcenter_uitest_locale", _context.EnvironmentVariable("appcenter_uitest_locale") ?? _context.Argument("appcenter_uitest_locale", "nl_NL"));
     }
 
     private static void ReadNugetSettings()
