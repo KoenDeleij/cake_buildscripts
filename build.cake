@@ -676,8 +676,16 @@ Task("SonarQubeCoverage")
     .IsDependentOn("SonarEnd")
     .WithCriteria(() => Configurator.IsValidForSonarQube);
 
+Task("UITest-Build")
+    .Does()=>{
+        MSBuild (Configurator.UITestProject, c => {
+            c.Configuration = Configurator.BuildConfiguration;        
+            c.MaxCpuCount = 0;
+        });
+    });
 Task("UITest-Droid")
 	.IsDependentOn("Build-Droid")
+    .IsDependentOn("UITest-Build")
     .IsDependentOn("AppCenterLogin")
 	.Does(() =>{
         var apkFile = GetFiles("./**/*.apk").FirstOrDefault();

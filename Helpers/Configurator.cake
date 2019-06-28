@@ -140,6 +140,7 @@ public static class Configurator
     public static string AppCenterUITestDeviceSet { get; private set; }
     public static string AppCenterUITestTestSeries { get; private set; }
     public static string AppCenterUITestLocale { get; private set; }
+    public static string UITestProject { get; private set; }
 
     private static ICakeContext _context;
 
@@ -299,6 +300,7 @@ public static class Configurator
         IOSURLIdentifier = _context.EvaluateTfsBuildVariable("ios_url_identifier",  _context.EnvironmentVariable("ios_url_identifier") ??  _context.Argument("ios_url_identifier", string.Empty)); 
         IOSAppIdentifier = _context.EvaluateTfsBuildVariable("ios_appidentifier",  _context.EnvironmentVariable("ios_appidentifier") ??  _context.Argument("ios_appidentifier", string.Empty)); 
         iOSVersion = _context.EvaluateTfsBuildVariable("ios_buildversion", _context.EnvironmentVariable("ios_buildversion") ?? _context.Argument("ios_buildversion", string.Empty));
+        UITestProject = _context.EvaluateTfsBuildVariable("ui_testproject",  _context.EnvironmentVariable("ui_testproject") ??  _context.Argument("ui_testproject", string.Empty)); 
     }
 
     private static void ReadDroidBuildSettings()
