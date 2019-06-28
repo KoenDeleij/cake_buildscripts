@@ -685,12 +685,10 @@ Task("UITest-Build")
             c.MaxCpuCount = 0;
         });
     });
-Task("UITest-Droid")
-	.IsDependentOn("Build-Droid")
-    .IsDependentOn("UITest-Build")
+    
+Task("UITest-Droid-Upload")
     .IsDependentOn("AppCenterLogin")
-	.Does(() =>{
-         
+    .Does(()=>{
         var apkFile = GetFiles("./**/*.apk").FirstOrDefault();
 
         Information($"Uploading for UITest {apkFile.ToString()}");
@@ -708,6 +706,11 @@ Task("UITest-Droid")
 
             });
     });
+
+Task("UITest-Droid")
+	.IsDependentOn("Build-Droid")
+    .IsDependentOn("UITest-Build")
+    .IsDependentOn("UITest-Upload");
 
 //////////////////////////////////////////////////////////////////////
 // Help
