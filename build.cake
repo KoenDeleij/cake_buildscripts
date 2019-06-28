@@ -79,6 +79,7 @@ Task("NuGetRestore")
 
         foreach (var file in files)
         {
+            Information($"## Restoring{file.ToString()});
             //droid or iOS projects are typically not dotnet standard. they need a different restore.
             if(file.ToString().ToLower().Contains("droid") || file.ToString().ToLower().Contains("ios") || file.ToString().ToLower().Contains("touch"))
             {
