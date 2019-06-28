@@ -677,7 +677,7 @@ Task("SonarQubeCoverage")
     .WithCriteria(() => Configurator.IsValidForSonarQube);
 
 Task("UITest-Build")
-    .Does()=>{
+    .Does(()=>{
         MSBuild (Configurator.UITestProject, c => {
             c.Configuration = Configurator.BuildConfiguration;        
             c.MaxCpuCount = 0;
