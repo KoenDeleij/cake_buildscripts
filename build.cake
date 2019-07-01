@@ -481,7 +481,7 @@ Task("CreateNugetBySpec")
 Task("PushNugetPackageWithSQ")   
     .IsDependentOn("UnitTest")
     //.IsDependentOn("MutationTest")
-    .IsDependentOn("SonarQubeCoverage")
+    //.IsDependentOn("SonarQubeCoverage")
     .IsDependentOn("BuildAndPushNugetPackage");
 
 Task("PushNugetPackage")
