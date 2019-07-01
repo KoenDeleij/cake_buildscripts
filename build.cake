@@ -165,22 +165,36 @@ Task("SetDroidVersion")
         if(foundManifestFiles.Any())
         {
             var manifestPath = foundManifestFiles.FirstOrDefault();
+
+            Information($"Changing manifest {manifestPath}");
+
             var manifest = DeserializeAppManifest(manifestPath);
 
             //versioning
             manifest.VersionName = Configurator.FullVersion;
             manifest.VersionCode = int.Parse(Configurator.AndroidVersion.Replace(".",""));
 
+            Information($"Changing manifest version name {manifest.VersionName} , code : {manifest.VersionCode}");
+
             //theming
             if(!string.IsNullOrEmpty(Configurator.AndroidStyle))
+            {
                 manifest.ApplicationTheme = Configurator.AndroidStyle;
+                Information($"Changing manifest style {manifest.ApplicationTheme}");
+            }
 
             if(!string.IsNullOrEmpty(Configurator.AndroidIcon))
+            {
                 manifest.ApplicationIcon = Configurator.AndroidIcon;
+                Information($"Changing manifest icon {manifest.ApplicationIcon}");
+            }
 
             //app name
             manifest.PackageName = Configurator.AppPackageName;
             manifest.ApplicationLabel = Configurator.AndroidDisplayName;
+
+            Information($"Changing manifest packageName {manifest.PackageName}");
+            Information($"Changing manifest app label {manifest.ApplicationLabel}");
 
             SerializeAppManifest(manifestPath, manifest);
         }
@@ -466,7 +480,7 @@ Task("CreateNugetBySpec")
 
 Task("PushNugetPackageWithSQ")   
     .IsDependentOn("UnitTest")
-    .IsDependentOn("MutationTest")
+    //.IsDependentOn("MutationTest")
     .IsDependentOn("SonarQubeCoverage")
     .IsDependentOn("BuildAndPushNugetPackage");
 
