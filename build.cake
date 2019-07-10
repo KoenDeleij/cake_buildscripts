@@ -671,9 +671,8 @@ Task("SonarBegin")
             CoverageExclusions = Configurator.SonarQubeExclusions,
             ArgumentCustomization = args => args
                 //.Append($"/d:sonar.cs.opencover.reportsPaths=\"{Configurator.TestResultOutputFolder}/Coverlet/*.xml\"")
-                .Append($"/d:sonar.cs.opencover.reportsPaths=\"{Configurator.TestResultOutputFolder}/Coverlet/opencover-LandalParkApp.Core.Tests.xml\"")
-
-                
+                //.Append($"/d:sonar.cs.opencover.reportsPaths=\"{Configurator.TestResultOutputFolder}/Coverlet/opencover-LandalParkApp.Core.Tests.xml\"")
+                .Append($"/d:sonar.cs.opencover.reportsPaths=\"**/coverage.opencover.xml\"")
         });
 });
 
@@ -698,12 +697,12 @@ Task("CoverletCoverage")
                 var coverletSettings = new CoverletSettings {
                     CollectCoverage = true,
                     CoverletOutputFormat = CoverletOutputFormat.opencover,
-                    CoverletOutputDirectory = Directory($"{Configurator.TestResultOutputFolder}/Coverlet"),
-                    CoverletOutputName = $"opencover-{project.Name}.xml",
+                    //CoverletOutputDirectory = Directory($"{Configurator.TestResultOutputFolder}/Coverlet"),
+                    //CoverletOutputName = $"opencover-{project.Name}.xml",
                     Exclude = new List<string>(){"[xunit.*]*","[*]*Should","[*]*Test"}
                 };
 
-                Information($"COVERLET  {project.Path.ToString()} {Configurator.TestConfiguration} {coverletSettings.CoverletOutputDirectory}/{coverletSettings.CoverletOutputName}");
+                Information($"COVERLET  {project.Path.ToString()} {Configurator.TestConfiguration} ");//{coverletSettings.CoverletOutputDirectory}/{coverletSettings.CoverletOutputName}");
 
                 var testSettings = new DotNetCoreTestSettings {
                     Configuration = Configurator.TestConfiguration,
