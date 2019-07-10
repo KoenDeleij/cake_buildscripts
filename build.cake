@@ -123,7 +123,7 @@ Task("Build-MultiTarget")
 
 Task("Test-Apps")
     .IsDependentOn("UnitTest")
-    .IsDependentOn("MutationTest")
+    //.IsDependentOn("MutationTest")
     .IsDependentOn("SonarQubeCoverage");
     
 Task("Build-Apps")
@@ -493,7 +493,7 @@ Task("CreateNugetBySpec")
 
 Task("PushNugetPackageWithSQ")   
     .IsDependentOn("UnitTest")
-    .IsDependentOn("MutationTest")
+    //.IsDependentOn("MutationTest")
     .IsDependentOn("SonarQubeCoverage")
     .IsDependentOn("UpdateNugetPackageVersion")
     .IsDependentOn("Build")
