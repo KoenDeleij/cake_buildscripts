@@ -493,18 +493,22 @@ Task("CreateNugetBySpec")
 
 Task("PushNugetPackageWithSQ")   
     .IsDependentOn("UnitTest")
-    //.IsDependentOn("MutationTest")
-    //.IsDependentOn("SonarQubeCoverage")
-    .IsDependentOn("BuildAndPushNugetPackage");
-
-Task("PushNugetPackage")
-    .IsDependentOn("UnitTest")
-    .IsDependentOn("BuildAndPushNugetPackage");
-
-Task("BuildAndPushNugetPackage")
+    .IsDependentOn("MutationTest")
+    .IsDependentOn("SonarQubeCoverage")
     .IsDependentOn("UpdateNugetPackageVersion")
     .IsDependentOn("Build")
     .IsDependentOn("CreateNugetBySpec")
+    .IsDependentOn("PushNugetPackage");
+
+Task("PushMultiTargetNugetPackage")
+    .IsDependentOn("UnitTest")
+    .IsDependentOn("UpdateNugetPackageVersion")
+    .IsDependentOn("Build-MultiTarget")
+    .IsDependentOn("CreateNugetBySpec")
+    .IsDependentOn("PushNugetPackage");
+
+Task("PushNugetPackage")
+
     .WithCriteria(() => Configurator.IsValidForPushingPackage)
     .Does(() => 
     {
