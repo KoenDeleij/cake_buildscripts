@@ -108,6 +108,19 @@ Task("Build")
 	});
 });
 
+Task("Build-MultiTarget")
+    .IsDependentOn("Clean")
+    .IsDependentOn("NuGetRestore")
+    .Does(() =>
+{
+    var settings = new DotNetCoreBuildSettings
+    {
+        Configuration = Configurator.BuildConfiguration
+    };
+
+    DotNetCoreBuild(Configurator.SolutionFile, settings);
+});
+
 Task("Test-Apps")
     .IsDependentOn("UnitTest")
     .IsDependentOn("MutationTest")
@@ -653,27 +666,42 @@ Task("SonarBegin")
             Verbose = true,
             CoverageExclusions = Configurator.SonarQubeExclusions,
             ArgumentCustomization = args => args
-                .Append("/d:sonar.cs.opencover.reportsPaths=\"**/coverage.opencover.xml\"")
+                .Append("/d:sonar.cs.opencover.reportsPaths=\"**/**/coverage.opencover.xml\"")
         });
 });
 
 Task("CoverletCoverage")
     .Does(() => 
 {
-    var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
+    //var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
+
         var coverletSettings = new CoverletSettings {
             CollectCoverage = true,
             CoverletOutputFormat = CoverletOutputFormat.opencover,
             Exclude = new List<string>(){"[xunit.*]*","[*]*Should","[*]*Test"}
         };
 
-        Information($"COVERLET  {Configurator.SolutionFile} {Configurator.TestConfiguration}");
+        //Information($"COVERLET  {Configurator.SolutionFile} {Configurator.TestConfiguration}");
 
-        var testSettings = new DotNetCoreTestSettings {
-            Configuration = Configurator.TestConfiguration,
-        };//Verbosity = DotNetCoreVerbosity.Quiet
+        //var testSettings = new DotNetCoreTestSettings {
+        //    Configuration = Configurator.TestConfiguration,
+        //};//Verbosity = DotNetCoreVerbosity.Quiet
 
-        DotNetCoreTest(Configurator.SolutionFile, testSettings, coverletSettings);
+        //DotNetCoreTest(Configurator.SolutionFile, testSettings, coverletSettings);
+
+
+        var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
+        foreach(var project in solutionResult.Projects){
+            if(project.Path.ToString().Contains("Tests.csproj")){
+                Information($"COVERLET  {project.Path.ToString()} {Configurator.TestConfiguration}");
+
+                var testSettings = new DotNetCoreTestSettings {
+                    Configuration = Configurator.TestConfiguration,
+                };//Verbosity = DotNetCoreVerbosity.Quiet
+
+                DotNetCoreTest(project.Path.ToString(), testSettings, coverletSettings);
+            }
+        }
 });
 
 Task("SonarEnd")
