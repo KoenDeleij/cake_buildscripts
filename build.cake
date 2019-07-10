@@ -122,7 +122,7 @@ Task("Build-MultiTarget")
 });
 
 Task("Test-Apps")
-    .IsDependentOn("UnitTest")
+    //.IsDependentOn("UnitTest")
     //.IsDependentOn("MutationTest")
     .IsDependentOn("SonarQubeCoverage");
     
@@ -662,7 +662,7 @@ Task("SonarBegin")
 {
     Information($"SQ BEGIN {Configurator.ProjectName} with output {Configurator.TestResultOutputFolder}");
 
-    SonarBegin(new SonarBeginSettings{
+        SonarBegin(new SonarBeginSettings{
             Name = $"{Configurator.ProjectName}_{Configurator.SonarQubeBranch}",
             Key = $"{Configurator.ProjectName}_{Configurator.SonarQubeBranch}",
             Url = Configurator.SonarQubeUrl,
@@ -670,7 +670,7 @@ Task("SonarBegin")
             Verbose = true,
             CoverageExclusions = Configurator.SonarQubeExclusions,
             ArgumentCustomization = args => args
-                .Append("/d:sonar.cs.opencover.reportsPaths=\"**/**/coverage.opencover.xml\"")
+                .Append($"/d:sonar.cs.opencover.reportsPaths=\"{Configurator.TestResultOutputFolder}/Coverlet/*.xml\"")
         });
 });
 
@@ -678,12 +678,6 @@ Task("CoverletCoverage")
     .Does(() => 
 {
     //var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
-
-        var coverletSettings = new CoverletSettings {
-            CollectCoverage = true,
-            CoverletOutputFormat = CoverletOutputFormat.opencover,
-            Exclude = new List<string>(){"[xunit.*]*","[*]*Should","[*]*Test"}
-        };
 
         //Information($"COVERLET  {Configurator.SolutionFile} {Configurator.TestConfiguration}");
 
@@ -696,8 +690,17 @@ Task("CoverletCoverage")
 
         var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
         foreach(var project in solutionResult.Projects){
-            if(project.Path.ToString().Contains("Tests.csproj")){
-                Information($"COVERLET  {project.Path.ToString()} {Configurator.TestConfiguration}");
+            if(project.Path.ToString().Contains("Tests.csproj"))
+            {
+                var coverletSettings = new CoverletSettings {
+                    CollectCoverage = true,
+                    CoverletOutputFormat = CoverletOutputFormat.opencover,
+                    CoverletOutputDirectory = Directory($"{Configurator.TestResultOutputFolder}/Coverlet"),
+                    CoverletOutputName = $"opencover-{project.Name}.xml",
+                    Exclude = new List<string>(){"[xunit.*]*","[*]*Should","[*]*Test"}
+                };
+
+                Information($"COVERLET  {project.Path.ToString()} {Configurator.TestConfiguration} {coverletSettings.CoverletOutputDirectory}/{coverletSettings.CoverletOutputName}");
 
                 var testSettings = new DotNetCoreTestSettings {
                     Configuration = Configurator.TestConfiguration,
