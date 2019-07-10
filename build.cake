@@ -662,7 +662,7 @@ Task("SonarBegin")
 {
     Information($"SQ BEGIN {Configurator.ProjectName} with output {Configurator.TestResultOutputFolder}");
 
-        SonarBegin(new SonarBeginSettings{
+    SonarBegin(new SonarBeginSettings{
             Name = $"{Configurator.ProjectName}_{Configurator.SonarQubeBranch}",
             Key = $"{Configurator.ProjectName}_{Configurator.SonarQubeBranch}",
             Url = Configurator.SonarQubeUrl,
@@ -670,47 +670,27 @@ Task("SonarBegin")
             Verbose = true,
             CoverageExclusions = Configurator.SonarQubeExclusions,
             ArgumentCustomization = args => args
-                //.Append($"/d:sonar.cs.opencover.reportsPaths=\"{Configurator.TestResultOutputFolder}/Coverlet/*.xml\"")
-                //.Append($"/d:sonar.cs.opencover.reportsPaths=\"{Configurator.TestResultOutputFolder}/Coverlet/opencover-LandalParkApp.Core.Tests.xml\"")
-                .Append($"/d:sonar.cs.opencover.reportsPaths=\"**/coverage.opencover.xml\"")
+                .Append("/d:sonar.cs.opencover.reportsPaths=\"**/coverage.opencover.xml\"")
         });
 });
 
 Task("CoverletCoverage")
     .Does(() => 
 {
-    //var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
+    var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
+        var coverletSettings = new CoverletSettings {
+            CollectCoverage = true,
+            CoverletOutputFormat = CoverletOutputFormat.opencover,
+            Exclude = new List<string>(){"[xunit.*]*","[*]*Should","[*]*Test"}
+        };
 
-        //Information($"COVERLET  {Configurator.SolutionFile} {Configurator.TestConfiguration}");
+        Information($"COVERLET  {Configurator.SolutionFile} {Configurator.TestConfiguration}");
 
-        //var testSettings = new DotNetCoreTestSettings {
-        //    Configuration = Configurator.TestConfiguration,
-        //};//Verbosity = DotNetCoreVerbosity.Quiet
+        var testSettings = new DotNetCoreTestSettings {
+            Configuration = Configurator.TestConfiguration,
+        };//Verbosity = DotNetCoreVerbosity.Quiet
 
-        //DotNetCoreTest(Configurator.SolutionFile, testSettings, coverletSettings);
-
-
-        var solutionResult = ParseSolution(new FilePath(Configurator.SolutionFile)); 
-        foreach(var project in solutionResult.Projects){
-            if(project.Path.ToString().Contains("Tests.csproj"))
-            {
-                var coverletSettings = new CoverletSettings {
-                    CollectCoverage = true,
-                    CoverletOutputFormat = CoverletOutputFormat.opencover,
-                    //CoverletOutputDirectory = Directory($"{Configurator.TestResultOutputFolder}/Coverlet"),
-                    //CoverletOutputName = $"opencover-{project.Name}.xml",
-                    Exclude = new List<string>(){"[xunit.*]*","[*]*Should","[*]*Test"}
-                };
-
-                Information($"COVERLET  {project.Path.ToString()} {Configurator.TestConfiguration} ");//{coverletSettings.CoverletOutputDirectory}/{coverletSettings.CoverletOutputName}");
-
-                var testSettings = new DotNetCoreTestSettings {
-                    Configuration = Configurator.TestConfiguration,
-                };//Verbosity = DotNetCoreVerbosity.Quiet
-
-                DotNetCoreTest(project.Path.ToString(), testSettings, coverletSettings);
-            }
-        }
+        DotNetCoreTest(Configurator.SolutionFile, testSettings, coverletSettings);
 });
 
 Task("SonarEnd")
