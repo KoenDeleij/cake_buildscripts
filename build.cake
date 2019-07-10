@@ -670,7 +670,10 @@ Task("SonarBegin")
             Verbose = true,
             CoverageExclusions = Configurator.SonarQubeExclusions,
             ArgumentCustomization = args => args
-                .Append($"/d:sonar.cs.opencover.reportsPaths=\"{Configurator.TestResultOutputFolder}/Coverlet/*.xml\"")
+                //.Append($"/d:sonar.cs.opencover.reportsPaths=\"{Configurator.TestResultOutputFolder}/Coverlet/*.xml\"")
+                .Append($"/d:sonar.cs.opencover.reportsPaths=\"{Configurator.TestResultOutputFolder}/Coverlet/opencover-LandalParkApp.Core.Tests.xml\"")
+
+                
         });
 });
 
