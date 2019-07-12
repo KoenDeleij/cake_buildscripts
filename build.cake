@@ -671,7 +671,7 @@ Task("SonarBegin")
         CoverageExclusions = Configurator.SonarQubeExclusions,
         ArgumentCustomization = args => args
         .Append("/d:sonar.cs.opencover.reportsPaths=\"**/coverage.opencover.xml\"")
-    }
+    };
 
     if(!string.IsNullOrEmpty(Configurator.SonarQubeInclusions)
     {
