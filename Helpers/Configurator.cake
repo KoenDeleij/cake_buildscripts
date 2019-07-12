@@ -81,6 +81,7 @@ public static class Configurator
 
     private static string _sonarQubeDefaultExcludes = "**/*Should.cs,**/*Test.cs,**/*Tests.cs";
     public static string SonarQubeExclusions => !string.IsNullOrWhiteSpace(SonarQubeExtraExclusions) ? $"{SonarQubeExtraExclusions},{_sonarQubeDefaultExcludes}" :_sonarQubeDefaultExcludes;
+    public static string SonarQubeInclusions { get; private set; }
 
     public static bool IsValidForSonarQube => !string.IsNullOrEmpty(SonarQubeUrl) && 
                                               !string.IsNullOrEmpty(SonarQubeBranch) &&
@@ -243,6 +244,7 @@ public static class Configurator
         _context.Information(string.Format("Branch: {0}", SonarQubeBranch));
         _context.Information(string.Format("Token: {0}", SonarQubeToken));   
         _context.Information(string.Format("Exclusions: {0}", SonarQubeExtraExclusions));
+        _context.Information(string.Format("Inclusions: {0}", SonarQubeInclusions));
         _context.Information(string.Format("Url: {0}", SonarQubeUrl));          
         _context.Information(string.Format("SQ Valid: {0}", IsValidForSonarQube)); 
 
@@ -351,7 +353,8 @@ public static class Configurator
         SonarQubeUrl = _context.EvaluateTfsBuildVariable("sonarqube_url", _context.EnvironmentVariable("sonarqube_url") ?? _context.Argument("sonarqube_url", string.Empty));    //"http://rhm-d-ranch01.boolhosting.tld:9000/""52ad219e8d1eec9bc631beb648e78fa0f6390425"
         SonarQubeBranch = _context.EvaluateTfsBuildVariable("sonarqube_branch", _context.EnvironmentVariable("sonarqube_branch") ?? _context.Argument("sonarqube_branch", string.Empty));
         SonarQubeToken = _context.EvaluateTfsBuildVariable("sonarqube_token", _context.EnvironmentVariable("sonarqube_token") ?? _context.Argument("sonarqube_token", string.Empty));    
-        SonarQubeExtraExclusions = _context.EvaluateTfsBuildVariable("sonarqube_exclusions", _context.EnvironmentVariable("sonarqube_exclusions") ?? _context.Argument("sonarqube_exclusions", string.Empty));    
+        SonarQubeExtraExclusions = _context.EvaluateTfsBuildVariable("sonarqube_exclusions", _context.EnvironmentVariable("sonarqube_exclusions") ?? _context.Argument("sonarqube_exclusions", string.Empty));
+        SonarQubeInclusions = _context.EvaluateTfsBuildVariable("sonarqube_inclusions", _context.EnvironmentVariable("sonarqube_inclusions") ?? _context.Argument("sonarqube_inclusions", string.Empty));    
     }
 
     private static void ReadAppCenterSettings()
