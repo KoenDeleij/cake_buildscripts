@@ -662,16 +662,23 @@ Task("SonarBegin")
 {
     Information($"SQ BEGIN {Configurator.ProjectName} with output {Configurator.TestResultOutputFolder}");
 
-    SonarBegin(new SonarBeginSettings{
-            Name = $"{Configurator.ProjectName}_{Configurator.SonarQubeBranch}",
-            Key = $"{Configurator.ProjectName}_{Configurator.SonarQubeBranch}",
-            Url = Configurator.SonarQubeUrl,
-            Login = Configurator.SonarQubeToken,
-            Verbose = true,
-            CoverageExclusions = Configurator.SonarQubeExclusions,
-            ArgumentCustomization = args => args
-                .Append("/d:sonar.cs.opencover.reportsPaths=\"**/coverage.opencover.xml\"")
-        });
+    var settings = new SonarBeginSettings{
+        Name = $"{Configurator.ProjectName}_{Configurator.SonarQubeBranch}",
+        Key = $"{Configurator.ProjectName}_{Configurator.SonarQubeBranch}",
+        Url = Configurator.SonarQubeUrl,
+        Login = Configurator.SonarQubeToken,
+        Verbose = true,
+        CoverageExclusions = Configurator.SonarQubeExclusions,
+        ArgumentCustomization = args => args
+        .Append("/d:sonar.cs.opencover.reportsPaths=\"**/coverage.opencover.xml\"")
+    }
+
+    if(!string.IsNullOrEmpty(Configurator.SonarQubeInclusions)
+    {
+        settings.Inclusions = Configurator.SonarQubeInclusions;
+    }
+
+    SonarBegin(settings);
 });
 
 Task("CoverletCoverage")
