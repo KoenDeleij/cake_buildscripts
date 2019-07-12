@@ -673,7 +673,7 @@ Task("SonarBegin")
         .Append("/d:sonar.cs.opencover.reportsPaths=\"**/coverage.opencover.xml\"")
     };
 
-    if(!string.IsNullOrEmpty(Configurator.SonarQubeInclusions)
+    if(!string.IsNullOrEmpty(Configurator.SonarQubeInclusions))
     {
         settings.Inclusions = Configurator.SonarQubeInclusions;
     }
