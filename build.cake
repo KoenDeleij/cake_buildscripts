@@ -233,6 +233,8 @@ Task("AppCenterRelease-DroidUpload")
 
         if(foundApkFiles.Any())
         {
+            Information($"Appcenter upload file {foundApkFiles.FirstOrDefault().ToString()}");
+
             Information($"Appcenter upload droid owner {Configurator.AppCenterOwner}, appname {Configurator.AppCenterDroidAppName}, distribution {Configurator.AppCenterDistributionGroup}");
             AppCenterDistributeRelease(
                 new AppCenterDistributeReleaseSettings() 
