@@ -442,7 +442,7 @@ Task("AppCenterLogout")
     .Does(() => 
     {
         // TODO: move to settings
-        AppCenterLogout(new AppCenterLogoutSettings { Token = Configurator.AppCenterToken });
+        AppCenterLogout();//new AppCenterLogoutSettings { Token = Configurator.AppCenterToken }
     })
     .OnError(exception =>
     {
