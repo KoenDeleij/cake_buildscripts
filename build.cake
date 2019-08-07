@@ -424,7 +424,7 @@ Task("AppCenterRelease-iOS")
 Task("AppCenterLogin")
     .Does(() => 
     {
-        // TODO: move to settings
+        Information($"Login with token {Configurator.AppCenterToken}");
         AppCenterLogin(new AppCenterLoginSettings { Token = Configurator.AppCenterToken });
     })
     .OnError(exception =>
