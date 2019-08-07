@@ -228,7 +228,7 @@ Task("AppCenterRelease-DroidUpload")
         // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ ls CakeTestApp
         // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ appcenter distribute release -f CakeTestApp/CakeTestApp.iOS/bin/iPhone/CakeTestApp.iOS.ipa -g Collaborators
 
-        var apkFilePattern = "./**/*.apk";
+        var apkFilePattern = "./**/*Signed.apk";
         var foundApkFiles = GetFiles(apkFilePattern);
 
         if(foundApkFiles.Any())
