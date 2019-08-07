@@ -245,11 +245,6 @@ Task("AppCenterRelease-DroidUpload")
                     Debug = true
                 });
         }
-    })
-    .Finally(() =>
-    {  
-        // TODO: move to settings
-        AppCenterLogout(new AppCenterLogoutSettings { Token = Configurator.AppCenterToken });
     });
 
 Task("AppCenterRelease-Droid")
@@ -444,7 +439,7 @@ Task("AppCenterLogout")
     .Does(() => 
     {
         // TODO: move to settings
-        AppCenterLogout();//new AppCenterLogoutSettings { Token = Configurator.AppCenterToken }
+        AppCenterLogout(new AppCenterLogoutSettings());//{ Token = Configurator.AppCenterToken }
     })
     .OnError(exception =>
     {
