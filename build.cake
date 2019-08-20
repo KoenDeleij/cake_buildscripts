@@ -229,18 +229,23 @@ Task("AppCenterRelease-DroidUpload")
         // MBP-JacobD:Redhotminute.Appollo.Cake.BuildScripts jacob.duijzer$ appcenter distribute release -f CakeTestApp/CakeTestApp.iOS/bin/iPhone/CakeTestApp.iOS.ipa -g Collaborators
 
         var apkFilePattern = "./**/*Signed.apk";
-        var foundApkFiles = GetFiles(apkFilePattern);
+        var aabFilePattern = "./**/*Signed.aab";
+        var foundBuildFiles = GetFiles(apkFilePattern);
 
-        if(foundApkFiles.Any())
+        if(!foundBuildFiles.Any())
         {
-            Information($"Appcenter upload file {foundApkFiles.FirstOrDefault().ToString()}");
+            foundBuildFiles = GetFiles(aabFilePattern);
+        }
+        if(foundBuildFiles.Any())
+        {
+            Information($"Appcenter upload file {foundBuildFiles.FirstOrDefault().ToString()}");
 
             Information($"Appcenter upload droid owner {Configurator.AppCenterOwner}, appname {Configurator.AppCenterDroidAppName}, distribution {Configurator.AppCenterDistributionGroup}");
             AppCenterDistributeRelease(
                 new AppCenterDistributeReleaseSettings() 
                 { 
                     App = Configurator.AppCenterOwner + "/" + Configurator.AppCenterDroidAppName, 
-                    File = foundApkFiles.FirstOrDefault().ToString(),
+                    File = foundBuildFiles.FirstOrDefault().ToString(),
                     Group = Configurator.AppCenterDistributionGroup,
                     Debug = true
                 });
