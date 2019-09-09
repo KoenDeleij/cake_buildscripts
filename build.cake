@@ -4,7 +4,7 @@
 #tool "nuget:?package=xunit.runner.console"
 #tool "nuget:?package=MSBuild.SonarQube.Runner.Tool"
 #tool "nuget:?package=ReportGenerator"
-#tool "nuget:?package=Xamarin.UITest"
+#tool "nuget:?package=Xamarin.UITest&version=3.0.0"
 
 #addin "nuget:?package=Cake.CoreCLR"
 #addin "nuget:?package=Cake.Figlet"
