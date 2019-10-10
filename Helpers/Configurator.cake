@@ -43,6 +43,16 @@ public static class Configurator
     public static bool IsValidForBuildingIOS => !string.IsNullOrEmpty(IOSProjectFile) &&
                                                 !string.IsNullOrEmpty(AppPackageName);
 
+    // iOS Firebase
+
+    public static string IOSFirebaseClientId { get; private set; }
+    
+    public static string IOSFirebaseReversedClientId { get; private set; }
+
+    public static string IOSFirebaseConfigFile => "GoogleService-Info.plist";
+
+    public static bool IsValidForFirebase => !string.IsNullOrEmpty(IOSFirebaseClientId) &&
+                                                !string.IsNullOrEmpty(IOSFirebaseReversedClientId);
     /// Android
 
     public static string AndroidProjectFile { get; private set; }
@@ -157,6 +167,8 @@ public static class Configurator
         
         ReadIOSBuildSettings();
 
+        ReadIOSFirebaseBuildSettings();
+
         ReadDroidBuildSettings();
 
         ReadTestBuildSettings();
@@ -192,8 +204,13 @@ public static class Configurator
         _context.Information(string.Format("iOS app id identifier: {0}", !string.IsNullOrEmpty(IOSAppIdentifier) ? IOSAppIdentifier : "NOT SET: ios_appidentifier"));   
         _context.Information(string.Format("iOS version: {0}", !string.IsNullOrEmpty(iOSVersion) ? iOSVersion : "NOT SET: ios_buildversion"));   
         
-        
         _context.Information(string.Format("Configuration complete for building iOS: {0}", IsValidForBuildingIOS));        
+
+        _context.Information("============ iOS Firebase ============");
+        _context.Information(string.Format("iOS firebase client id: {0}", !string.IsNullOrEmpty(IOSFirebaseClientId) ? IOSFirebaseClientId : "NOT SET: ios_firebase_clientid"));   
+        _context.Information(string.Format("iOS firebase reverse client id: {0}", !string.IsNullOrEmpty(IOSFirebaseReversedClientId) ? IOSFirebaseReversedClientId : "NOT SET: ios_firebase_reverseclientid"));   
+
+        _context.Information(string.Format("Configuration complete for building iOS Firebase: {0}", IsValidForFirebase));  
 
         _context.Information("");
         _context.Information("============ Droid ============");
@@ -303,6 +320,12 @@ public static class Configurator
         IOSAppIdentifier = _context.EvaluateTfsBuildVariable("ios_appidentifier",  _context.EnvironmentVariable("ios_appidentifier") ??  _context.Argument("ios_appidentifier", string.Empty)); 
         iOSVersion = _context.EvaluateTfsBuildVariable("ios_buildversion", _context.EnvironmentVariable("ios_buildversion") ?? _context.Argument("ios_buildversion", string.Empty));
         UITestProject = _context.EvaluateTfsBuildVariable("ui_testproject",  _context.EnvironmentVariable("ui_testproject") ??  _context.Argument("ui_testproject", string.Empty)); 
+    }
+
+    private static void ReadIOSFirebaseBuildSettings(){
+
+        IOSFirebaseClientId = _context.EvaluateTfsBuildVariable("ios_firebase_clientid",  _context.EnvironmentVariable("ios_firebase_clientid") ??  _context.Argument("ios_firebase_clientid", string.Empty));            
+        IOSFirebaseReversedClientId = _context.EvaluateTfsBuildVariable("ios_firebase_reverseclientid",  _context.EnvironmentVariable("ios_firebase_reverseclientid") ??  _context.Argument("ios_firebase_reverseclientid", string.Empty));     
     }
 
     private static void ReadDroidBuildSettings()

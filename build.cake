@@ -369,6 +369,36 @@ Task("SetIOSParameters")
 
             SerializePlist(entitlementsPath, entitlementsData);
         } 
+
+        //firebase
+        Information("## SetIOS notification parameters");
+        var firebaseConfigFilePattern = $"./**/{IOSFirebaseConfigFile}";
+        var foundConfigFiles = GetFiles(firebaseConfigFilePattern);
+        if(foundConfigFiles.Any())
+        {
+            var firebasePath = foundConfigFiles.FirstOrDefault().ToString();
+            dynamic firebaseData = DeserializePlist(firebasePath);
+
+            if(!string.IsNullOrEmpty(Configurator.IOSFirebaseClientId))
+            {
+                Information(string.Format("Writing firebase client id: {0} {1}", Configurator.IOSFirebaseClientId,firebaseData["CLIENT_ID"]));
+                firebaseData["CLIENT_ID"] = Configurator.IOSFirebaseClientId;
+            }
+
+            if(!string.IsNullOrEmpty(Configurator.IOSFirebaseReversedClientId))
+            {
+                Information(string.Format("Writing firebase client id: {0} {1}", Configurator.IOSFirebaseReversedClientId,firebaseData["REVERSED_CLIENT_ID"]));
+                firebaseData["REVERSED_CLIENT_ID"] = Configurator.IOSFirebaseReversedClientId;
+            }
+
+            if(!string.IsNullOrEmpty(Configurator.AppPackageName))
+            {
+                Information(string.Format("Writing bundle identifier: {0}", Configurator.AppPackageName));
+                firebaseData["BUNDLE_ID"] = Configurator.AppPackageName;
+            }
+
+            SerializePlist(firebasePath, firebaseData);
+        }
     });
 
 Task("AppCenterRelease-iOSUpload")
