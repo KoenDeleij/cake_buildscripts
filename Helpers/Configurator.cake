@@ -51,6 +51,8 @@ public static class Configurator
 
     public static string IOSFirebaseConfigFile => "GoogleService-Info.plist";
 
+    public static string IOSAPSEnvironment { get; private set; }
+
     public static bool IsValidForFirebase => !string.IsNullOrEmpty(IOSFirebaseClientId) &&
                                                 !string.IsNullOrEmpty(IOSFirebaseReversedClientId);
     /// Android
@@ -325,7 +327,8 @@ public static class Configurator
     private static void ReadIOSFirebaseBuildSettings(){
 
         IOSFirebaseClientId = _context.EvaluateTfsBuildVariable("ios_firebase_clientid",  _context.EnvironmentVariable("ios_firebase_clientid") ??  _context.Argument("ios_firebase_clientid", string.Empty));            
-        IOSFirebaseReversedClientId = _context.EvaluateTfsBuildVariable("ios_firebase_reverseclientid",  _context.EnvironmentVariable("ios_firebase_reverseclientid") ??  _context.Argument("ios_firebase_reverseclientid", string.Empty));     
+        IOSFirebaseReversedClientId = _context.EvaluateTfsBuildVariable("ios_firebase_reverseclientid",  _context.EnvironmentVariable("ios_firebase_reverseclientid") ??  _context.Argument("ios_firebase_reverseclientid", string.Empty));   
+        IOSAPSEnvironment = _context.EvaluateTfsBuildVariable("ios_firebase_aps",  _context.EnvironmentVariable("ios_firebase_aps") ??  _context.Argument("ios_firebase_aps", "production"));   
     }
 
     private static void ReadDroidBuildSettings()

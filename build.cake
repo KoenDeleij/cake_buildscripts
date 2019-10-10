@@ -367,6 +367,16 @@ Task("SetIOSParameters")
                 entitlementsData["application-identifier"] = Configurator.IOSAppIdentifier;
             } 
 
+            if(!string.IsNullOrEmpty(Configurator.IOSAPSEnvironment))
+            {
+                Information(string.Format("Writing aps environment: {0} {1}", Configurator.IOSAPSEnvironment,entitlementsData["aps-environment"]));
+                entitlementsData["aps-environment"] = Configurator.IOSAPSEnvironment;
+            }
+            else
+            {
+                entitlementsData["aps-environment"] = "production";
+            }
+
             SerializePlist(entitlementsPath, entitlementsData);
         } 
 
