@@ -372,7 +372,7 @@ Task("SetIOSParameters")
 
         //firebase
         Information("## SetIOS notification parameters");
-        var firebaseConfigFilePattern = $"./**/{IOSFirebaseConfigFile}";
+        var firebaseConfigFilePattern = $"./**/{Configurator.IOSFirebaseConfigFile}";
         var foundConfigFiles = GetFiles(firebaseConfigFilePattern);
         if(foundConfigFiles.Any())
         {
