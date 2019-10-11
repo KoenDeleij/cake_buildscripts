@@ -134,6 +134,7 @@ Task("Build-Apps")
 
 Task("Build-Apps-Appcenter")
     .IsDependentOn("UnitTest")
+    .IsDependentOn("CoverletCoverage")
     .IsDependentOn("AppCenterLogin")
     .IsDependentOn("Build-iOS")
     .IsDependentOn("AppCenterRelease-iOSUpload")
