@@ -368,19 +368,16 @@ Task("SetIOSParameters")
                 entitlementsData["application-identifier"] = Configurator.IOSAppIdentifier;
             } 
 
-            if(entitlementsData["aps-environment"] != null)
+            if(!string.IsNullOrEmpty(Configurator.IOSAPSEnvironment))
             {
-                if(!string.IsNullOrEmpty(Configurator.IOSAPSEnvironment))
-                {
-                    Information(string.Format("Writing aps environment: {0} {1}", Configurator.IOSAPSEnvironment,entitlementsData["aps-environment"]));
-                    entitlementsData["aps-environment"] = Configurator.IOSAPSEnvironment;
-                }
-                else
-                {
-                    Information(string.Format("Writing aps environment: {0} {1}", "production",entitlementsData["aps-environment"]));
-                    entitlementsData["aps-environment"] = "production";
-                }
+                Information(string.Format("Writing aps environment: {0} {1}", Configurator.IOSAPSEnvironment,entitlementsData["aps-environment"]));
+                entitlementsData["aps-environment"] = Configurator.IOSAPSEnvironment;
             }
+            //else
+            //{
+            //    Information(string.Format("Writing aps environment: {0} {1}", "production",entitlementsData["aps-environment"]));
+            //    entitlementsData["aps-environment"] = "production";
+            //}
 
             SerializePlist(entitlementsPath, entitlementsData);
         } 
