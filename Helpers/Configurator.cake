@@ -205,13 +205,12 @@ public static class Configurator
         _context.Information(string.Format("iOS associated domain: {0}", !string.IsNullOrEmpty(IOSAssociatedDomain) ? IOSAssociatedDomain : "NOT SET: ios_associateddomain"));   
         _context.Information(string.Format("iOS app id identifier: {0}", !string.IsNullOrEmpty(IOSAppIdentifier) ? IOSAppIdentifier : "NOT SET: ios_appidentifier"));   
         _context.Information(string.Format("iOS version: {0}", !string.IsNullOrEmpty(iOSVersion) ? iOSVersion : "NOT SET: ios_buildversion"));   
-        
         _context.Information(string.Format("Configuration complete for building iOS: {0}", IsValidForBuildingIOS));        
 
         _context.Information("============ iOS Firebase ============");
         _context.Information(string.Format("iOS firebase client id: {0}", !string.IsNullOrEmpty(IOSFirebaseClientId) ? IOSFirebaseClientId : "NOT SET: ios_firebase_clientid"));   
         _context.Information(string.Format("iOS firebase reverse client id: {0}", !string.IsNullOrEmpty(IOSFirebaseReversedClientId) ? IOSFirebaseReversedClientId : "NOT SET: ios_firebase_reverseclientid"));   
-
+        _context.Information(string.Format("iOS APS env: {0}", !string.IsNullOrEmpty(IOSAPSEnvironment) ? IOSAPSEnvironment : "NOT SET: ios_firebase_aps"));   
         _context.Information(string.Format("Configuration complete for building iOS Firebase: {0}", IsValidForFirebase));  
 
         _context.Information("");
@@ -328,7 +327,7 @@ public static class Configurator
 
         IOSFirebaseClientId = _context.EvaluateTfsBuildVariable("ios_firebase_clientid",  _context.EnvironmentVariable("ios_firebase_clientid") ??  _context.Argument("ios_firebase_clientid", string.Empty));            
         IOSFirebaseReversedClientId = _context.EvaluateTfsBuildVariable("ios_firebase_reverseclientid",  _context.EnvironmentVariable("ios_firebase_reverseclientid") ??  _context.Argument("ios_firebase_reverseclientid", string.Empty));   
-        IOSAPSEnvironment = _context.EvaluateTfsBuildVariable("ios_firebase_aps",  _context.EnvironmentVariable("ios_firebase_aps") ??  _context.Argument("ios_firebase_aps", "production"));   
+        IOSAPSEnvironment = _context.EvaluateTfsBuildVariable("ios_firebase_aps",  _context.EnvironmentVariable("ios_firebase_aps") ??  _context.Argument("ios_firebase_aps", string.Empty));   
     }
 
     private static void ReadDroidBuildSettings()
