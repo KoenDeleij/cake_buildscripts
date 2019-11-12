@@ -535,6 +535,13 @@ Task("CreateNugetBySpec")
         }
     });
 
+Task("PushNugetPackage")   
+    .IsDependentOn("UnitTest")
+    .IsDependentOn("UpdateNugetPackageVersion")
+    .IsDependentOn("Build")
+    .IsDependentOn("CreateNugetBySpec")
+    .IsDependentOn("PushPackage");
+
 Task("PushNugetPackageWithSQ")   
     .IsDependentOn("UnitTest")
     //.IsDependentOn("MutationTest")
@@ -542,16 +549,16 @@ Task("PushNugetPackageWithSQ")
     .IsDependentOn("UpdateNugetPackageVersion")
     .IsDependentOn("Build")
     .IsDependentOn("CreateNugetBySpec")
-    .IsDependentOn("PushNugetPackage");
+    .IsDependentOn("PushPackage");
 
 Task("PushMultiTargetNugetPackage")
     .IsDependentOn("UnitTest")
     .IsDependentOn("UpdateNugetPackageVersion")
     .IsDependentOn("Build-MultiTarget")
     .IsDependentOn("CreateNugetBySpec")
-    .IsDependentOn("PushNugetPackage");
+    .IsDependentOn("PushPackage");
 
-Task("PushNugetPackage")
+Task("PushPackage")
 
     .WithCriteria(() => Configurator.IsValidForPushingPackage)
     .Does(() => 
