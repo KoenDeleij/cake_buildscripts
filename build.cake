@@ -739,7 +739,7 @@ Task("CoverletCoverage")
         var coverletSettings = new CoverletSettings {
             CollectCoverage = true,
             CoverletOutputFormat = CoverletOutputFormat.opencover,
-            Exclude = new List<string>(){"[xunit.*]*","[*]*Should","[*]*Test"}
+            Exclude = new List<string>(){"[xunit.*]*","[*]*Should","[*]*Test","*/Data/Migrations/*"}
         };
 
         Information($"COVERLET  {Configurator.SolutionFile} {Configurator.TestConfiguration}");
