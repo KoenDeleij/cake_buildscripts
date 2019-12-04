@@ -724,7 +724,7 @@ Task("SonarBegin")
                 .Append("/d:sonar.scm.provider=\"git\"")
                 .Append(!string.IsNullOrEmpty(Configurator.SonarQubeExclusions)?
                         $"/d:sonar.exclusions=\"{Configurator.SonarQubeExclusions}\""
-                        :string.Empty);
+                        :string.Empty)
     };
 
     //CoverageExclusions = Configurator.SonarQubeExclusions,
