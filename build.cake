@@ -727,7 +727,7 @@ Task("SonarBegin")
             {
                 args.Append($"/d:sonar.exclusions=\"{Configurator.SonarQubeExclusions}\"");
             }
-
+        }
     };
 
 //CoverageExclusions = Configurator.SonarQubeExclusions,
