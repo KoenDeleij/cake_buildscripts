@@ -720,17 +720,14 @@ Task("SonarBegin")
         Login = Configurator.SonarQubeToken,
         Verbose = true,
         ArgumentCustomization = args => 
-        {
-            args.Append("/d:sonar.cs.opencover.reportsPaths=\"**/coverage.opencover.xml\"");
-            args.Append("/d:sonar.scm.provider=\"git\"");
-            if(!string.IsNullOrEmpty(Configurator.SonarQubeExclusions))
-            {
-                args.Append($"/d:sonar.exclusions=\"{Configurator.SonarQubeExclusions}\"");
-            }
-        }
+            args.Append("/d:sonar.cs.opencover.reportsPaths=\"**/coverage.opencover.xml\"")
+                .Append("/d:sonar.scm.provider=\"git\"");
+                .Append(!string.IsNullOrEmpty(Configurator.SonarQubeExclusions)?
+                        $"/d:sonar.exclusions=\"{Configurator.SonarQubeExclusions}\""
+                        :string.Empty);
     };
 
-//CoverageExclusions = Configurator.SonarQubeExclusions,
+    //CoverageExclusions = Configurator.SonarQubeExclusions,
     if(!string.IsNullOrEmpty(Configurator.SonarQubeInclusions))
     {
         settings.Inclusions = Configurator.SonarQubeInclusions;
