@@ -723,7 +723,7 @@ Task("SonarBegin")
         {
             args.Append("/d:sonar.cs.opencover.reportsPaths=\"**/coverage.opencover.xml\"");
             args.Append("/d:sonar.scm.provider=\"git\"");
-            if(!string.IsNullOrEmpty)
+            if(!string.IsNullOrEmpty(Configurator.SonarQubeExclusions))
             {
                 args.Append($"/d:sonar.exclusions=\"{Configurator.SonarQubeExclusions}\"");
             }
